@@ -21,7 +21,6 @@ def load_config(path: str) -> dict:
 
             if not config:
                 raise ValueError("Config file empty")
-            
             return json.loads(config)
         
     except json.JSONDecodeError:
@@ -71,10 +70,14 @@ def config_check(config: Config) -> bool:
 
 
 def parser(path: str) -> Config:
-    config = Config(**load_config(path))
-    if config_check(config):
-        return config
-    else:
+    try:
+        config = Config(**load_config(path))
+        if config_check(config):
+            return config
+        else:
+            sys.exit()
+    except TypeError as e:
+        print(f"Error: {e}")
         sys.exit()
 
 
