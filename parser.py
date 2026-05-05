@@ -13,6 +13,15 @@ class Config(BaseModel):
     levels: list[dict[str, int]]
 
 
+def dict_raise_on_duplicate(pairs):
+    d = {}
+    for k, v in pairs:
+        if k in d:
+            raise ValueError(f"Double key: '{k}'")
+        d[k] = v
+    return d
+
+
 def load_config(path: str) -> dict:
     try:
         with open(path, 'r') as f:
@@ -21,7 +30,7 @@ def load_config(path: str) -> dict:
 
             if not config:
                 raise ValueError("Config file empty")
-            return json.loads(config)
+            return json.loads(config, object_pairs_hook=dict_raise_on_duplicate)
         
     except json.JSONDecodeError:
         print("Error: JSON not valid")
