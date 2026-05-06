@@ -92,5 +92,3 @@ def parser(path: str) -> Config:
 
 
 
-test = parser("./config.json")
-print(test)
