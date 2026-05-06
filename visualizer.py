@@ -9,18 +9,23 @@ class Visualizer():
         WIDTH=1280
         HEIGHT=720
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        self.screen.fill("purple")
-        pygame.display.update()
         self.running = True
-
+        self.screen.fill("white")
+        self.header_text = pygame.font.SysFont("Arial", 42)
+        pygame.display.update()
 
     def run(self) -> None:
         """The full game visualisation"""
+        background = pygame.Surface(self.screen.get_size())
+        background.fill((255,255,255))
+        self.screen.blit(background, (0,0))
+        pygame.display.flip()
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-            self.screen.fill("white")
+            text = self.header_text.render("PAC-MAN", True, "blue")
+            background.blit(text, (0, 0))
         pygame.quit()
 
     def _show_main_menu(self) -> None:
