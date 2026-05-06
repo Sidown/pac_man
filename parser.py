@@ -17,7 +17,7 @@ def dict_raise_on_duplicate(pairs):
     d = {}
     for k, v in pairs:
         if k in d:
-            raise ValueError(f"Double key: '{k}'")
+            raise ValueError(f'Double key: "{k}"')
         d[k] = v
     return d
 
@@ -38,7 +38,7 @@ def load_config(path: str) -> dict:
     
     except FileNotFoundError:
         print(f"File {path} not found")
-        sys.exit("")
+        sys.exit()
 
     except Exception as e:
         print(f"Error: {e}")
@@ -64,12 +64,17 @@ def config_check(config: Config) -> bool:
     if len(config.levels) < 10:
         errors.append(f"The game must have at least 10 levels (currently {len(config.levels)})")
     for level in config.levels:
-        if len(level) != 2:
+        if len(level) > 2:
             errors.append("A level must only contain a width and height")
-        if level['width'] < 0:
-            errors.append("The width of a level must be postive int")
-        if level['height'] < 0:
-            errors.append("The height of a level must be positive int")
+        if len(level) < 2:
+            errors.append("A level must have a width and a height key")
+        try:
+            if level['width'] <= 0:
+                errors.append("The width of a level must be postive int")
+            if level['height'] <= 0:
+                errors.append("The height of a level must be positive int")
+        except KeyError:
+            errors.append("Level must have a width an height key")
     if errors: 
         for error in errors:
             print(f"Error: {error}")
@@ -85,6 +90,10 @@ def parser(path: str) -> Config:
             return config
         else:
             sys.exit()
+
+    except ValidationError as e:
+        print(f"Error: {e}")
+        sys.exit()
     except TypeError as e:
         print(f"Error: {e}")
         sys.exit()
