@@ -1,12 +1,12 @@
-import parser
-from visualizer import Visualizer
 from mazegenerator.mazegenerator import MazeGenerator
 
+import parser
+from visualizer import Visualizer
 
 
 def main():
     print("Hello from pac-man!")
-    
+
     # Parsing
     config = parser.parser("./config.json")
     print(config)
@@ -15,12 +15,14 @@ def main():
     gui = Visualizer()
     gui.run()
     mazegenerator = MazeGenerator(
-        size = (15, 15),
-        entry_cell = (0, 0),
-        exit_cell = (-1, -1),
-        seed = 42,
+        size=(15, 15),
+        entry_cell=(0, 0),
+        exit_cell=(-1, -1),
+        seed=42,
     )
     mazegenerator.generate()
+    print("======")
+    print(f"maze: {mazegenerator._maze}")
 
 
 if __name__ == "__main__":
