@@ -28,10 +28,11 @@ class Ghost(ABC):
         self.is_vulnerable = False
         self.respawn_timer = 10
 
-    def get_moves_possible(self, maze: MazeGenerator):
+    def get_moves_possible(self, maze: MazeGenerator, x, y):
         possible = []
-        current_case_value = maze.maze[self.y][self.x]
-
+        if x >= maze._width or y >= maze._height or x < 0 or y < 0:
+            return []
+        current_case_value = maze.maze[y][x]
         if not (current_case_value & 1):
             possible.append("UP")
         if not (current_case_value & 4):
@@ -51,15 +52,41 @@ class Blinky(Ghost): # chases a* algo, dest player pos
     def __init__(self, color, spawn_x, spawn_y, is_frozen = False):
         super().__init__(color, spawn_x, spawn_y, is_frozen)
 
-    def next_move(self, player_pos: tuple[int], maze: MazeGenerator):
+    def next_move(self, player_pos: tuple[int], maze: MazeGenerator) -> tuple[int, int]:
+        """
+        DFS, prend en target la position du joueur, renvoi le prochain mouvement du drone.
+        a recall a chaque mouvement pour connaitre la prochaine dest en fonction du mouv du joueur
+        """
         if not self.is_frozen and self.alive and not self.is_vulnerable:
-            player_x = player_pos[0]
-            player_y = player_pos[1]
-            queue = {}
-            
+            visited = set()
+            stack = [(self.x, self.y, [(self.x, self.y)])]
+            target_x, target_y = player_pos
 
+            while stack:
+                x, y, path = stack.pop()
 
-        
+                if (x, y) in visited:
+                    continue
+                visited.add((x, y))
+
+                if x == target_x and y == target_y:
+                    return path[1]
+                moves = self.get_moves_possible(maze, x, y)
+                for move in moves:
+                    if move == 'DOWN':
+                        new_y = y + 1
+                        stack.append([x, new_y, path + [(x, new_y)]])
+                    elif move == 'UP':
+                        new_y = y -1
+                        stack.append([x, new_y, path + [(x, new_y)]])
+                    elif move == 'RIGHT':
+                        new_x = x + 1
+                        stack.append([new_x, y, path + [(new_x, y)]])
+                    elif move == 'LEFT':
+                        new_x = x - 1
+                        stack.append([new_x, y, path + [(new_x, y)]])
+                    else:
+                        pass
 
 
 class Pinky(Ghost): # ambushes a* algo, dest 2 case devant le player
@@ -92,3 +119,8 @@ class Clyde(Ghost): # weird
 
     def next_move(player_pos: tuple[int], maze):
         pass
+
+
+test = Blinky("red", 0, 0)
+maze = MazeGenerator()
+print(test.next_move((10, 10), maze))
