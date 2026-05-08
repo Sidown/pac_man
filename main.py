@@ -5,15 +5,13 @@ from visualizer import Visualizer
 
 
 def main():
-    print("Hello from pac-man!")
+    # print("Hello from pac-man!")
 
     # Parsing
     config = parser.parser("./config.json")
-    print(config)
+    # print(config)
 
-    # Visualisation
-    gui = Visualizer()
-    gui.run()
+    # Maze genereation
     mazegenerator = MazeGenerator(
         size=(15, 15),
         entry_cell=(0, 0),
@@ -21,8 +19,11 @@ def main():
         seed=42,
     )
     mazegenerator.generate()
-    print("======")
-    print(f"maze: {mazegenerator._maze}")
+
+    print(len(mazegenerator.maze))
+    # Visualisation
+    gui = Visualizer(mazegenerator)
+    gui.run()
 
 
 if __name__ == "__main__":
