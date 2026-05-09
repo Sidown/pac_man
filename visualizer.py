@@ -202,8 +202,8 @@ class Visualizer:
             pygame.draw.line(
                 self.screen,
                 wall_color,
-                (x - border_size, y - border_size),
-                (x + cell_width + border_size, y - border_size),
+                (x, y),
+                (x + cell_width + border_size, y),
                 border_size,
             )
         # east border
@@ -211,7 +211,7 @@ class Visualizer:
             pygame.draw.line(
                 self.screen,
                 wall_color,
-                (x + cell_width + border_size, y - border_size),
+                (x + border_size + cell_width, y),
                 (x + cell_width + border_size, y + cell_height + border_size),
                 border_size,
             )
@@ -220,7 +220,7 @@ class Visualizer:
             pygame.draw.line(
                 self.screen,
                 wall_color,
-                (x - border_size, y + cell_height + border_size),
+                (x, y + cell_height + border_size),
                 (x + cell_width + border_size, y + cell_height + border_size),
                 border_size,
             )
@@ -229,8 +229,8 @@ class Visualizer:
             pygame.draw.line(
                 self.screen,
                 wall_color,
-                (x - border_size, y - border_size),
-                (x - border_size, y + cell_height + border_size),
+                (x, y),
+                (x, y + cell_height + border_size),
                 border_size,
             )
 
