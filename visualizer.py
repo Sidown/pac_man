@@ -145,24 +145,31 @@ class Visualizer:
 
         maze_width = len(self.maze.maze)
         maze_height = len(self.maze.maze[0])
-        border_size = 10
+        border_size = 5
 
         cell_width = (
             self.WIDTH - (2 * self.PADDING) - ((maze_width + 1) * border_size)
         ) / maze_width
         cell_height = (
-            self.WIDTH - (2 * self.PADDING) - ((maze_height + 1) * border_size)
+            self.HEIGHT - (2 * self.PADDING) - ((maze_height + 1) * border_size)
         ) / maze_height
 
+        print(f"self.WIDTH: {self.WIDTH} | cell_width: {cell_width}")
         self.screen.fill((149, 204, 144))
 
         curr_x = self.PADDING
         curr_y = self.PADDING
 
         for row_nb in range(maze_height):
+            print_down = False
+            if row_nb == (maze_height - 1):
+                print_down = True
             for col_nb in range(maze_width):
-                curr_x += cell_width
                 opp_code = self.maze.maze[row_nb][col_nb]
+                print_right = False
+                if col_nb == (maze_width - 1):
+                    print_right = True
+
                 self._print_cell(
                     curr_x,
                     curr_y,
@@ -171,9 +178,12 @@ class Visualizer:
                     opp_code,
                     border_size,
                     (126, 29, 29),
+                    print_right,
+                    print_down,
                 )
+                curr_x += cell_width + (border_size)
             curr_x = self.PADDING
-            curr_y += cell_height
+            curr_y += cell_height + (border_size)
 
     def _print_cell(
         self,
@@ -184,32 +194,34 @@ class Visualizer:
         opp_code: int,
         border_size: int,
         wall_color: tuple[int, int, int],
+        print_east: bool,
+        print_down: bool,
     ) -> None:
         # upper border
         if opp_code & 0b0001:
             pygame.draw.line(
                 self.screen,
                 wall_color,
-                (x, y),
-                (x + cell_width, y),
+                (x - border_size, y - border_size),
+                (x + cell_width + border_size, y - border_size),
                 border_size,
             )
         # east border
-        if opp_code & 0b0010:
+        if (opp_code & 0b0010) and print_east:
             pygame.draw.line(
                 self.screen,
                 wall_color,
-                (x + cell_width, y),
-                (x + cell_width, y + cell_height),
+                (x + cell_width + border_size, y - border_size),
+                (x + cell_width + border_size, y + cell_height + border_size),
                 border_size,
             )
         # south border
-        if opp_code & 0b0100:
+        if (opp_code & 0b0100) and print_down:
             pygame.draw.line(
                 self.screen,
                 wall_color,
-                (x, y + cell_height),
-                (x + cell_width, y + cell_height),
+                (x - border_size, y + cell_height + border_size),
+                (x + cell_width + border_size, y + cell_height + border_size),
                 border_size,
             )
         # west border
@@ -217,8 +229,8 @@ class Visualizer:
             pygame.draw.line(
                 self.screen,
                 wall_color,
-                (x, y),
-                (x, y + cell_height),
+                (x - border_size, y - border_size),
+                (x - border_size, y + cell_height + border_size),
                 border_size,
             )
 
