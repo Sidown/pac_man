@@ -60,12 +60,29 @@ class Visualizer:
         self.WIDTH = 960
         self.HEIGHT = 720
         self.PADDING = 50
-        self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        self.bg = pygame.image.load("assets/background/main_background.jpg")
-        self.pac_man = pygame.image.load("assets/skin/skin_survivor.png")
-        self.ghost = pygame.image.load("assets/skin/skin_zombie.png")
         self.maze: MazeGenerator = maze
+        self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.maze_width = len(self.maze.maze)
+        self.maze_height = len(self.maze.maze[0])
+        self.border_size = 5
+        self.cell_width = (
+            self.WIDTH - (2 * self.PADDING) - ((self.maze_width + 1) * self.border_size)
+        ) / self.maze_width
+        self.cell_height = (
+            self.HEIGHT
+            - (2 * self.PADDING)
+            - ((self.maze_height + 1) * self.border_size)
+        ) / self.maze_height
 
+        self.bg = pygame.image.load("assets/background/main_background.jpg")
+        self.pac_man = pygame.transform.scale(
+            pygame.image.load("assets/skin/skin_survivor.png"),
+            (self.cell_width, self.cell_height),
+        )
+        self.ghost = pygame.transform.scale(
+            pygame.image.load("assets/skin/skin_zombie.png"),
+            (self.cell_width, self.cell_height),
+        )
         pygame.init()
 
     def _show_main_menu(self) -> None:
@@ -145,50 +162,38 @@ class Visualizer:
     def _print_maze(self) -> None:
         """Print the maze."""
 
-        maze_width = len(self.maze.maze)
-        maze_height = len(self.maze.maze[0])
-        border_size = 5
-
-        cell_width = (
-            self.WIDTH - (2 * self.PADDING) - ((maze_width + 1) * border_size)
-        ) / maze_width
-        cell_height = (
-            self.HEIGHT - (2 * self.PADDING) - ((maze_height + 1) * border_size)
-        ) / maze_height
-
-        print(f"self.WIDTH: {self.WIDTH} | cell_width: {cell_width}")
         self.screen.fill((149, 204, 144))
 
         curr_x = self.PADDING
         curr_y = self.PADDING
 
-        for row_nb in range(maze_height):
+        for row_nb in range(self.maze_height):
             print_down = False
-            if row_nb == (maze_height - 1):
+            if row_nb == (self.maze_height - 1):
                 print_down = True
-            for col_nb in range(maze_width):
+            for col_nb in range(self.maze_width):
                 opp_code = self.maze.maze[row_nb][col_nb]
                 print_right = False
-                if col_nb == (maze_width - 1):
+                if col_nb == (self.maze_width - 1):
                     print_right = True
 
                 self._print_cell(
                     curr_x,
                     curr_y,
-                    cell_width,
-                    cell_height,
+                    self.cell_width,
+                    self.cell_height,
                     opp_code,
-                    border_size,
+                    self.border_size,
                     (126, 29, 29),
                     print_right,
                     print_down,
                 )
-                curr_x += cell_width + (border_size)
+                curr_x += self.cell_width + (self.border_size)
             curr_x = self.PADDING
-            curr_y += cell_height + (border_size)
+            curr_y += self.cell_height + (self.border_size)
         self._print_skin(self.pac_man, self.PADDING, self.PADDING)
         self._print_skin(
-            self.ghost, self.PADDING + cell_width, self.PADDING + cell_height
+            self.ghost, self.PADDING + self.cell_width, self.PADDING + self.cell_height
         )
 
     def _print_cell(
@@ -242,7 +247,7 @@ class Visualizer:
 
     def _print_skin(self, skin: Surface, x, y) -> None:
         """A function that print a Skin on the maze."""
-        self.screen.blit(skin, (x, y))
+        self.screen.blit(skin, (x + self.border_size, y + self.border_size))
 
     def _show_game(self) -> None:
         """The Game screen"""
