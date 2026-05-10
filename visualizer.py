@@ -28,9 +28,11 @@ class Boxed_text:
         self.font_size: int = font_size
         self.font_color: tuple[int, int, int] = font_color
         self.rect: Rect
+        self.center_x: bool = False
 
     def create_boxed_text(self, center_x: bool) -> None:
         """Create a box containing a text."""
+        self.center_x = center_x
         font = pygame.font.Font(self.font_path, self.font_size)
         text = font.render(self.text, False, self.font_color)
 
@@ -40,7 +42,30 @@ class Boxed_text:
         x2 = text.get_width()
         y2 = text.get_height()
 
-        if center_x:
+        if self.center_x:
+            width = self.screen.get_width()
+            text_width = text.get_width()
+            x1 = (width // 2) - (text_width // 2)
+            x2 = text_width
+
+        self.rect = pygame.Rect(x1, y1, x2, y2)
+
+        # print the rect and the text on the surface.
+        pygame.draw.rect(self.screen, (255, 255, 255), self.rect)
+        self.screen.blit(text, (x1, y1))
+
+    def set_color(self, color: tuple[int, int, int]) -> None:
+        """Change the button color."""
+        font = pygame.font.Font(self.font_path, self.font_size)
+        text = font.render(self.text, False, color)
+
+        # calculate the coordinate of the rect
+        x1 = self.x
+        y1 = self.y
+        x2 = text.get_width()
+        y2 = text.get_height()
+
+        if self.center_x:
             width = self.screen.get_width()
             text_width = text.get_width()
             x1 = (width // 2) - (text_width // 2)
@@ -133,14 +158,17 @@ class Visualizer:
         if pygame.mouse.get_focused():
             x, y = pygame.mouse.get_pos()
             if btn_game.rect.collidepoint(x, y):
+                btn_game.set_color((200, 200, 200))
                 pressed = pygame.mouse.get_pressed()
                 if pressed[0]:
                     self._show_game()
             if btn_high_score.rect.collidepoint(x, y):
+                btn_high_score.set_color((200, 200, 200))
                 pressed = pygame.mouse.get_pressed()
                 if pressed[0]:
                     print("let's view the highest score!")
             if btn_theme.rect.collidepoint(x, y):
+                btn_theme.set_color((200, 200, 200))
                 pressed = pygame.mouse.get_pressed()
                 if pressed[0]:
                     print("Ok we will set up a new theme !")
@@ -163,6 +191,25 @@ class Visualizer:
         """Print the maze."""
 
         self.screen.fill((149, 204, 144))
+
+        # bouton pour revenir au main menu.
+        btn_back_to_main_menu = Boxed_text(
+            self.screen,
+            "Back to main menu",
+            (10, 10),
+            "assets/fonts/shlop rg.otf",
+            24,
+            (126, 29, 29),
+        )
+        btn_back_to_main_menu.create_boxed_text(False)
+        if pygame.mouse.get_focused():
+            x, y = pygame.mouse.get_pos()
+            if btn_back_to_main_menu.rect.collidepoint(x, y):
+                btn_back_to_main_menu.set_color((200, 200, 200))
+                pressed = pygame.mouse.get_pressed()
+                if pressed[0]:
+                    self.run()
+                    return
 
         curr_x = self.PADDING
         curr_y = self.PADDING
