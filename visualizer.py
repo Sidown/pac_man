@@ -57,11 +57,13 @@ class Visualizer:
     """"""
 
     def __init__(self, maze: MazeGenerator) -> None:
-        self.WIDTH = 540
-        self.HEIGHT = 960
+        self.WIDTH = 960
+        self.HEIGHT = 720
         self.PADDING = 50
         self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        self.bg = pygame.image.load("assets/background/zombie.jpg")
+        self.bg = pygame.image.load("assets/background/main_background.jpg")
+        self.pac_man = pygame.image.load("assets/skin/skin_survivor.png")
+        self.ghost = pygame.image.load("assets/skin/skin_zombie.png")
         self.maze: MazeGenerator = maze
 
         pygame.init()
@@ -184,6 +186,10 @@ class Visualizer:
                 curr_x += cell_width + (border_size)
             curr_x = self.PADDING
             curr_y += cell_height + (border_size)
+        self._print_skin(self.pac_man, self.PADDING, self.PADDING)
+        self._print_skin(
+            self.ghost, self.PADDING + cell_width, self.PADDING + cell_height
+        )
 
     def _print_cell(
         self,
@@ -233,6 +239,10 @@ class Visualizer:
                 (x, y + cell_height + border_size),
                 border_size,
             )
+
+    def _print_skin(self, skin: Surface, x, y) -> None:
+        """A function that print a Skin on the maze."""
+        self.screen.blit(skin, (x, y))
 
     def _show_game(self) -> None:
         """The Game screen"""
