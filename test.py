@@ -47,3 +47,7 @@
 # solutions = []
 # path = []
 # print(dfs((0,0), path, solutions, (0,0), (10,10)))
+
+
+if self.is_vulnerable or dist((self.x, self.y), (player.x, player.y)) <= 3:
+                self.target = self.spawn

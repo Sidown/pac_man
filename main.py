@@ -1,4 +1,5 @@
 from mazegenerator.mazegenerator import MazeGenerator
+from ghost import Blinky, Pinky, Inky, Clyde, Player
 
 import parser
 from visualizer import Visualizer
@@ -19,9 +20,15 @@ def main():
         seed=42,
     )
     mazegenerator.generate()
+    player = Player(3, 2, 2) # a remplacer par le player definitif
+    blinky = Blinky("./assets/skin/skin_zombie.png", 14, 14, mazegenerator, player)
+    pinky = Pinky("./assets/skin/skin_zombie.png", 14, 14, mazegenerator, player)
+    inky = Inky("./assets/skin/skin_zombie.png", 14, 14, mazegenerator, player, blinky, pinky)
+    clyde = Clyde("./assets/skin/skin_zombie.png", 14, 14, mazegenerator, player)
+
 
     # Visualisation
-    gui = Visualizer(mazegenerator)
+    gui = Visualizer(mazegenerator, clyde)
     gui.run()
 
 

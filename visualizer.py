@@ -1,6 +1,7 @@
 import pygame
 from mazegenerator.mazegenerator import MazeGenerator
-from pygame import Rect, Surface
+from pygame import Rect, Surface, time
+from ghost import Ghost
 
 # idee creatives:
 # - Mode Zombie -18 => fond: shlop rg.otf
@@ -81,14 +82,14 @@ class Boxed_text:
 class Visualizer:
     """"""
 
-    def __init__(self, maze: MazeGenerator) -> None:
+    def __init__(self, maze: MazeGenerator, ghost: Ghost) -> None:
         self.WIDTH = 960
         self.HEIGHT = 720
         self.PADDING = 50
         self.maze: MazeGenerator = maze
         self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        self.maze_width = len(self.maze.maze)
-        self.maze_height = len(self.maze.maze[0])
+        self.maze_height = len(self.maze.maze)
+        self.maze_width = len(self.maze.maze[0])
         self.border_size = 5
         self.cell_width = (
             self.WIDTH - (2 * self.PADDING) - ((self.maze_width + 1) * self.border_size)
@@ -104,10 +105,11 @@ class Visualizer:
             pygame.image.load("assets/skin/skin_survivor.png"),
             (self.cell_width, self.cell_height),
         )
-        self.ghost = pygame.transform.scale(
-            pygame.image.load("assets/skin/skin_zombie.png"),
-            (self.cell_width, self.cell_height),
-        )
+        # self.ghost = pygame.transform.scale(
+        #     pygame.image.load(ghost.skin),
+        #     (self.cell_width, self.cell_height),
+        # )
+        self.ghost = ghost
         pygame.init()
 
     def _show_main_menu(self) -> None:
@@ -240,7 +242,10 @@ class Visualizer:
             curr_y += self.cell_height + (self.border_size)
         self._print_skin(self.pac_man, self.PADDING, self.PADDING)
         self._print_skin(
-            self.ghost, self.PADDING + self.cell_width, self.PADDING + self.cell_height
+            pygame.transform.scale(
+            pygame.image.load(self.ghost.skin),
+            (self.cell_width, self.cell_height),
+            ), self.PADDING + (self.cell_width + self.border_size) * self.ghost.x, self.PADDING + (self.cell_height + self.border_size) * self.ghost.y
         )
 
     def _print_cell(
@@ -299,13 +304,16 @@ class Visualizer:
     def _show_game(self) -> None:
         """The Game screen"""
         game_running = True
+        clock = time.Clock()
         while game_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     game_running = False
             self.screen.blit(self.bg, (0, 0))
+            self.ghost.play()
             self._print_maze()
             pygame.display.flip()
+            clock.tick(10)
         pygame.quit()
 
     def _show_game_over(self) -> None:
