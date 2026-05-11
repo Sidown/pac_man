@@ -20,7 +20,6 @@ def main():
     )
     mazegenerator.generate()
 
-    print(len(mazegenerator.maze))
     # Visualisation
     gui = Visualizer(mazegenerator)
     gui.run()
