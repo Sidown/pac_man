@@ -1,0 +1,313 @@
+import pygame
+from mazegenerator.mazegenerator import MazeGenerator
+from pygame import Rect, Surface
+
+# idee creatives:
+# - Mode Zombie -18 => fond: shlop rg.otf
+# - Mode Sex -18
+# - drogue
+# - alcolique
+# - sucre
+# - mode 42.
+
+
+class Boxed_text:
+    def __init__(
+        self,
+        screen: Surface,
+        text: str,
+        coordinate: tuple[int, int],
+        font_path: str,
+        font_size: int,
+        font_color: tuple[int, int, int],
+    ) -> None:
+        self.screen: Surface = screen
+        self.text: str = text
+        self.x, self.y = coordinate
+        self.font_path: str = font_path
+        self.font_size: int = font_size
+        self.font_color: tuple[int, int, int] = font_color
+        self.rect: Rect
+        self.center_x: bool = False
+
+    def create_boxed_text(self, center_x: bool) -> None:
+        """Create a box containing a text."""
+        self.center_x = center_x
+        font = pygame.font.Font(self.font_path, self.font_size)
+        text = font.render(self.text, False, self.font_color)
+
+        # calculate the coordinate of the rect
+        x1 = self.x
+        y1 = self.y
+        x2 = text.get_width()
+        y2 = text.get_height()
+
+        if self.center_x:
+            width = self.screen.get_width()
+            text_width = text.get_width()
+            x1 = (width // 2) - (text_width // 2)
+            x2 = text_width
+
+        self.rect = pygame.Rect(x1, y1, x2, y2)
+
+        # print the rect and the text on the surface.
+        pygame.draw.rect(self.screen, (255, 255, 255), self.rect)
+        self.screen.blit(text, (x1, y1))
+
+    def set_color(self, color: tuple[int, int, int]) -> None:
+        """Change the button color."""
+        font = pygame.font.Font(self.font_path, self.font_size)
+        text = font.render(self.text, False, color)
+
+        # calculate the coordinate of the rect
+        x1 = self.x
+        y1 = self.y
+        x2 = text.get_width()
+        y2 = text.get_height()
+
+        if self.center_x:
+            width = self.screen.get_width()
+            text_width = text.get_width()
+            x1 = (width // 2) - (text_width // 2)
+            x2 = text_width
+
+        self.rect = pygame.Rect(x1, y1, x2, y2)
+
+        # print the rect and the text on the surface.
+        pygame.draw.rect(self.screen, (255, 255, 255), self.rect)
+        self.screen.blit(text, (x1, y1))
+
+
+class Visualizer:
+    """"""
+
+    def __init__(self, maze: MazeGenerator) -> None:
+        self.WIDTH = 960
+        self.HEIGHT = 720
+        self.PADDING = 50
+        self.maze: MazeGenerator = maze
+        self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.maze_width = len(self.maze.maze)
+        self.maze_height = len(self.maze.maze[0])
+        self.border_size = 5
+        self.cell_width = (
+            self.WIDTH - (2 * self.PADDING) - ((self.maze_width + 1) * self.border_size)
+        ) / self.maze_width
+        self.cell_height = (
+            self.HEIGHT
+            - (2 * self.PADDING)
+            - ((self.maze_height + 1) * self.border_size)
+        ) / self.maze_height
+
+        self.bg = pygame.image.load("assets/background/main_background.jpg")
+        self.pac_man = pygame.transform.scale(
+            pygame.image.load("assets/skin/skin_survivor.png"),
+            (self.cell_width, self.cell_height),
+        )
+        self.ghost = pygame.transform.scale(
+            pygame.image.load("assets/skin/skin_zombie.png"),
+            (self.cell_width, self.cell_height),
+        )
+        pygame.init()
+
+    def _show_main_menu(self) -> None:
+        """Show the home page of the Pac-Man game."""
+
+        header = Boxed_text(
+            self.screen,
+            "Pac-Man, Will you survive...",
+            ((self.WIDTH // 2), 30),
+            "assets/fonts/shlop rg.otf",
+            56,
+            (126, 29, 29),
+        )
+
+        btn_game = Boxed_text(
+            self.screen,
+            "New Game",
+            ((self.WIDTH // 2), 250),
+            "assets/fonts/shlop rg.otf",
+            42,
+            (126, 29, 29),
+        )
+
+        btn_high_score = Boxed_text(
+            self.screen,
+            "View High Score",
+            ((self.WIDTH // 2), 350),
+            "assets/fonts/shlop rg.otf",
+            42,
+            (126, 29, 29),
+        )
+
+        btn_theme = Boxed_text(
+            self.screen,
+            "Change Theme",
+            ((self.WIDTH // 2), 450),
+            "assets/fonts/shlop rg.otf",
+            42,
+            (126, 29, 29),
+        )
+
+        header.create_boxed_text(True)
+        btn_game.create_boxed_text(True)
+        btn_high_score.create_boxed_text(True)
+        btn_theme.create_boxed_text(True)
+
+        # Managed mouse click
+        if pygame.mouse.get_focused():
+            x, y = pygame.mouse.get_pos()
+            if btn_game.rect.collidepoint(x, y):
+                btn_game.set_color((200, 200, 200))
+                pressed = pygame.mouse.get_pressed()
+                if pressed[0]:
+                    self._show_game()
+            if btn_high_score.rect.collidepoint(x, y):
+                btn_high_score.set_color((200, 200, 200))
+                pressed = pygame.mouse.get_pressed()
+                if pressed[0]:
+                    print("let's view the highest score!")
+            if btn_theme.rect.collidepoint(x, y):
+                btn_theme.set_color((200, 200, 200))
+                pressed = pygame.mouse.get_pressed()
+                if pressed[0]:
+                    print("Ok we will set up a new theme !")
+
+    def run(self) -> None:
+        """The full game visualisation"""
+        pygame.display.set_caption("Pac-Man")
+        running = True
+
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+            self.screen.blit(self.bg, (0, 0))
+            self._show_main_menu()
+            pygame.display.flip()
+        pygame.quit()
+
+    def _print_maze(self) -> None:
+        """Print the maze."""
+
+        self.screen.fill((149, 204, 144))
+
+        # bouton pour revenir au main menu.
+        btn_back_to_main_menu = Boxed_text(
+            self.screen,
+            "Back to main menu",
+            (10, 10),
+            "assets/fonts/shlop rg.otf",
+            24,
+            (126, 29, 29),
+        )
+        btn_back_to_main_menu.create_boxed_text(False)
+        if pygame.mouse.get_focused():
+            x, y = pygame.mouse.get_pos()
+            if btn_back_to_main_menu.rect.collidepoint(x, y):
+                btn_back_to_main_menu.set_color((200, 200, 200))
+                pressed = pygame.mouse.get_pressed()
+                if pressed[0]:
+                    self.run()
+                    return
+
+        curr_x = self.PADDING
+        curr_y = self.PADDING
+
+        for row_nb in range(self.maze_height):
+            print_down = False
+            if row_nb == (self.maze_height - 1):
+                print_down = True
+            for col_nb in range(self.maze_width):
+                opp_code = self.maze.maze[row_nb][col_nb]
+                print_right = False
+                if col_nb == (self.maze_width - 1):
+                    print_right = True
+
+                self._print_cell(
+                    curr_x,
+                    curr_y,
+                    self.cell_width,
+                    self.cell_height,
+                    opp_code,
+                    self.border_size,
+                    (126, 29, 29),
+                    print_right,
+                    print_down,
+                )
+                curr_x += self.cell_width + (self.border_size)
+            curr_x = self.PADDING
+            curr_y += self.cell_height + (self.border_size)
+        self._print_skin(self.pac_man, self.PADDING, self.PADDING)
+        self._print_skin(
+            self.ghost, self.PADDING + self.cell_width, self.PADDING + self.cell_height
+        )
+
+    def _print_cell(
+        self,
+        x: int | float,
+        y: int | float,
+        cell_width: int | float,
+        cell_height: int | float,
+        opp_code: int,
+        border_size: int,
+        wall_color: tuple[int, int, int],
+        print_east: bool,
+        print_down: bool,
+    ) -> None:
+        # upper border
+        if opp_code & 0b0001:
+            pygame.draw.line(
+                self.screen,
+                wall_color,
+                (x, y),
+                (x + cell_width + border_size, y),
+                border_size,
+            )
+        # east border
+        if (opp_code & 0b0010) and print_east:
+            pygame.draw.line(
+                self.screen,
+                wall_color,
+                (x + border_size + cell_width, y),
+                (x + cell_width + border_size, y + cell_height + border_size),
+                border_size,
+            )
+        # south border
+        if (opp_code & 0b0100) and print_down:
+            pygame.draw.line(
+                self.screen,
+                wall_color,
+                (x, y + cell_height + border_size),
+                (x + cell_width + border_size, y + cell_height + border_size),
+                border_size,
+            )
+        # west border
+        if opp_code & 0b1000:
+            pygame.draw.line(
+                self.screen,
+                wall_color,
+                (x, y),
+                (x, y + cell_height + border_size),
+                border_size,
+            )
+
+    def _print_skin(self, skin: Surface, x, y) -> None:
+        """A function that print a Skin on the maze."""
+        self.screen.blit(skin, (x + self.border_size, y + self.border_size))
+
+    def _show_game(self) -> None:
+        """The Game screen"""
+        game_running = True
+        while game_running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game_running = False
+            self.screen.blit(self.bg, (0, 0))
+            self._print_maze()
+            pygame.display.flip()
+        pygame.quit()
+
+    def _show_game_over(self) -> None:
+        """The Gane Over screen"""
+        pass

@@ -1,10 +1,18 @@
 .PHONY: install run debug lint clean
 
+MAZE_GENERATOR=mazegenerator-00001-py3-none-any.whl
+
 install:
 	uv sync
+	UV_SKIP_WHEEL_FILENAME_CHECK=1 uv pip install $(MAZE_GENERATOR)
 
+<<<<<<< HEAD
 run:
 	UV_SKIP_WHEEL_FILENAME_CHECK=1 uv run python -m ghost
+=======
+run: install
+	uv run main.py
+>>>>>>> visualizer
 
 debug:
 	uv run python -m pdb -m ghost
