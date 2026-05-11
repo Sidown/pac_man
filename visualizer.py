@@ -2,6 +2,8 @@ import pygame
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Rect, Surface
 
+from ghost import Player
+
 # idee creatives:
 # - Mode Zombie -18 => fond: shlop rg.otf
 # - Mode Sex -18
@@ -87,8 +89,8 @@ class Visualizer:
         self.PADDING = 50
         self.maze: MazeGenerator = maze
         self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        self.maze_width = len(self.maze.maze)
-        self.maze_height = len(self.maze.maze[0])
+        self.maze_width = len(self.maze.maze[0])
+        self.maze_height = len(self.maze.maze)
         self.border_size = 5
         self.cell_width = (
             self.WIDTH - (2 * self.PADDING) - ((self.maze_width + 1) * self.border_size)
@@ -100,10 +102,16 @@ class Visualizer:
         ) / self.maze_height
 
         self.bg = pygame.image.load("assets/background/main_background.jpg")
-        self.pac_man = pygame.transform.scale(
-            pygame.image.load("assets/skin/skin_survivor.png"),
-            (self.cell_width, self.cell_height),
+        self.player = Player(
+            5,
+            self.maze_height,
+            self.maze_width,
+            pygame.transform.scale(
+                pygame.image.load("assets/skin/skin_survivor.png"),
+                (self.cell_width, self.cell_height),
+            ),
         )
+
         self.ghost = pygame.transform.scale(
             pygame.image.load("assets/skin/skin_zombie.png"),
             (self.cell_width, self.cell_height),
@@ -189,9 +197,7 @@ class Visualizer:
 
     def _print_maze(self) -> None:
         """Print the maze."""
-
         self.screen.fill((149, 204, 144))
-
         # bouton pour revenir au main menu.
         btn_back_to_main_menu = Boxed_text(
             self.screen,
@@ -214,6 +220,7 @@ class Visualizer:
         curr_x = self.PADDING
         curr_y = self.PADDING
 
+        # afficher le maze
         for row_nb in range(self.maze_height):
             print_down = False
             if row_nb == (self.maze_height - 1):
@@ -238,10 +245,38 @@ class Visualizer:
                 curr_x += self.cell_width + (self.border_size)
             curr_x = self.PADDING
             curr_y += self.cell_height + (self.border_size)
-        self._print_skin(self.pac_man, self.PADDING, self.PADDING)
-        self._print_skin(
-            self.ghost, self.PADDING + self.cell_width, self.PADDING + self.cell_height
-        )
+
+    def _is_neighbor(
+        self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int
+    ) -> bool:
+        """A function to know if the movement to the next cell is possible."""
+        curr_x, curr_y = current_cell
+        next_x, next_y = next_cell
+        # print(f"curr_x: {curr_x} | curr_y: {curr_y}")
+        # print(f"next_x: {next_x} | next_y: {next_y}")
+        # if player want to go up:
+        if curr_y > next_y:
+            print("I want to go up")
+            if not opp_code & 0b0001:
+                return True
+        # if player want to go down:
+        elif curr_y < next_y:
+            print("I want to go to down")
+            if not opp_code & 0b0100:
+                return True
+        # if player want to go right:
+        elif curr_x < next_x:
+            print("I want to go to the right")
+            if not opp_code & 0b0010:
+                print("there is no border to the right")
+                return True
+        elif curr_x > next_x:
+            print("I want to go to the left")
+            if not opp_code & 0b1000:
+                return True
+        else:
+            return False
+        return False
 
     def _print_cell(
         self,
@@ -292,9 +327,15 @@ class Visualizer:
                 border_size,
             )
 
-    def _print_skin(self, skin: Surface, x, y) -> None:
+    def _print_skin(self, skin: Surface, x_cell, y_cell) -> None:
         """A function that print a Skin on the maze."""
-        self.screen.blit(skin, (x + self.border_size, y + self.border_size))
+        self.screen.blit(
+            skin,
+            (
+                self.PADDING + x_cell * (self.border_size + self.cell_width),
+                self.PADDING + y_cell * (self.border_size + self.cell_height),
+            ),
+        )
 
     def _show_game(self) -> None:
         """The Game screen"""
@@ -303,8 +344,48 @@ class Visualizer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     game_running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        self.player.direction = "N"
+                    if event.key == pygame.K_DOWN:
+                        self.player.direction = "S"
+                    if event.key == pygame.K_RIGHT:
+                        self.player.direction = "E"
+                    if event.key == pygame.K_LEFT:
+                        self.player.direction = "W"
             self.screen.blit(self.bg, (0, 0))
             self._print_maze()
+            # deplacer le personnage en fonction de la direction et en respectant les contraintes de murs ...
+            if self.player.direction == "":
+                pass
+            if self.player.direction == "N" and self._is_neighbor(
+                (self.player.x, self.player.y),
+                (self.player.x, self.player.y - 1),
+                self.maze.maze[self.player.y][self.player.x],
+            ):
+                self.player.y = self.player.y - 1
+            if self.player.direction == "S" and self._is_neighbor(
+                (self.player.x, self.player.y),
+                (self.player.x, self.player.y + 1),
+                self.maze.maze[self.player.y][self.player.x],
+            ):
+                self.player.y = self.player.y + 1
+            if self.player.direction == "W" and self._is_neighbor(
+                (self.player.x, self.player.y),
+                (self.player.x - 1, self.player.y),
+                self.maze.maze[self.player.y][self.player.x],
+            ):
+                self.player.x = self.player.x - 1
+            if self.player.direction == "E" and self._is_neighbor(
+                (self.player.x, self.player.y),
+                (self.player.x + 1, self.player.y),
+                self.maze.maze[self.player.y][self.player.x],
+            ):
+                print("successfully passed to the right")
+                self.player.x = self.player.x + 1
+            self._print_skin(self.player.skin, self.player.x, self.player.y)
+            # TODO: print les ghosts.
+            # self._print_skin(self.ghost, 1, 1)
             pygame.display.flip()
         pygame.quit()
 

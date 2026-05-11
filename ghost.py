@@ -1,18 +1,20 @@
-from enum import Enum
 from abc import ABC, abstractmethod
+from enum import Enum
 from math import dist
+
 from mazegenerator.mazegenerator import MazeGenerator
+from pygame import Surface
 
 
 class Player:
-    def __init__(self, lives: int, maze_height: int, maze_width: int):
+    def __init__(self, lives: int, maze_height: int, maze_width: int, skin: Surface):
         self.lives: int = lives
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
-        self.direction: str = None
+        self.direction: str = ""
+        self.skin: Surface = skin
         self.score = 0
         self.speed = 1
-        
 
 
 class Ghost(ABC):
@@ -27,9 +29,9 @@ class Ghost(ABC):
         self.is_frozen = is_frozen
         self.respawn_timer = 0
         self.speed = 0.8
-    
+
     @abstractmethod
-    def next_move(self, player: Player, maze: MazeGenerator): 
+    def next_move(self, player: Player, maze: MazeGenerator):
         pass
 
     def respawn(self):
@@ -55,15 +57,16 @@ class Ghost(ABC):
             possible.append("LEFT")
         if not (current_case_value & 2):
             possible.append("RIGHT")
-        
+
         return possible
 
 
-class Blinky(Ghost): # chases, dest player pos
+class Blinky(Ghost):  # chases, dest player pos
     """Follows Pac-Man directly during Chase mode, and heads to the upper-right corner
     during Scatter mode. He also has an "angry" mode that is triggered when there are a
     certain number of dots left in the maze."""
-    def __init__(self, color, spawn_x, spawn_y, is_frozen = False):
+
+    def __init__(self, color, spawn_x, spawn_y, is_frozen=False):
         super().__init__(color, spawn_x, spawn_y, is_frozen)
 
     def next_move(self, player: Player, maze: MazeGenerator) -> tuple[int, int]:
@@ -94,28 +97,28 @@ class Blinky(Ghost): # chases, dest player pos
                     return path[1]
                 moves = self.get_moves_possible(maze, x, y)
                 for move in moves:
-                    if move == 'DOWN':
+                    if move == "DOWN":
                         new_y = y + 1
                         stack.append([x, new_y, path + [(x, new_y)]])
-                    elif move == 'UP':
-                        new_y = y -1
+                    elif move == "UP":
+                        new_y = y - 1
                         stack.append([x, new_y, path + [(x, new_y)]])
-                    elif move == 'RIGHT':
+                    elif move == "RIGHT":
                         new_x = x + 1
                         stack.append([new_x, y, path + [(new_x, y)]])
-                    elif move == 'LEFT':
+                    elif move == "LEFT":
                         new_x = x - 1
                         stack.append([new_x, y, path + [(new_x, y)]])
                     else:
                         pass
 
 
-
-class Pinky(Ghost): # ambushes, dest 2 case devant le player
+class Pinky(Ghost):  # ambushes, dest 2 case devant le player
     """Chases towards the spot 2 Pac-Dots in front of Pac-Man. Due to a bug in the original
     game's coding, if Pac-Man faces upwards, Pinky's target will be 2 Pac-Dots in front of and 2
     to the left of Pac-Man. During Scatter mode, she heads towards the upper-left corner."""
-    def __init__(self, color, spawn_x, spawn_y, is_frozen = False):
+
+    def __init__(self, color, spawn_x, spawn_y, is_frozen=False):
         super().__init__(color, spawn_x, spawn_y, is_frozen)
 
     def next_move(self, player: Player, maze: MazeGenerator) -> tuple[int, int]:
@@ -151,7 +154,7 @@ class Pinky(Ghost): # ambushes, dest 2 case devant le player
 
                 elif player.direction == "LEFT":
                     if player.x - 2 >= 0:
-                        self.target = (player.x -2, player.y)
+                        self.target = (player.x - 2, player.y)
                     else:
                         self.target = (player.x, player.y)
 
@@ -173,30 +176,33 @@ class Pinky(Ghost): # ambushes, dest 2 case devant le player
                     return path[1]
                 moves = self.get_moves_possible(maze, x, y)
                 for move in moves:
-                    if move == 'DOWN':
+                    if move == "DOWN":
                         new_y = y + 1
                         stack.append([x, new_y, path + [(x, new_y)]])
-                    elif move == 'UP':
-                        new_y = y -1
+                    elif move == "UP":
+                        new_y = y - 1
                         stack.append([x, new_y, path + [(x, new_y)]])
-                    elif move == 'RIGHT':
+                    elif move == "RIGHT":
                         new_x = x + 1
                         stack.append([new_x, y, path + [(new_x, y)]])
-                    elif move == 'LEFT':
+                    elif move == "LEFT":
                         new_x = x - 1
                         stack.append([new_x, y, path + [(new_x, y)]])
                     else:
                         pass
 
 
-class Inky(Ghost): # unpredictable, dest = distance entre blinky et pinky target * 2
+class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky target * 2
     """During Chase mode, his target is a bit complex. His target is relative to both
     Blinky and Pac-Man, where the distance Blinky is from Pinky's target is doubled to
     get Inky's target. He heads to the lower-right corner during Scatter mode."""
-    def __init__(self, color, spawn_x, spawn_y, is_frozen = False):
+
+    def __init__(self, color, spawn_x, spawn_y, is_frozen=False):
         super().__init__(color, spawn_x, spawn_y, is_frozen)
 
-    def next_move(self, player: Player, maze: MazeGenerator, blinky: Blinky, pinky: Pinky) -> tuple[int, int]:
+    def next_move(
+        self, player: Player, maze: MazeGenerator, blinky: Blinky, pinky: Pinky
+    ) -> tuple[int, int]:
         """
         DFS, prend en target la position du joueur, renvoi le prochain mouvement du drone.
         a recall a chaque mouvement pour connaitre la prochaine dest en fonction du mouv du joueur
@@ -205,7 +211,10 @@ class Inky(Ghost): # unpredictable, dest = distance entre blinky et pinky target
             if self.is_vulnerable:
                 self.target = self.spawn
             else:
-                self.target = (blinky.target[0] - pinky.target[0], blinky.target[1] - pinky.target[1])
+                self.target = (
+                    blinky.target[0] - pinky.target[0],
+                    blinky.target[1] - pinky.target[1],
+                )
             visited = set()
             stack = [(self.x, self.y, [(self.x, self.y)])]
 
@@ -224,26 +233,27 @@ class Inky(Ghost): # unpredictable, dest = distance entre blinky et pinky target
                     return path[1]
                 moves = self.get_moves_possible(maze, x, y)
                 for move in moves:
-                    if move == 'DOWN':
+                    if move == "DOWN":
                         new_y = y + 1
                         stack.append([x, new_y, path + [(x, new_y)]])
-                    elif move == 'UP':
-                        new_y = y -1
+                    elif move == "UP":
+                        new_y = y - 1
                         stack.append([x, new_y, path + [(x, new_y)]])
-                    elif move == 'RIGHT':
+                    elif move == "RIGHT":
                         new_x = x + 1
                         stack.append([new_x, y, path + [(new_x, y)]])
-                    elif move == 'LEFT':
+                    elif move == "LEFT":
                         new_x = x - 1
                         stack.append([new_x, y, path + [(new_x, y)]])
                     else:
                         pass
 
 
-class Clyde(Ghost): # weird 
+class Clyde(Ghost):  # weird
     """Chases directly after Pac-Man, but tries to head to his Scatter corner when within
     an 8-Dot radius of Pac-Man. His Scatter Mode corner is the lower-left."""
-    def __init__(self, color, spawn_x, spawn_y, is_frozen = False):
+
+    def __init__(self, color, spawn_x, spawn_y, is_frozen=False):
         super().__init__(color, spawn_x, spawn_y, is_frozen)
 
     def next_move(self, player: Player, maze: MazeGenerator) -> tuple[int, int]:
@@ -271,20 +281,21 @@ class Clyde(Ghost): # weird
                     return path[1]
                 moves = self.get_moves_possible(maze, x, y)
                 for move in moves:
-                    if move == 'DOWN':
+                    if move == "DOWN":
                         new_y = y + 1
                         stack.append([x, new_y, path + [(x, new_y)]])
-                    elif move == 'UP':
-                        new_y = y -1
+                    elif move == "UP":
+                        new_y = y - 1
                         stack.append([x, new_y, path + [(x, new_y)]])
-                    elif move == 'RIGHT':
+                    elif move == "RIGHT":
                         new_x = x + 1
                         stack.append([new_x, y, path + [(new_x, y)]])
-                    elif move == 'LEFT':
+                    elif move == "LEFT":
                         new_x = x - 1
                         stack.append([new_x, y, path + [(new_x, y)]])
                     else:
                         pass
+
 
 # PlayerTest = Player(3, 10, 10)
 # BlinkyTest = Blinky("red", 0, 0)
