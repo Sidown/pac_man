@@ -4,13 +4,13 @@ install:
 	uv sync
 
 run:
-	uv run python -m parser
+	UV_SKIP_WHEEL_FILENAME_CHECK=1 uv run python -m ghost
 
 debug:
-	uv run python -m pdb -m parser
+	uv run python -m pdb -m ghost
 
 lint: install
-	flake8 parser
+	flake8
 	mypy parser --follow-imports=skip --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 clean:

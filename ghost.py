@@ -1,5 +1,6 @@
 from enum import Enum
 from abc import ABC, abstractmethod
+from math import dist
 from mazegenerator.mazegenerator import MazeGenerator
 
 
@@ -9,6 +10,9 @@ class Player:
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
         self.direction: str = None
+        self.score = 0
+        self.speed = 1
+        
 
 
 class Ghost(ABC):
@@ -22,6 +26,7 @@ class Ghost(ABC):
         self.is_vulnerable = False
         self.is_frozen = is_frozen
         self.respawn_timer = 0
+        self.speed = 0.8
     
     @abstractmethod
     def next_move(self, player: Player, maze: MazeGenerator): 
@@ -241,12 +246,53 @@ class Clyde(Ghost): # weird
     def __init__(self, color, spawn_x, spawn_y, is_frozen = False):
         super().__init__(color, spawn_x, spawn_y, is_frozen)
 
-    def next_move(player_pos: tuple[int], maze):
-        pass
+    def next_move(self, player: Player, maze: MazeGenerator) -> tuple[int, int]:
+        if not self.is_frozen and self.alive:
+            print(dist((self.x, self.y), (player.x, player.y)))
+            if self.is_vulnerable or dist((self.x, self.y), (player.x, player.y)) <= 3:
+                self.target = self.spawn
+            else:
+                self.target = (player.x, player.y)
+            visited = set()
+            stack = [(self.x, self.y, [(self.x, self.y)])]
 
-PlayerTest = Player(3, 10, 10)
-BlinkyTest = Blinky("red", 0, 0)
-maze = MazeGenerator()
-print(BlinkyTest.next_move(PlayerTest, maze))
-PinkyTest = Pinky("pink", 14, 14)
-print(PinkyTest.next_move(PlayerTest, maze))
+            while stack:
+                x, y, path = stack.pop()
+
+                if self.is_vulnerable:
+                    if x == player.x and y == player.y:
+                        continue
+
+                if (x, y) in visited:
+                    continue
+                visited.add((x, y))
+
+                if x == self.target[0] and y == self.target[1]:
+                    return path[1]
+                moves = self.get_moves_possible(maze, x, y)
+                for move in moves:
+                    if move == 'DOWN':
+                        new_y = y + 1
+                        stack.append([x, new_y, path + [(x, new_y)]])
+                    elif move == 'UP':
+                        new_y = y -1
+                        stack.append([x, new_y, path + [(x, new_y)]])
+                    elif move == 'RIGHT':
+                        new_x = x + 1
+                        stack.append([new_x, y, path + [(new_x, y)]])
+                    elif move == 'LEFT':
+                        new_x = x - 1
+                        stack.append([new_x, y, path + [(new_x, y)]])
+                    else:
+                        pass
+
+# PlayerTest = Player(3, 10, 10)
+# BlinkyTest = Blinky("red", 0, 0)
+# maze = MazeGenerator()
+# print(BlinkyTest.next_move(PlayerTest, maze))
+# PinkyTest = Pinky("pink", 14, 14)
+# print(PinkyTest.next_move(PlayerTest, maze))
+# InkyTest = Inky("blue", 5, 5)
+# print(InkyTest.next_move(PlayerTest, maze, BlinkyTest, PinkyTest))
+# ClydeTest = Clyde("green", 0, 0)
+# print(ClydeTest.next_move(PlayerTest, maze))
