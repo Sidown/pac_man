@@ -1,8 +1,8 @@
 import pygame
 from mazegenerator.mazegenerator import MazeGenerator
-from pygame import Rect, Surface
+from pygame import Rect, Surface, time
 
-from ghost import Player
+from ghost import Ghost, Player
 
 # idee creatives:
 # - Mode Zombie -18 => fond: shlop rg.otf
@@ -83,14 +83,14 @@ class Boxed_text:
 class Visualizer:
     """"""
 
-    def __init__(self, maze: MazeGenerator) -> None:
+    def __init__(self, maze: MazeGenerator, ghost: Ghost, player: Player) -> None:
         self.WIDTH = 960
         self.HEIGHT = 720
         self.PADDING = 50
         self.maze: MazeGenerator = maze
         self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        self.maze_width = len(self.maze.maze[0])
         self.maze_height = len(self.maze.maze)
+        self.maze_width = len(self.maze.maze[0])
         self.border_size = 5
         self.cell_width = (
             self.WIDTH - (2 * self.PADDING) - ((self.maze_width + 1) * self.border_size)
@@ -102,20 +102,12 @@ class Visualizer:
         ) / self.maze_height
 
         self.bg = pygame.image.load("assets/background/main_background.jpg")
-        self.player = Player(
-            5,
-            self.maze_height,
-            self.maze_width,
-            pygame.transform.scale(
-                pygame.image.load("assets/skin/skin_survivor.png"),
-                (self.cell_width, self.cell_height),
-            ),
-        )
-
-        self.ghost = pygame.transform.scale(
-            pygame.image.load("assets/skin/skin_zombie.png"),
+        self.player: Player = player
+        self.player.skin = pygame.transform.scale(
+            pygame.image.load("assets/skin/skin_survivor.png"),
             (self.cell_width, self.cell_height),
         )
+        self.ghost = ghost
         pygame.init()
 
     def _show_main_menu(self) -> None:
@@ -256,22 +248,21 @@ class Visualizer:
         # print(f"next_x: {next_x} | next_y: {next_y}")
         # if player want to go up:
         if curr_y > next_y:
-            print("I want to go up")
+            # print("I want to go up")
             if not opp_code & 0b0001:
                 return True
         # if player want to go down:
         elif curr_y < next_y:
-            print("I want to go to down")
+            # print("I want to go to down")
             if not opp_code & 0b0100:
                 return True
         # if player want to go right:
         elif curr_x < next_x:
-            print("I want to go to the right")
+            # print("I want to go to the right")
             if not opp_code & 0b0010:
-                print("there is no border to the right")
                 return True
         elif curr_x > next_x:
-            print("I want to go to the left")
+            # print("I want to go to the left")
             if not opp_code & 0b1000:
                 return True
         else:
@@ -340,6 +331,7 @@ class Visualizer:
     def _show_game(self) -> None:
         """The Game screen"""
         game_running = True
+        clock = time.Clock()
         while game_running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -354,6 +346,7 @@ class Visualizer:
                     if event.key == pygame.K_LEFT:
                         self.player.direction = "W"
             self.screen.blit(self.bg, (0, 0))
+            self.ghost.play()
             self._print_maze()
             # deplacer le personnage en fonction de la direction et en respectant les contraintes de murs ...
             if self.player.direction == "":
@@ -384,9 +377,19 @@ class Visualizer:
                 print("successfully passed to the right")
                 self.player.x = self.player.x + 1
             self._print_skin(self.player.skin, self.player.x, self.player.y)
+            # moins bon en perf de recharger l'image a chaque fois
+            self._print_skin(
+                pygame.transform.scale(
+                    pygame.image.load(self.ghost.skin),
+                    (self.cell_width, self.cell_height),
+                ),
+                self.ghost.x,
+                self.ghost.y,
+            )
             # TODO: print les ghosts.
             # self._print_skin(self.ghost, 1, 1)
             pygame.display.flip()
+            clock.tick(10)
         pygame.quit()
 
     def _show_game_over(self) -> None:
