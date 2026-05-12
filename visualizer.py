@@ -339,6 +339,39 @@ class Visualizer:
             ),
         )
 
+    def _update_player(self):
+        """update the player position and player movement pixel by pixel"""
+        player = self.player
+        if player.move_progress >= 1.0:
+            player.x = player.next_x
+            player.y = player.next_y
+            direction_x, direction_y = {"N": (0,-1), "S": (0,1),
+                                        "E": (1,0), "W": (-1,0)}.get(
+                                            player.queud_direction, (0, 0))
+            
+            new_x, new_y = player.x + direction_x, player.y + direction_y
+            if direction_x != 0 or direction_y != 0:
+                if self._is_neighbor((player.x, player.y), (new_x, new_y),
+                                     self.maze.maze[player.y][player.x]):
+                    player.next_x, player.next_y = new_x, new_y
+                    player.direction = player.queud_direction
+                    player.move_progress = 0.0
+            
+            direction_x, direction_y = {"N": (0,-1), "S": (0,1),
+                                        "E": (1,0), "W": (-1,0)}.get(
+                                            player.direction, (0, 0))
+            new_x, new_y = player.x + direction_x, player.y + direction_y
+            if direction_x != 0 or direction_y != 0:
+                if self._is_neighbor((player.x, player.y), (new_x, new_y),
+                                     self.maze.maze[player.y][player.x]):
+                    player.next_x, player.next_y = new_x, new_y
+                    player.move_progress = 0.0
+                    return
+        
+        player.move_progress = min(1.0, player.move_progress + player.speed)
+        player.pixel_x = player.x + (player.next_x - player.x) * player.move_progress
+        player.pixel_y = player.y + (player.next_y - player.y) * player.move_progress
+
     def _show_game(self) -> None:
         """The Game simulation"""
         game_running = True
@@ -349,13 +382,13 @@ class Visualizer:
                     game_running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        self.player.direction = "N"
+                        self.player.queud_direction = "N"
                     if event.key == pygame.K_DOWN:
-                        self.player.direction = "S"
+                        self.player.queud_direction = "S"
                     if event.key == pygame.K_RIGHT:
-                        self.player.direction = "E"
+                        self.player.queud_direction = "E"
                     if event.key == pygame.K_LEFT:
-                        self.player.direction = "W"
+                        self.player.queud_direction = "W"
             self.screen.blit(self.bg, (0, 0))
             self.blinky.play()
             self.inky.play()
@@ -363,66 +396,40 @@ class Visualizer:
             self.clyde.play()
             self._print_maze()
             # deplacer le personnage en fonction de la direction et en respectant les contraintes de murs ...
-            if self.player.direction == "":
-                pass
-            if self.player.direction == "N" and self._is_neighbor(
-                (self.player.x, self.player.y),
-                (self.player.x, self.player.y - 1),
-                self.maze.maze[self.player.y][self.player.x],
-            ):
-                self.player.y = self.player.y - 1
-            if self.player.direction == "S" and self._is_neighbor(
-                (self.player.x, self.player.y),
-                (self.player.x, self.player.y + 1),
-                self.maze.maze[self.player.y][self.player.x],
-            ):
-                self.player.y = self.player.y + 1
-            if self.player.direction == "W" and self._is_neighbor(
-                (self.player.x, self.player.y),
-                (self.player.x - 1, self.player.y),
-                self.maze.maze[self.player.y][self.player.x],
-            ):
-                self.player.x = self.player.x - 1
-            if self.player.direction == "E" and self._is_neighbor(
-                (self.player.x, self.player.y),
-                (self.player.x + 1, self.player.y),
-                self.maze.maze[self.player.y][self.player.x],
-            ):
-                print("successfully passed to the right")
-                self.player.x = self.player.x + 1
-            self._print_skin(self.player.skin, self.player.x, self.player.y)
+            self._update_player()
+            self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
             # moins bon en perf de recharger l'image a chaque fois
             self._print_skin(
                 pygame.transform.scale(
                     pygame.image.load(self.blinky.skin),
                     (self.cell_width, self.cell_height),
                 ),
-                self.blinky.x,
-                self.blinky.y,
+                self.blinky.pixel_x,
+                self.blinky.pixel_y,
             )
             self._print_skin(
                 pygame.transform.scale(
                     pygame.image.load(self.pinky.skin),
                     (self.cell_width, self.cell_height),
                 ),
-                self.pinky.x,
-                self.pinky.y,
+                self.pinky.pixel_x,
+                self.pinky.pixel_y,
             )
             self._print_skin(
                 pygame.transform.scale(
                     pygame.image.load(self.inky.skin),
                     (self.cell_width, self.cell_height),
                 ),
-                self.inky.x,
-                self.inky.y,
+                self.inky.pixel_x,
+                self.inky.pixel_y,
             )
             self._print_skin(
                 pygame.transform.scale(
                     pygame.image.load(self.clyde.skin),
                     (self.cell_width, self.cell_height),
                 ),
-                self.clyde.x,
-                self.clyde.y,
+                self.clyde.pixel_x,
+                self.clyde.pixel_y,
             )
             # Si le zombie attrape le joueur, Game Over
             if (
@@ -435,7 +442,7 @@ class Visualizer:
                 game_running = False
 
             pygame.display.flip()
-            clock.tick(10)
+            clock.tick(60)
         pygame.quit()
 
     def _show_game_over(self) -> None:
