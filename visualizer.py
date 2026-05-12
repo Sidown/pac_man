@@ -2,15 +2,7 @@ import pygame
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Rect, Surface, time
 
-from ghost import Blinky, Clyde, Ghost, Inky, Pinky, Player
-
-# idee creatives:
-# - Mode Zombie -18 => fond: shlop rg.otf
-# - Mode Sex -18
-# - drogue
-# - alcolique
-# - sucre
-# - mode 42.
+from ghost import Blinky, Clyde, Inky, Pinky, Player
 
 
 class Boxed_text:
@@ -433,9 +425,10 @@ class Visualizer:
             ):
                 print("Game Over...")
                 game_running = False
+                return None
 
             pygame.display.flip()
-            clock.tick(10)
+            clock.tick(5)
         pygame.quit()
 
     def _show_game_over(self) -> None:
