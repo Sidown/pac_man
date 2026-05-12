@@ -2,7 +2,7 @@ import pygame
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Rect, Surface, time
 
-from ghost import Ghost, Player
+from ghost import Blinky, Clyde, Ghost, Inky, Pinky, Player
 
 # idee creatives:
 # - Mode Zombie -18 => fond: shlop rg.otf
@@ -83,7 +83,15 @@ class Boxed_text:
 class Visualizer:
     """"""
 
-    def __init__(self, maze: MazeGenerator, ghost: Ghost, player: Player) -> None:
+    def __init__(
+        self,
+        maze: MazeGenerator,
+        blinky: Blinky,
+        pinky: Pinky,
+        inky: Inky,
+        clyde: Clyde,
+        player: Player,
+    ) -> None:
         self.WIDTH = 960
         self.HEIGHT = 720
         self.PADDING = 50
@@ -107,7 +115,10 @@ class Visualizer:
             pygame.image.load("assets/skin/skin_survivor.png"),
             (self.cell_width, self.cell_height),
         )
-        self.ghost = ghost
+        self.blinky: Blinky = blinky
+        self.pinky: Pinky = pinky
+        self.inky: Inky = inky
+        self.clyde: Clyde = clyde
         pygame.init()
 
     def _show_main_menu(self) -> None:
@@ -329,7 +340,7 @@ class Visualizer:
         )
 
     def _show_game(self) -> None:
-        """The Game screen"""
+        """The Game simulation"""
         game_running = True
         clock = time.Clock()
         while game_running:
@@ -346,7 +357,10 @@ class Visualizer:
                     if event.key == pygame.K_LEFT:
                         self.player.direction = "W"
             self.screen.blit(self.bg, (0, 0))
-            self.ghost.play()
+            self.blinky.play()
+            self.inky.play()
+            self.pinky.play()
+            self.clyde.play()
             self._print_maze()
             # deplacer le personnage en fonction de la direction et en respectant les contraintes de murs ...
             if self.player.direction == "":
@@ -380,14 +394,46 @@ class Visualizer:
             # moins bon en perf de recharger l'image a chaque fois
             self._print_skin(
                 pygame.transform.scale(
-                    pygame.image.load(self.ghost.skin),
+                    pygame.image.load(self.blinky.skin),
                     (self.cell_width, self.cell_height),
                 ),
-                self.ghost.x,
-                self.ghost.y,
+                self.blinky.x,
+                self.blinky.y,
             )
-            # TODO: print les ghosts.
-            # self._print_skin(self.ghost, 1, 1)
+            self._print_skin(
+                pygame.transform.scale(
+                    pygame.image.load(self.pinky.skin),
+                    (self.cell_width, self.cell_height),
+                ),
+                self.pinky.x,
+                self.pinky.y,
+            )
+            self._print_skin(
+                pygame.transform.scale(
+                    pygame.image.load(self.inky.skin),
+                    (self.cell_width, self.cell_height),
+                ),
+                self.inky.x,
+                self.inky.y,
+            )
+            self._print_skin(
+                pygame.transform.scale(
+                    pygame.image.load(self.clyde.skin),
+                    (self.cell_width, self.cell_height),
+                ),
+                self.clyde.x,
+                self.clyde.y,
+            )
+            # Si le zombie attrape le joueur, Game Over
+            if (
+                ((self.player.x == self.blinky.x) and (self.player.y == self.blinky.y))
+                or ((self.player.x == self.pinky.x) and (self.player.y == self.pinky.y))
+                or ((self.player.x == self.inky.x) and (self.player.y == self.inky.y))
+                or ((self.player.x == self.clyde.x) and (self.player.y == self.clyde.y))
+            ):
+                print("Game Over...")
+                game_running = False
+
             pygame.display.flip()
             clock.tick(10)
         pygame.quit()

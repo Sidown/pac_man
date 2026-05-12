@@ -26,15 +26,15 @@ def main():
         14,
         14,
     )
-    blinky = Blinky("./assets/skin/skin_zombie.png", 14, 14, mazegenerator, player)
-    pinky = Pinky("./assets/skin/skin_zombie.png", 14, 14, mazegenerator, player)
+    blinky = Blinky("./assets/skin/skin_zombie.png", 0, 0, mazegenerator, player)
+    pinky = Pinky("./assets/skin/skin_zombie.png", 0, 14, mazegenerator, player)
     inky = Inky(
-        "./assets/skin/skin_zombie.png", 14, 14, mazegenerator, player, blinky, pinky
+        "./assets/skin/skin_zombie.png", 14, 0, mazegenerator, player, blinky, pinky
     )
     clyde = Clyde("./assets/skin/skin_zombie.png", 14, 14, mazegenerator, player)
 
     # Visualisation
-    gui = Visualizer(mazegenerator, clyde, player)
+    gui = Visualizer(mazegenerator, blinky, pinky, inky, clyde, player)
     gui.run()
 
 
