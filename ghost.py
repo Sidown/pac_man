@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from collections import deque
-from enum import Enum
 from math import dist
 
 from mazegenerator.mazegenerator import MazeGenerator
@@ -12,10 +11,16 @@ class Player:
         self.lives: int = lives
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
+        self.next_x: int = maze_width // 2
+        self.next_y: int = maze_height // 2
+        self.pixel_x = float(maze_width // 2)
+        self.pixel_y = float(maze_height // 2)
+        self.move_progress: float = 1.0
         self.direction: str = ""
+        self.queud_direction: str = ""
         self.skin: Surface | None = None
-        self.score = 0
-        self.speed = 1
+        self.score: int = 0
+        self.speed: float = 0.20
 
 
 class Ghost(ABC):
@@ -31,13 +36,18 @@ class Ghost(ABC):
         self.skin = skin
         self.x = spawn_x
         self.y = spawn_y
+        self.next_x = spawn_x
+        self.next_y = spawn_y
+        self.pixel_x = float(spawn_x)
+        self.pixel_y = float(spawn_y)
         self.alive = True
         self.spawn = (spawn_x, spawn_y)
         self.target: tuple[int] = self.spawn
         self.is_vulnerable = False
         self.is_frozen = is_frozen
         self.respawn_timer = 0
-        self.speed = 0.8
+        self.speed = 0.15
+        self.move_progress = 1.0
         self.maze = maze
         self.player = player
         self.direction = "UP"
@@ -48,9 +58,16 @@ class Ghost(ABC):
         pass
 
     def play(self):
-        move = self.next_move()
-        self.x = move[0]
-        self.y = move[1]
+        if self.move_progress >= 1.0:
+            self.x = self.next_x
+            self.y = self.next_y
+            move = self.next_move()
+            self.next_x = move[0]
+            self.next_y = move[1]
+            self.move_progress = 0.0
+        self.move_progress = min(1.0, self.move_progress + self.speed)
+        self.pixel_x = self.x + (self.next_x - self.x) * self.move_progress
+        self.pixel_y = self.y + (self.next_y - self.y) * self.move_progress
 
     def respawn(self):
         self.x = self.spawn[0]
@@ -98,7 +115,6 @@ class Blinky(Ghost):  # chases, dest player pos
 
         if (self.x, self.y) == self.target:
             return (self.x, self.y)
-        print(self.x, self.y, self.target)
         queue = deque()
         visited = {(self.x, self.y)}
 
@@ -177,7 +193,6 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
 
         if (self.x, self.y) == self.target:
             return (self.x, self.y)
-        print(self.x, self.y, self.target)
         queue = deque()
         visited = {(self.x, self.y)}
 
@@ -248,7 +263,6 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
 
         if (self.x, self.y) == self.target:
             return (self.x, self.y)
-        print(self.x, self.y, self.target)
         queue = deque()
         visited = {(self.x, self.y)}
 
@@ -314,7 +328,6 @@ class Clyde(Ghost):  # weird
 
         if (self.x, self.y) == self.target:
             return (self.x, self.y)
-        print(self.x, self.y, self.target)
         queue = deque()
         visited = {(self.x, self.y)}
 
