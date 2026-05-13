@@ -386,16 +386,19 @@ class Visualizer:
 
     def _print_HUD(self) -> None:
         """Print a HUD in the top right corner, that display the number of life and the player score and the highest score."""
-        # print un rectange de couleur
+
         x1 = self.screen.get_width() - 300
         x2 = self.screen.get_width()
         y1 = 0
         y2 = 100
+
+        # affichage le HUD
         self.rect = pygame.Rect(x1, y1, x2, y2)
         pygame.draw.rect(self.screen, (170, 75, 75), self.rect)
         pygame.draw.line(self.screen, (0, 0, 0), (x1, y1), (x1, y2), 3)
         pygame.draw.line(self.screen, (0, 0, 0), (x1, y2), (x2, y2), 3)
-        # print du text dans ce rectange
+
+        # affichage du text dans le HUD
         font = pygame.font.Font("assets/fonts/shlop rg.otf", 28)
         life_nb = font.render("Life number: ", False, (0, 0, 0))
         current_score = font.render("Current score: ", False, (0, 0, 0))
@@ -404,6 +407,9 @@ class Visualizer:
         self.screen.blit(current_score, (x1 + 5, y1 + 32))
         self.screen.blit(highest_score, (x1 + 5, y1 + 64))
 
+        # affichage des valeurs NB LIFE, HIGHSCORE ...
+        player_lives = font.render(f"{self.player.lives}", False, (0, 0, 0))
+        self.screen.blit(player_lives, (x1 + life_nb.get_width() + 5, y1))
         pass
 
     def _show_game(self) -> None:
@@ -486,7 +492,7 @@ class Visualizer:
                     self.player.next_x,
                     self.player.next_y,
                 ) = self.player.spawn
-                self.player.queud_direction = ""
+                self.player.direction = self.player.queud_direction = ""
                 print(f"player.x= {self.player.x}, player.y= {self.player.y}")
                 self.blinky.x, self.blinky.y = (
                     self.blinky.next_x,
