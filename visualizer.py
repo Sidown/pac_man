@@ -328,6 +328,19 @@ class Visualizer:
                 (x, y + cell_height + border_size),
                 border_size,
             )
+        # si tout les murs sont ferme, c'est le 42 pattern, le mettre en couleur
+        if opp_code == 15:
+            print(opp_code)
+            pygame.draw.rect(
+                self.screen,
+                wall_color,
+                (
+                    x,
+                    y,
+                    self.cell_width + self.border_size,
+                    self.cell_height + self.border_size,
+                ),
+            )
 
     def _print_skin(self, skin: Surface, x_cell, y_cell) -> None:
         """A function that print a Skin on the maze."""
