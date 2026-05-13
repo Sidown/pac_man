@@ -507,7 +507,11 @@ class Visualizer:
                     print("Game Over...")
                     return
                 pygame.time.wait(1000)
-                self._reset_game()
+                self.player._reset_param()
+                self.blinky._reset_param()
+                self.inky._reset_param()
+                self.pinky._reset_param()
+                self.clyde._reset_param()
                 self._show_game()
             pygame.display.flip()
             clock.tick(10)
@@ -519,22 +523,3 @@ class Visualizer:
         New_Game_BTN
         Exti_BTN"""
         pass
-
-    def _reset_game(self) -> None:
-        """Reset the game simulation for the next turn"""
-        self.player.x, self.player.y = (
-            self.player.next_x,
-            self.player.next_y,
-        ) = self.player.spawn
-        self.player.direction = self.player.queud_direction = ""
-        self.blinky.x, self.blinky.y = (
-            self.blinky.next_x,
-            self.blinky.next_y,
-        ) = self.blinky.spawn
-        self.inky.x, self.inky.y = self.inky.next_x, self.inky.next_y = self.inky.spawn
-        self.pinky.x, self.pinky.y = self.pinky.next_x, self.pinky.next_y = (
-            self.pinky.spawn
-        )
-        self.clyde.x, self.clyde.y = self.clyde.next_x, self.clyde.next_y = (
-            self.clyde.spawn
-        )

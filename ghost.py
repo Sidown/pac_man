@@ -23,6 +23,14 @@ class Player:
         self.score: int = 0
         self.speed: float = 0.20
 
+    def _reset_param(self) -> None:
+        """Reset the player parameters for a new game."""
+        self.x, self.y = (
+            self.next_x,
+            self.next_y,
+        ) = self.spawn
+        self.direction = self.queud_direction = ""
+
 
 class Ghost(ABC):
     def __init__(
@@ -95,6 +103,13 @@ class Ghost(ABC):
             possible.append("RIGHT")
 
         return possible
+
+    def _reset_param(self) -> None:
+        """Reset the Ghost parameters for a new game."""
+        self.x, self.y = (
+            self.next_x,
+            self.next_y,
+        ) = self.spawn
 
 
 class Blinky(Ghost):  # chases, dest player pos
