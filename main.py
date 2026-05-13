@@ -22,7 +22,7 @@ def main():
     )
     mazegenerator.generate()
     player = Player(
-        5,
+        3,
         14,
         14,
     )

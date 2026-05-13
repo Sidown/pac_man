@@ -399,15 +399,17 @@ class Visualizer:
         pygame.draw.line(self.screen, (0, 0, 0), (x1, y2), (x2, y2), 3)
 
         # affichage du text dans le HUD
-        font = pygame.font.Font("assets/fonts/shlop rg.otf", 28)
+        font = pygame.font.Font("assets/fonts/shlop rg.otf", 22)
         life_nb = font.render("Life number: ", False, (0, 0, 0))
+        time = font.render("Time: ", False, (0, 0, 0))
         current_score = font.render("Current score: ", False, (0, 0, 0))
         highest_score = font.render("Highest score: ", False, (0, 0, 0))
         self.screen.blit(life_nb, (x1 + 5, y1))
-        self.screen.blit(current_score, (x1 + 5, y1 + 32))
-        self.screen.blit(highest_score, (x1 + 5, y1 + 64))
+        self.screen.blit(time, (x1 + 5, y1 + 25))
+        self.screen.blit(current_score, (x1 + 5, y1 + 50))
+        self.screen.blit(highest_score, (x1 + 5, y1 + 75))
 
-        # affichage des valeurs NB LIFE, HIGHSCORE ...
+        # affichage des valeurs NB LIFE, TIME, HIGHSCORE ...
         player_lives = font.render(f"{self.player.lives}", False, (0, 0, 0))
         self.screen.blit(player_lives, (x1 + life_nb.get_width() + 5, y1))
         pass
@@ -429,6 +431,14 @@ class Visualizer:
                         self.player.queud_direction = "E"
                     if event.key == pygame.K_LEFT:
                         self.player.queud_direction = "W"
+                    if event.key == pygame.K_SPACE:
+                        is_paused = True
+                        while is_paused:
+                            pygame.time.wait(1000)
+                            for event in pygame.event.get():
+                                if event.type == pygame.KEYDOWN:
+                                    if event.key == pygame.K_SPACE:
+                                        is_paused = False
             self.screen.blit(self.bg, (0, 0))
             self.blinky.play()
             self.inky.play()
@@ -480,39 +490,39 @@ class Visualizer:
                 or ((self.player.x == self.inky.x) and (self.player.y == self.inky.y))
                 or ((self.player.x == self.clyde.x) and (self.player.y == self.clyde.y))
             ):
-                # continue  # a supprimer plus tard
-                print(f"life: {self.player.lives}")
                 self.player.lives -= 1
                 if self.player.lives <= 0:
                     print("Game Over...")
                     return
-                # relancer le jeu depuis le debut
                 pygame.time.wait(1000)
-                self.player.x, self.player.y = (
-                    self.player.next_x,
-                    self.player.next_y,
-                ) = self.player.spawn
-                self.player.direction = self.player.queud_direction = ""
-                print(f"player.x= {self.player.x}, player.y= {self.player.y}")
-                self.blinky.x, self.blinky.y = (
-                    self.blinky.next_x,
-                    self.blinky.next_y,
-                ) = self.blinky.spawn
-                self.inky.x, self.inky.y = self.inky.next_x, self.inky.next_y = (
-                    self.inky.spawn
-                )
-                self.pinky.x, self.pinky.y = self.pinky.next_x, self.pinky.next_y = (
-                    self.pinky.spawn
-                )
-                self.clyde.x, self.clyde.y = self.clyde.next_x, self.clyde.next_y = (
-                    self.clyde.spawn
-                )
-                game_running = False
+                self._reset_game()
                 self._show_game()
             pygame.display.flip()
             clock.tick(10)
         return
 
     def _show_game_over(self) -> None:
-        """The Gane Over screen"""
+        """The Game Over screen
+        Save score -> enter player Name
+        New_Game_BTN
+        Exti_BTN"""
         pass
+
+    def _reset_game(self) -> None:
+        """Reset the game simulation for the next turn"""
+        self.player.x, self.player.y = (
+            self.player.next_x,
+            self.player.next_y,
+        ) = self.player.spawn
+        self.player.direction = self.player.queud_direction = ""
+        self.blinky.x, self.blinky.y = (
+            self.blinky.next_x,
+            self.blinky.next_y,
+        ) = self.blinky.spawn
+        self.inky.x, self.inky.y = self.inky.next_x, self.inky.next_y = self.inky.spawn
+        self.pinky.x, self.pinky.y = self.pinky.next_x, self.pinky.next_y = (
+            self.pinky.spawn
+        )
+        self.clyde.x, self.clyde.y = self.clyde.next_x, self.clyde.next_y = (
+            self.clyde.spawn
+        )
