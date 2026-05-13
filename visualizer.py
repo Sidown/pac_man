@@ -330,7 +330,6 @@ class Visualizer:
             )
         # si tout les murs sont ferme, c'est le 42 pattern, le mettre en couleur
         if opp_code == 15:
-            print(opp_code)
             pygame.draw.rect(
                 self.screen,
                 wall_color,
