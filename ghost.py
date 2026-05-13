@@ -11,6 +11,7 @@ class Player:
         self.lives: int = lives
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
+        self.spawn: tuple[int, int] = (self.x, self.y)
         self.next_x: int = maze_width // 2
         self.next_y: int = maze_height // 2
         self.pixel_x = float(maze_width // 2)

@@ -94,7 +94,7 @@ class Visualizer:
     ) -> None:
         self.WIDTH = 960
         self.HEIGHT = 720
-        self.PADDING = 50
+        self.PADDING = 150
         self.maze: MazeGenerator = maze
         self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         self.maze_height = len(self.maze.maze)
@@ -384,6 +384,28 @@ class Visualizer:
         player.pixel_x = player.x + (player.next_x - player.x) * player.move_progress
         player.pixel_y = player.y + (player.next_y - player.y) * player.move_progress
 
+    def _print_HUD(self) -> None:
+        """Print a HUD in the top right corner, that display the number of life and the player score and the highest score."""
+        # print un rectange de couleur
+        x1 = self.screen.get_width() - 300
+        x2 = self.screen.get_width()
+        y1 = 0
+        y2 = 100
+        self.rect = pygame.Rect(x1, y1, x2, y2)
+        pygame.draw.rect(self.screen, (170, 75, 75), self.rect)
+        pygame.draw.line(self.screen, (0, 0, 0), (x1, y1), (x1, y2), 3)
+        pygame.draw.line(self.screen, (0, 0, 0), (x1, y2), (x2, y2), 3)
+        # print du text dans ce rectange
+        font = pygame.font.Font("assets/fonts/shlop rg.otf", 28)
+        life_nb = font.render("Life number: ", False, (0, 0, 0))
+        current_score = font.render("Current score: ", False, (0, 0, 0))
+        highest_score = font.render("Highest score: ", False, (0, 0, 0))
+        self.screen.blit(life_nb, (x1 + 5, y1))
+        self.screen.blit(current_score, (x1 + 5, y1 + 32))
+        self.screen.blit(highest_score, (x1 + 5, y1 + 64))
+
+        pass
+
     def _show_game(self) -> None:
         """The Game simulation"""
         game_running = True
@@ -407,7 +429,9 @@ class Visualizer:
             self.pinky.play()
             self.clyde.play()
             self._print_maze()
-            # deplacer le personnage en fonction de la direction et en respectant les contraintes de murs ...
+            self._print_HUD()
+
+            # deplacer le personnage
             self._update_player()
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
             # moins bon en perf de recharger l'image a chaque fois
@@ -450,12 +474,38 @@ class Visualizer:
                 or ((self.player.x == self.inky.x) and (self.player.y == self.inky.y))
                 or ((self.player.x == self.clyde.x) and (self.player.y == self.clyde.y))
             ):
-                print("Game Over...")
+                # continue  # a supprimer plus tard
+                print(f"life: {self.player.lives}")
+                self.player.lives -= 1
+                if self.player.lives <= 0:
+                    print("Game Over...")
+                    return
+                # relancer le jeu depuis le debut
+                pygame.time.wait(1000)
+                self.player.x, self.player.y = (
+                    self.player.next_x,
+                    self.player.next_y,
+                ) = self.player.spawn
+                self.player.queud_direction = ""
+                print(f"player.x= {self.player.x}, player.y= {self.player.y}")
+                self.blinky.x, self.blinky.y = (
+                    self.blinky.next_x,
+                    self.blinky.next_y,
+                ) = self.blinky.spawn
+                self.inky.x, self.inky.y = self.inky.next_x, self.inky.next_y = (
+                    self.inky.spawn
+                )
+                self.pinky.x, self.pinky.y = self.pinky.next_x, self.pinky.next_y = (
+                    self.pinky.spawn
+                )
+                self.clyde.x, self.clyde.y = self.clyde.next_x, self.clyde.next_y = (
+                    self.clyde.spawn
+                )
                 game_running = False
-
+                self._show_game()
             pygame.display.flip()
-            clock.tick(60)
-        pygame.quit()
+            clock.tick(10)
+        return
 
     def _show_game_over(self) -> None:
         """The Gane Over screen"""
