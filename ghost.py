@@ -7,7 +7,7 @@ from pygame import Surface
 
 
 class Player:
-    def __init__(self, lives: int, maze_height: int, maze_width: int):
+    def __init__(self, lives: int, maze_height: int, maze_width: int, maze: MazeGenerator):
         self.lives: int = lives
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
@@ -22,14 +22,90 @@ class Player:
         self.skin: Surface | None = None
         self.score: int = 0
         self.speed: float = 0.20
+        self.maze = maze
 
-    def _reset_param(self) -> None:
+    def reset_param(self) -> None:
         """Reset the player parameters for a new game."""
         self.x, self.y = (
             self.next_x,
             self.next_y,
         ) = self.spawn
         self.direction = self.queud_direction = ""
+
+    def _is_neighbor(
+        self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int
+    ) -> bool:
+        """A function to know if the movement to the next cell is possible."""
+        curr_x, curr_y = current_cell
+        next_x, next_y = next_cell
+        # print(f"curr_x: {curr_x} | curr_y: {curr_y}")
+        # print(f"next_x: {next_x} | next_y: {next_y}")
+        # if player want to go up:
+        if curr_y > next_y:
+            # print("I want to go up")
+            if not opp_code & 0b0001:
+                return True
+        # if player want to go down:
+        elif curr_y < next_y:
+            # print("I want to go to down")
+            if not opp_code & 0b0100:
+                return True
+        # if player want to go right:
+        elif curr_x < next_x:
+            # print("I want to go to the right")
+            if not opp_code & 0b0010:
+                return True
+        elif curr_x > next_x:
+            # print("I want to go to the left")
+            if not opp_code & 0b1000:
+                return True
+        else:
+            return False
+        return False
+
+    def update_player(self):
+        """update the player position and player movement pixel by pixel"""
+        if self.move_progress >= 1.0:
+            self.x = self.next_x
+            self.y = self.next_y
+            direction_x, direction_y = {
+                "N": (0, -1),
+                "S": (0, 1),
+                "E": (1, 0),
+                "W": (-1, 0),
+            }.get(self.queud_direction, (0, 0))
+
+            new_x, new_y = self.x + direction_x, self.y + direction_y
+            if direction_x != 0 or direction_y != 0:
+                if self._is_neighbor(
+                    (self.x, self.y),
+                    (new_x, new_y),
+                    self.maze.maze[self.y][self.x],
+                ):
+                    self.next_x, self.next_y = new_x, new_y
+                    self.direction = self.queud_direction
+                    self.move_progress = 0.0
+
+            direction_x, direction_y = {
+                "N": (0, -1),
+                "S": (0, 1),
+                "E": (1, 0),
+                "W": (-1, 0),
+            }.get(self.direction, (0, 0))
+            new_x, new_y = self.x + direction_x, self.y + direction_y
+            if direction_x != 0 or direction_y != 0:
+                if self._is_neighbor(
+                    (self.x, self.y),
+                    (new_x, new_y),
+                    self.maze.maze[self.y][self.x],
+                ):
+                    self.next_x, self.next_y = new_x, new_y
+                    self.move_progress = 0.0
+                    return
+
+        self.move_progress = min(1.0, self.move_progress + self.speed)
+        self.pixel_x = self.x + (self.next_x - self.x) * self.move_progress
+        self.pixel_y = self.y + (self.next_y - self.y) * self.move_progress
 
 
 class Ghost(ABC):
@@ -104,7 +180,7 @@ class Ghost(ABC):
 
         return possible
 
-    def _reset_param(self) -> None:
+    def reset_param(self) -> None:
         """Reset the Ghost parameters for a new game."""
         self.x, self.y = (
             self.next_x,

@@ -25,6 +25,7 @@ def main():
         3,
         14,
         14,
+        mazegenerator
     )
     blinky = Blinky("./assets/skin/skin_zombie.png", 0, 0, mazegenerator, player)
     pinky = Pinky("./assets/skin/skin_zombie.png", 0, 14, mazegenerator, player)

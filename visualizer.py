@@ -121,6 +121,26 @@ class Visualizer:
         self.clyde: Clyde = clyde
         pygame.init()
 
+    def manage_mouse_click(self, btn_game, btn_high_score, btn_theme):
+        """Managed mouse click"""
+        if pygame.mouse.get_focused():
+            x, y = pygame.mouse.get_pos()
+            if btn_game.rect.collidepoint(x, y):
+                btn_game.set_color((200, 200, 200))
+                pressed = pygame.mouse.get_pressed()
+                if pressed[0]:
+                    self._show_game()
+            if btn_high_score.rect.collidepoint(x, y):
+                btn_high_score.set_color((200, 200, 200))
+                pressed = pygame.mouse.get_pressed()
+                if pressed[0]:
+                    print("let's view the highest score!")
+            if btn_theme.rect.collidepoint(x, y):
+                btn_theme.set_color((200, 200, 200))
+                pressed = pygame.mouse.get_pressed()
+                if pressed[0]:
+                    print("Ok we will set up a new theme !")
+
     def _show_main_menu(self) -> None:
         """Show the home page of the Pac-Man game."""
 
@@ -165,24 +185,7 @@ class Visualizer:
         btn_high_score.create_boxed_text(True)
         btn_theme.create_boxed_text(True)
 
-        # Managed mouse click
-        if pygame.mouse.get_focused():
-            x, y = pygame.mouse.get_pos()
-            if btn_game.rect.collidepoint(x, y):
-                btn_game.set_color((200, 200, 200))
-                pressed = pygame.mouse.get_pressed()
-                if pressed[0]:
-                    self._show_game()
-            if btn_high_score.rect.collidepoint(x, y):
-                btn_high_score.set_color((200, 200, 200))
-                pressed = pygame.mouse.get_pressed()
-                if pressed[0]:
-                    print("let's view the highest score!")
-            if btn_theme.rect.collidepoint(x, y):
-                btn_theme.set_color((200, 200, 200))
-                pressed = pygame.mouse.get_pressed()
-                if pressed[0]:
-                    print("Ok we will set up a new theme !")
+        self.manage_mouse_click(btn_game, btn_high_score, btn_theme)
 
     def run(self) -> None:
         """The full game visualisation"""
@@ -197,6 +200,33 @@ class Visualizer:
             self._show_main_menu()
             pygame.display.flip()
         pygame.quit()
+
+    def _show_maze(self, curr_x, curr_y):
+        """Show the maze"""
+        for row_nb in range(self.maze_height):
+            print_down = False
+            if row_nb == (self.maze_height - 1):
+                print_down = True
+            for col_nb in range(self.maze_width):
+                opp_code = self.maze.maze[row_nb][col_nb]
+                print_right = False
+                if col_nb == (self.maze_width - 1):
+                    print_right = True
+
+                self._print_cell(
+                    curr_x,
+                    curr_y,
+                    self.cell_width,
+                    self.cell_height,
+                    opp_code,
+                    self.border_size,
+                    (126, 29, 29),
+                    print_right,
+                    print_down,
+                )
+                curr_x += self.cell_width + (self.border_size)
+            curr_x = self.PADDING
+            curr_y += self.cell_height + (self.border_size)
 
     def _print_maze(self) -> None:
         """Print the maze."""
@@ -224,61 +254,7 @@ class Visualizer:
         curr_y = self.PADDING
 
         # afficher le maze
-        for row_nb in range(self.maze_height):
-            print_down = False
-            if row_nb == (self.maze_height - 1):
-                print_down = True
-            for col_nb in range(self.maze_width):
-                opp_code = self.maze.maze[row_nb][col_nb]
-                print_right = False
-                if col_nb == (self.maze_width - 1):
-                    print_right = True
-
-                self._print_cell(
-                    curr_x,
-                    curr_y,
-                    self.cell_width,
-                    self.cell_height,
-                    opp_code,
-                    self.border_size,
-                    (126, 29, 29),
-                    print_right,
-                    print_down,
-                )
-                curr_x += self.cell_width + (self.border_size)
-            curr_x = self.PADDING
-            curr_y += self.cell_height + (self.border_size)
-
-    def _is_neighbor(
-        self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int
-    ) -> bool:
-        """A function to know if the movement to the next cell is possible."""
-        curr_x, curr_y = current_cell
-        next_x, next_y = next_cell
-        # print(f"curr_x: {curr_x} | curr_y: {curr_y}")
-        # print(f"next_x: {next_x} | next_y: {next_y}")
-        # if player want to go up:
-        if curr_y > next_y:
-            # print("I want to go up")
-            if not opp_code & 0b0001:
-                return True
-        # if player want to go down:
-        elif curr_y < next_y:
-            # print("I want to go to down")
-            if not opp_code & 0b0100:
-                return True
-        # if player want to go right:
-        elif curr_x < next_x:
-            # print("I want to go to the right")
-            if not opp_code & 0b0010:
-                return True
-        elif curr_x > next_x:
-            # print("I want to go to the left")
-            if not opp_code & 0b1000:
-                return True
-        else:
-            return False
-        return False
+        self._show_maze(curr_x, curr_y)
 
     def _print_cell(
         self,
@@ -351,51 +327,6 @@ class Visualizer:
             ),
         )
 
-    def _update_player(self):
-        """update the player position and player movement pixel by pixel"""
-        player = self.player
-        if player.move_progress >= 1.0:
-            player.x = player.next_x
-            player.y = player.next_y
-            direction_x, direction_y = {
-                "N": (0, -1),
-                "S": (0, 1),
-                "E": (1, 0),
-                "W": (-1, 0),
-            }.get(player.queud_direction, (0, 0))
-
-            new_x, new_y = player.x + direction_x, player.y + direction_y
-            if direction_x != 0 or direction_y != 0:
-                if self._is_neighbor(
-                    (player.x, player.y),
-                    (new_x, new_y),
-                    self.maze.maze[player.y][player.x],
-                ):
-                    player.next_x, player.next_y = new_x, new_y
-                    player.direction = player.queud_direction
-                    player.move_progress = 0.0
-
-            direction_x, direction_y = {
-                "N": (0, -1),
-                "S": (0, 1),
-                "E": (1, 0),
-                "W": (-1, 0),
-            }.get(player.direction, (0, 0))
-            new_x, new_y = player.x + direction_x, player.y + direction_y
-            if direction_x != 0 or direction_y != 0:
-                if self._is_neighbor(
-                    (player.x, player.y),
-                    (new_x, new_y),
-                    self.maze.maze[player.y][player.x],
-                ):
-                    player.next_x, player.next_y = new_x, new_y
-                    player.move_progress = 0.0
-                    return
-
-        player.move_progress = min(1.0, player.move_progress + player.speed)
-        player.pixel_x = player.x + (player.next_x - player.x) * player.move_progress
-        player.pixel_y = player.y + (player.next_y - player.y) * player.move_progress
-
     def _print_HUD(self) -> None:
         """Print a HUD in the top right corner, that display the number of life and the player score and the highest score."""
 
@@ -425,6 +356,14 @@ class Visualizer:
         player_lives = font.render(f"{self.player.lives}", False, (0, 0, 0))
         self.screen.blit(player_lives, (x1 + life_nb.get_width() + 5, y1))
         pass
+
+    def _reset_all_param(self) -> None:
+        """Reset param for all ghosts and the player"""
+        self.player.reset_param()
+        self.blinky.reset_param()
+        self.inky.reset_param()
+        self.pinky.reset_param()
+        self.clyde.reset_param()
 
     def _show_game(self) -> None:
         """The Game simulation"""
@@ -460,7 +399,7 @@ class Visualizer:
             self._print_HUD()
 
             # deplacer le personnage
-            self._update_player()
+            self.player.update_player()
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
             # moins bon en perf de recharger l'image a chaque fois
             self._print_skin(
@@ -507,11 +446,8 @@ class Visualizer:
                     print("Game Over...")
                     return
                 pygame.time.wait(1000)
-                self.player._reset_param()
-                self.blinky._reset_param()
-                self.inky._reset_param()
-                self.pinky._reset_param()
-                self.clyde._reset_param()
+                self._reset_all_param()
+                
                 self._show_game()
             pygame.display.flip()
             clock.tick(10)
