@@ -1,4 +1,5 @@
 class Pacgum:
+    """class for pacgum"""
     def __init__(self, points: int, coord: tuple[int], skin: str):
         self.points: int = points
         self.visible: bool = True
@@ -9,6 +10,7 @@ class Pacgum:
 
 
 class SuperPacgum:
+    """class for super pacgum"""
     def __init__(self, points: int, coord: tuple[int], skin: str):
         self.points: int = points
         self.visible: bool = True

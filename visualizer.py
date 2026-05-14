@@ -453,7 +453,7 @@ class Visualizer:
                     self._print_skin(
                         pygame.transform.scale(
                             pygame.image.load(super_pacgum.skin),
-                            (self.cell_width * 2, self.cell_height * 2),
+                            (self.cell_width, self.cell_height)
                         ),
                         super_pacgum.pixel_x, super_pacgum.pixel_y
                     )

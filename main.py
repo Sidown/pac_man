@@ -17,7 +17,7 @@ def main():
 
     # Maze genereation
     mazegenerator = MazeGenerator(
-        size=(15, 15),
+        size=(10, 10),
         entry_cell=(0, 0),
         exit_cell=(-1, -1),
         seed=42,
@@ -26,7 +26,6 @@ def main():
     pacgums = {}
     for (y, row) in enumerate(mazegenerator.maze):
         for (x, _) in enumerate(row):
-            print(x, y)
             if mazegenerator.maze[y][x] != 15 and not_corner(mazegenerator, x, y):
                 pacgums.update({(x, y): Pacgum(20, (x, y), "./assets/skin/other/dot.png")})
     super_pacgums_coord = [(0, 0), (0, len(mazegenerator.maze) - 1),
@@ -35,7 +34,7 @@ def main():
                             len(mazegenerator.maze) - 1)]
     super_pacgums = {}
     for coord in super_pacgums_coord:
-        super_pacgums.update({coord: SuperPacgum(100, coord, "./assets/skin/other/dot.png")})
+        super_pacgums.update({coord: SuperPacgum(100, coord, "./assets/skin/other/sdot.png")})
     player = Player(
         3,
         14,
@@ -46,11 +45,11 @@ def main():
     )
 
     blinky = Blinky("./assets/skin/ghosts/blinky.png", 0, 0, mazegenerator, player)
-    pinky = Pinky("./assets/skin/ghosts/pinky.png", 0, 14, mazegenerator, player)
+    pinky = Pinky("./assets/skin/ghosts/pinky.png", 0, len(mazegenerator.maze) - 1, mazegenerator, player)
     inky = Inky(
-        "./assets/skin/ghosts/inky.png", 14, 0, mazegenerator, player, blinky, pinky
+        "./assets/skin/ghosts/inky.png", len(mazegenerator.maze[0]) - 1, 0, mazegenerator, player, blinky, pinky
     )
-    clyde = Clyde("./assets/skin/ghosts/clyde.png", 14, 14, mazegenerator, player)
+    clyde = Clyde("./assets/skin/ghosts/clyde.png", len(mazegenerator.maze[0]) - 1, len(mazegenerator.maze) - 1, mazegenerator, player)
 
     # Visualisation
     gui = Visualizer(mazegenerator, blinky, pinky, inky, clyde, player, pacgums, super_pacgums)

@@ -275,6 +275,7 @@ class Blinky(Ghost):  # chases, dest player pos
             current_x, current_y, move_name, first_step = queue.popleft()
             if (current_x, current_y) == self.target:
                 self.direction = move_name
+                print(f"Queue: {queue}")
                 return first_step
 
             for move in self.get_moves_possible(self.maze, current_x, current_y):
