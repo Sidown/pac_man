@@ -1,6 +1,7 @@
 import pygame
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Rect, Surface, time
+from pacgum import Pacgum, SuperPacgum
 
 from ghost import Blinky, Clyde, Ghost, Inky, Pinky, Player
 
@@ -91,6 +92,8 @@ class Visualizer:
         inky: Inky,
         clyde: Clyde,
         player: Player,
+        pacgums: dict[tuple[int], Pacgum],
+        super_pacgums: dict[tuple[int], SuperPacgum]
     ) -> None:
         self.WIDTH = 960
         self.HEIGHT = 720
@@ -119,6 +122,8 @@ class Visualizer:
         self.pinky: Pinky = pinky
         self.inky: Inky = inky
         self.clyde: Clyde = clyde
+        self.pacgums: dict[tuple[int], Pacgum] = pacgums
+        self.super_pacgums: dict[tuple[int], SuperPacgum] = super_pacgums
         pygame.init()
 
     def manage_mouse_click(self, btn_game, btn_high_score, btn_theme):
@@ -404,7 +409,7 @@ class Visualizer:
             # moins bon en perf de recharger l'image a chaque fois
             self._print_skin(
                 pygame.transform.scale(
-                    pygame.image.load(self.blinky.skin),
+                    pygame.image.load(self.blinky.actual_skin),
                     (self.cell_width, self.cell_height),
                 ),
                 self.blinky.pixel_x,
@@ -412,7 +417,7 @@ class Visualizer:
             )
             self._print_skin(
                 pygame.transform.scale(
-                    pygame.image.load(self.pinky.skin),
+                    pygame.image.load(self.pinky.actual_skin),
                     (self.cell_width, self.cell_height),
                 ),
                 self.pinky.pixel_x,
@@ -420,7 +425,7 @@ class Visualizer:
             )
             self._print_skin(
                 pygame.transform.scale(
-                    pygame.image.load(self.inky.skin),
+                    pygame.image.load(self.inky.actual_skin),
                     (self.cell_width, self.cell_height),
                 ),
                 self.inky.pixel_x,
@@ -428,29 +433,48 @@ class Visualizer:
             )
             self._print_skin(
                 pygame.transform.scale(
-                    pygame.image.load(self.clyde.skin),
+                    pygame.image.load(self.clyde.actual_skin),
                     (self.cell_width, self.cell_height),
                 ),
                 self.clyde.pixel_x,
                 self.clyde.pixel_y,
             )
+            for pacgum in self.pacgums.values():
+                if pacgum.visible:
+                    self._print_skin(
+                        pygame.transform.scale(
+                            pygame.image.load(pacgum.skin),
+                            (self.cell_width, self.cell_height),
+                        ),
+                        pacgum.pixel_x, pacgum.pixel_y
+                    )
+            for super_pacgum in self.super_pacgums.values():
+                if super_pacgum.visible:
+                    self._print_skin(
+                        pygame.transform.scale(
+                            pygame.image.load(super_pacgum.skin),
+                            (self.cell_width * 2, self.cell_height * 2),
+                        ),
+                        super_pacgum.pixel_x, super_pacgum.pixel_y
+                    )
             # Si le zombie attrape le joueur, Game Over
-            if (
-                ((self.player.x == self.blinky.x) and (self.player.y == self.blinky.y))
-                or ((self.player.x == self.pinky.x) and (self.player.y == self.pinky.y))
-                or ((self.player.x == self.inky.x) and (self.player.y == self.inky.y))
-                or ((self.player.x == self.clyde.x) and (self.player.y == self.clyde.y))
-            ):
-                self.player.lives -= 1
-                if self.player.lives <= 0:
-                    print("Game Over...")
-                    return
-                pygame.time.wait(1000)
-                self._reset_all_param()
-                
-                self._show_game()
+            if not self.player.pacgum_effect:
+                if (
+                    ((self.player.x == self.blinky.x) and (self.player.y == self.blinky.y))
+                    or ((self.player.x == self.pinky.x) and (self.player.y == self.pinky.y))
+                    or ((self.player.x == self.inky.x) and (self.player.y == self.inky.y))
+                    or ((self.player.x == self.clyde.x) and (self.player.y == self.clyde.y))
+                ):
+                    self.player.lives -= 1
+                    if self.player.lives <= 0:
+                        print("Game Over...")
+                        return
+                    pygame.time.wait(1000)
+                    self._reset_all_param()
+                    
+                    self._show_game()
             pygame.display.flip()
-            clock.tick(10)
+            clock.tick(60)
         return
 
     def _show_game_over(self) -> None:

@@ -4,10 +4,14 @@ from math import dist
 
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Surface
+from pacgum import Pacgum, SuperPacgum
 
 
 class Player:
-    def __init__(self, lives: int, maze_height: int, maze_width: int, maze: MazeGenerator):
+    """Player class"""
+    def __init__(self, lives: int, maze_height: int, maze_width: int,
+                 maze: MazeGenerator, pacgums: dict[tuple[int], Pacgum],
+                 super_pacgums: dict[tuple[int], SuperPacgum]):
         self.lives: int = lives
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
@@ -21,8 +25,12 @@ class Player:
         self.queud_direction: str = ""
         self.skin: Surface | None = None
         self.score: int = 0
-        self.speed: float = 0.20
+        self.speed: float = 0.10
         self.maze = maze
+        self.pacgums: dict[tuple[int], Pacgum] = pacgums
+        self.super_pacgums: dict[tuple[int], SuperPacgum] = super_pacgums
+        self.pacgum_effect: bool = False
+        self.timer_effect = 0
 
     def reset_param(self) -> None:
         """Reset the player parameters for a new game."""
@@ -31,6 +39,8 @@ class Player:
             self.next_y,
         ) = self.spawn
         self.direction = self.queud_direction = ""
+        self.timer_effect = 0
+        self.pacgum_effect = False
 
     def _is_neighbor(
         self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int
@@ -65,6 +75,10 @@ class Player:
 
     def update_player(self):
         """update the player position and player movement pixel by pixel"""
+        if self.timer_effect > 0:
+            self.timer_effect -= 1
+        if self.timer_effect == 0 and self.pacgum_effect == True:
+            self.pacgum_effect = False
         if self.move_progress >= 1.0:
             self.x = self.next_x
             self.y = self.next_y
@@ -106,6 +120,16 @@ class Player:
         self.move_progress = min(1.0, self.move_progress + self.speed)
         self.pixel_x = self.x + (self.next_x - self.x) * self.move_progress
         self.pixel_y = self.y + (self.next_y - self.y) * self.move_progress
+        if (self.x, self.y) in self.pacgums:
+            if self.pacgums[self.x, self.y].visible:
+                self.pacgums[self.x, self.y].visible = False
+                self.score += self.pacgums[self.x, self.y].points
+        if (self.x, self.y) in self.super_pacgums:
+            if self.super_pacgums[self.x, self.y].visible:
+                self.super_pacgums[self.x, self.y].visible = False
+                self.score += self.super_pacgums[self.x, self.y].points
+                self.pacgum_effect = True
+                self.timer_effect = 360
 
 
 class Ghost(ABC):
@@ -118,7 +142,9 @@ class Ghost(ABC):
         player: Player,
         is_frozen: bool = False,
     ):
-        self.skin = skin
+        self.actual_skin = skin
+        self.default_skin = skin
+        self.vulnerable_skin = "./assets/skin/ghosts/blue_ghost.png"
         self.x = spawn_x
         self.y = spawn_y
         self.next_x = spawn_x
@@ -131,7 +157,7 @@ class Ghost(ABC):
         self.is_vulnerable = False
         self.is_frozen = is_frozen
         self.respawn_timer = 0
-        self.speed = 0.15
+        self.speed = 0.05
         self.move_progress = 1.0
         self.maze = maze
         self.player = player
@@ -160,13 +186,13 @@ class Ghost(ABC):
         self.alive = True
 
     def die(self):
-        self.alive = False
-        self.is_vulnerable = False
-        self.respawn_timer = 10
+        # self.alive = False
+        self.reset_param()
+        # self.respawn_timer = 10
 
     def get_moves_possible(self, maze: MazeGenerator, x, y):
         possible = []
-        if x >= maze._width or y >= maze._height or x < 0 or y < 0:
+        if x >= len(maze.maze[0]) or y >= len(maze.maze) or x < 0 or y < 0:
             return []
         current_case_value = maze.maze[y][x]
         if not (current_case_value & 1):
@@ -186,6 +212,13 @@ class Ghost(ABC):
             self.next_x,
             self.next_y,
         ) = self.spawn
+        self.actual_skin = self.default_skin
+        self.is_vulnerable = False
+
+    def player_boosted(self) -> bool:
+        """check if the player is boosted with super pacgums"""
+        if self.player.pacgum_effect:
+            return True
 
 
 class Blinky(Ghost):  # chases, dest player pos
@@ -197,16 +230,27 @@ class Blinky(Ghost):  # chases, dest player pos
         super().__init__(skin, spawn_x, spawn_y, maze, player, is_frozen)
 
     def next_move(self) -> tuple[int, int]:
-        if self.is_frozen or not self.alive:
+        if self.player_boosted():
+            self.is_vulnerable = True
+        else:
+            self.is_vulnerable = False
+        if self.is_frozen:
             return (self.x, self.y)
 
         if self.is_vulnerable:
             self.target = self.spawn
+            self.actual_skin = self.vulnerable_skin
         else:
+            self.actual_skin = self.default_skin
             self.target = (self.player.x, self.player.y)
 
         if (self.x, self.y) == self.target:
-            return (self.x, self.y)
+            print("touch")
+            if self.player.pacgum_effect and self.is_vulnerable:
+                print("should die")
+                self.die()
+            else:
+                return (self.x, self.y)
         queue = deque()
         visited = {(self.x, self.y)}
 
@@ -260,12 +304,17 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
         super().__init__(skin, spawn_x, spawn_y, maze, player, is_frozen)
 
     def next_move(self) -> tuple[int, int]:
+        if self.player_boosted():
+            self.is_vulnerable = True
+        else:
+            self.is_vulnerable = False
         if self.is_frozen or not self.alive:
             return (self.x, self.y)
 
         if self.is_vulnerable:
-            self.target = self.spawn
+            self.actual_skin = self.vulnerable_skin
         else:
+            self.actual_skin = self.default_skin
             if self.player.direction == "UP" and self.player.y - 2 >= 0:
                 self.target = (self.player.x, self.player.y - 2)
             elif (
@@ -284,7 +333,11 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
                 self.target = (self.player.x, self.player.y)
 
         if (self.x, self.y) == self.target:
-            return (self.x, self.y)
+            if self.player.pacgum_effect and self.is_vulnerable:
+                print("should die")
+                self.die()
+            else:
+                return (self.x, self.y)
         queue = deque()
         visited = {(self.x, self.y)}
 
@@ -342,19 +395,28 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
         self.pinky = pinky
 
     def next_move(self) -> tuple[int, int]:
+        if self.player_boosted():
+            self.is_vulnerable = True
+        else:
+            self.is_vulnerable = False
         if self.is_frozen or not self.alive:
             return (self.x, self.y)
 
         if self.is_vulnerable:
-            self.target = self.spawn
+            self.actual_skin = self.vulnerable_skin
         else:
+            self.actual_skin = self.default_skin
             self.target = (
                 self.blinky.target[0] - self.pinky.target[0],
                 self.blinky.target[1] - self.pinky.target[1],
             )
 
         if (self.x, self.y) == self.target:
-            return (self.x, self.y)
+            if self.player.pacgum_effect and self.is_vulnerable:
+                print("should die")
+                self.die()
+            else:
+                return (self.x, self.y)
         queue = deque()
         visited = {(self.x, self.y)}
 
@@ -407,6 +469,10 @@ class Clyde(Ghost):  # weird
         super().__init__(skin, spawn_x, spawn_y, maze, player, is_frozen)
 
     def next_move(self) -> tuple[int, int]:
+        if self.player_boosted():
+            self.is_vulnerable = True
+        else:
+            self.is_vulnerable = False
         if self.is_frozen or not self.alive:
             return (self.x, self.y)
 
@@ -415,11 +481,18 @@ class Clyde(Ghost):  # weird
             or dist((self.x, self.y), (self.player.x, self.player.y)) <= 3
         ):
             self.target = self.spawn
+            if self.is_vulnerable:
+                self.actual_skin = self.vulnerable_skin
         else:
+            self.actual_skin = self.default_skin
             self.target = (self.player.x, self.player.y)
 
         if (self.x, self.y) == self.target:
-            return (self.x, self.y)
+            if self.player.pacgum_effect and self.is_vulnerable:
+                print("should die")
+                self.die()
+            else:
+                return (self.x, self.y)
         queue = deque()
         visited = {(self.x, self.y)}
 
