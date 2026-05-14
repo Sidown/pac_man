@@ -43,7 +43,8 @@ class Player:
         self.pacgum_effect = False
 
     def _is_neighbor(
-        self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int
+        self, current_cell: tuple[int, int],
+        next_cell: tuple[int, int], opp_code: int
     ) -> bool:
         """A function to know if the movement to the next cell is possible."""
         curr_x, curr_y = current_cell
@@ -77,7 +78,7 @@ class Player:
         """update the player position and player movement pixel by pixel"""
         if self.timer_effect > 0:
             self.timer_effect -= 1
-        if self.timer_effect == 0 and self.pacgum_effect == True:
+        if self.timer_effect == 0 and self.pacgum_effect is True:
             self.pacgum_effect = False
         if self.move_progress >= 1.0:
             self.x = self.next_x
@@ -133,6 +134,7 @@ class Player:
 
 
 class Ghost(ABC):
+    """abstract class for ghost"""
     def __init__(
         self,
         skin: str,
@@ -162,13 +164,16 @@ class Ghost(ABC):
         self.maze = maze
         self.player = player
         self.direction = "UP"
-        self.opposite = {"UP": "DOWN", "DOWN": "UP", "LEFT": "RIGHT", "RIGHT": "LEFT"}
+        self.opposite = {"UP": "DOWN", "DOWN": "UP",
+                         "LEFT": "RIGHT", "RIGHT": "LEFT"}
 
     @abstractmethod
     def next_move(self):
+        """Abstract method to get the next move of the ghost"""
         pass
 
     def play(self):
+        """Move the ghost"""
         if self.move_progress >= 1.0:
             self.x = self.next_x
             self.y = self.next_y
@@ -181,16 +186,19 @@ class Ghost(ABC):
         self.pixel_y = self.y + (self.next_y - self.y) * self.move_progress
 
     def respawn(self):
+        """Respawn the ghost when killed"""
         self.x = self.spawn[0]
         self.y = self.spawn[1]
         self.alive = True
 
     def die(self):
+        """Kill the ghost"""
         # self.alive = False
         self.reset_param()
         # self.respawn_timer = 10
 
     def get_moves_possible(self, maze: MazeGenerator, x, y):
+        """get a list of possible moves"""
         possible = []
         if x >= len(maze.maze[0]) or y >= len(maze.maze) or x < 0 or y < 0:
             return []

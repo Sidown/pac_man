@@ -26,15 +26,19 @@ def main():
     pacgums = {}
     for (y, row) in enumerate(mazegenerator.maze):
         for (x, _) in enumerate(row):
-            if mazegenerator.maze[y][x] != 15 and not_corner(mazegenerator, x, y):
-                pacgums.update({(x, y): Pacgum(20, (x, y), "./assets/skin/other/dot.png")})
+            if (mazegenerator.maze[y][x] != 15 and
+               not_corner(mazegenerator, x, y)):
+                pacgums.update({(x, y): Pacgum(20, (x, y),
+                                               "./assets/skin/other/dot.png")})
     super_pacgums_coord = [(0, 0), (0, len(mazegenerator.maze) - 1),
                            (len(mazegenerator.maze[0]) - 1, 0),
                            (len(mazegenerator.maze[0]) - 1,
                             len(mazegenerator.maze) - 1)]
     super_pacgums = {}
     for coord in super_pacgums_coord:
-        super_pacgums.update({coord: SuperPacgum(100, coord, "./assets/skin/other/sdot.png")})
+        super_pacgums.update({coord:
+                              SuperPacgum(100, coord,
+                                          "./assets/skin/other/sdot.png")})
     player = Player(
         3,
         14,
@@ -44,15 +48,21 @@ def main():
         super_pacgums
     )
 
-    blinky = Blinky("./assets/skin/ghosts/blinky.png", 0, 0, mazegenerator, player)
-    pinky = Pinky("./assets/skin/ghosts/pinky.png", 0, len(mazegenerator.maze) - 1, mazegenerator, player)
+    blinky = Blinky("./assets/skin/ghosts/blinky.png", 0, 0,
+                    mazegenerator, player)
+    pinky = Pinky("./assets/skin/ghosts/pinky.png", 0,
+                  len(mazegenerator.maze) - 1, mazegenerator, player)
     inky = Inky(
-        "./assets/skin/ghosts/inky.png", len(mazegenerator.maze[0]) - 1, 0, mazegenerator, player, blinky, pinky
+        "./assets/skin/ghosts/inky.png", len(mazegenerator.maze[0]) - 1, 0,
+        mazegenerator, player, blinky, pinky
     )
-    clyde = Clyde("./assets/skin/ghosts/clyde.png", len(mazegenerator.maze[0]) - 1, len(mazegenerator.maze) - 1, mazegenerator, player)
+    clyde = Clyde("./assets/skin/ghosts/clyde.png",
+                  len(mazegenerator.maze[0]) - 1, len(mazegenerator.maze) - 1,
+                  mazegenerator, player)
 
     # Visualisation
-    gui = Visualizer(mazegenerator, blinky, pinky, inky, clyde, player, pacgums, super_pacgums)
+    gui = Visualizer(mazegenerator, blinky, pinky, inky, clyde, player,
+                     pacgums, super_pacgums)
     gui.run()
 
 
