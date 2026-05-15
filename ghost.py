@@ -4,14 +4,24 @@ from math import dist
 
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Surface
+
 from pacgum import Pacgum, SuperPacgum
 
 
 class Player:
     """Player class"""
-    def __init__(self, lives: int, maze_height: int, maze_width: int,
-                 maze: MazeGenerator, pacgums: dict[tuple[int], Pacgum],
-                 super_pacgums: dict[tuple[int], SuperPacgum]):
+
+    def __init__(
+        self,
+        skin_path: str,
+        lives: int,
+        maze_height: int,
+        maze_width: int,
+        maze: MazeGenerator,
+        pacgums: dict[tuple[int], Pacgum],
+        super_pacgums: dict[tuple[int], SuperPacgum],
+    ):
+        self.skin_path: str = skin_path
         self.lives: int = lives
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
@@ -43,8 +53,7 @@ class Player:
         self.pacgum_effect = False
 
     def _is_neighbor(
-        self, current_cell: tuple[int, int],
-        next_cell: tuple[int, int], opp_code: int
+        self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int
     ) -> bool:
         """A function to know if the movement to the next cell is possible."""
         curr_x, curr_y = current_cell
@@ -135,6 +144,7 @@ class Player:
 
 class Ghost(ABC):
     """abstract class for ghost"""
+
     def __init__(
         self,
         skin: str,
@@ -164,7 +174,6 @@ class Ghost(ABC):
         self.maze = maze
         self.player = player
         self.direction = "UP"
-        
 
     @abstractmethod
     def next_move(self):
@@ -177,19 +186,30 @@ class Ghost(ABC):
             self.x = self.next_x
             self.y = self.next_y
             move = self.next_move()
-            
-            opposite = {"UP": "DOWN", "DOWN": "UP",
-                         "LEFT": "RIGHT", "RIGHT": "LEFT"}
-            directions = {"UP": (0,-1), "DOWN": (0,1),
-                                  "LEFT": (-1,0), "RIGHT": (1,0)}
-            
+
+            opposite = {"UP": "DOWN", "DOWN": "UP", "LEFT": "RIGHT", "RIGHT": "LEFT"}
+            directions = {
+                "UP": (0, -1),
+                "DOWN": (0, 1),
+                "LEFT": (-1, 0),
+                "RIGHT": (1, 0),
+            }
+
             # check si next move est un demi tour
             if move != (self.x, self.y):
                 direction_x = move[0] - self.x
                 direction_y = move[1] - self.y
-                current_direction = next((direction for direction, (dx, dy) in directions.items()
-                                         if dx == direction_x and dy == direction_y), None)
-                if current_direction and current_direction == opposite.get(self.direction):
+                current_direction = next(
+                    (
+                        direction
+                        for direction, (dx, dy) in directions.items()
+                        if dx == direction_x and dy == direction_y
+                    ),
+                    None,
+                )
+                if current_direction and current_direction == opposite.get(
+                    self.direction
+                ):
                     moves = self.get_moves_possible(self.maze, self.x, self.y)
                     forward = [m for m in moves if m != opposite.get(self.direction)]
                     if forward:
@@ -197,28 +217,28 @@ class Ghost(ABC):
                         direction_x, direction_y = directions[move_chosen]
                         move = (self.x + direction_x, self.y + direction_y)
                         self.direction = move_chosen
-            
-            # force un mouvement si pas de deplacement 
+
+            # force un mouvement si pas de deplacement
             if move == (self.x, self.y):
                 moves = self.get_moves_possible(self.maze, self.x, self.y)
                 forward = [m for m in moves if m != opposite.get(self.direction)]
-                #check si mouvement autre que demi tour possible
+                # check si mouvement autre que demi tour possible
                 if forward:
                     move_chosen = forward[0]
                     direction_x, direction_y = directions[move_chosen]
                     move = (self.x + direction_x, self.y + direction_y)
                     self.direction = move_chosen
-                #si pass de mouvement autre que demi tour : demi tour
+                # si pass de mouvement autre que demi tour : demi tour
                 elif moves:
                     move_chosen = moves[0]
                     direction_x, direction_y = directions[move_chosen]
                     move = (self.x + direction_x, self.y + direction_y)
                     self.direction = move_chosen
-            
+
             self.next_x = move[0]
             self.next_y = move[1]
             self.move_progress = 0.0
-        
+
         self.move_progress = min(1.0, self.move_progress + self.speed)
         self.pixel_x = self.x + (self.next_x - self.x) * self.move_progress
         self.pixel_y = self.y + (self.next_y - self.y) * self.move_progress
@@ -290,7 +310,7 @@ class Blinky(Ghost):  # chases, dest player pos
             self.target = (self.player.x, self.player.y)
 
         if (self.x, self.y) == self.target:
-                return (self.x, self.y)
+            return (self.x, self.y)
         queue = deque()
         visited = {(self.x, self.y)}
 
@@ -373,7 +393,7 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
                 self.target = (self.player.x, self.player.y)
 
         if (self.x, self.y) == self.target:
-                return (self.x, self.y)
+            return (self.x, self.y)
         queue = deque()
         visited = {(self.x, self.y)}
 
@@ -448,7 +468,7 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
             )
 
         if (self.x, self.y) == self.target:
-                return (self.x, self.y)
+            return (self.x, self.y)
         queue = deque()
         visited = {(self.x, self.y)}
 
@@ -520,7 +540,7 @@ class Clyde(Ghost):  # weird
             self.target = (self.player.x, self.player.y)
 
         if (self.x, self.y) == self.target:
-                return (self.x, self.y)
+            return (self.x, self.y)
         queue = deque()
         visited = {(self.x, self.y)}
 
