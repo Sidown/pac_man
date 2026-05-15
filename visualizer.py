@@ -439,23 +439,31 @@ class Visualizer:
             self.player.update_player()
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
             # moins bon en perf de recharger l'image a chaque fois
+            blinky_surface = (self.vulnerable_skin if self.blinky.is_vulnerable
+                              else self.blinky_skin)
             self._print_skin(
-                self.blinky_skin,
+                blinky_surface,
                 self.blinky.pixel_x,
                 self.blinky.pixel_y,
             )
+            pinky_surface = (self.vulnerable_skin if self.pinky.is_vulnerable
+                              else self.pinky_skin)
             self._print_skin(
-                self.pinky_skin,
+                pinky_surface,
                 self.pinky.pixel_x,
                 self.pinky.pixel_y,
             )
+            inky_surface = (self.vulnerable_skin if self.inky.is_vulnerable
+                              else self.inky_skin)
             self._print_skin(
-                self.inky_skin,
+                inky_surface,
                 self.inky.pixel_x,
                 self.inky.pixel_y,
             )
+            clyde_surface = (self.vulnerable_skin if self.clyde.is_vulnerable
+                              else self.clyde_skin)
             self._print_skin(
-                self.clyde_skin,
+                clyde_surface,
                 self.clyde.pixel_x,
                 self.clyde.pixel_y,
             )
