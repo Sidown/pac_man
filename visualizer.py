@@ -99,6 +99,7 @@ class Visualizer:
         self.HEIGHT = 720
         self.PADDING = 150
         self.maze: MazeGenerator = maze
+        pygame.init()
         self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         self.maze_height = len(self.maze.maze)
         self.maze_width = len(self.maze.maze[0])
@@ -118,13 +119,37 @@ class Visualizer:
             pygame.image.load("assets/skin/skin_survivor.png"),
             (self.cell_width, self.cell_height),
         )
+        self.vulnerable_skin = pygame.transform.scale(
+            pygame.image.load("./assets/skin/ghosts/blue_ghost.png"),
+            (self.cell_width, self.cell_height)
+        )
         self.blinky: Blinky = blinky
+        self.blinky_skin = pygame.transform.scale(
+                    pygame.image.load(self.blinky.actual_skin),
+                    (self.cell_width, self.cell_height))
         self.pinky: Pinky = pinky
+        self.pinky_skin = pygame.transform.scale(
+                    pygame.image.load(self.pinky.actual_skin),
+                    (self.cell_width, self.cell_height))
         self.inky: Inky = inky
+        self.inky_skin = pygame.transform.scale(
+                    pygame.image.load(self.inky.actual_skin),
+                    (self.cell_width, self.cell_height))
         self.clyde: Clyde = clyde
+        self.clyde_skin = pygame.transform.scale(
+                    pygame.image.load(self.clyde.actual_skin),
+                    (self.cell_width, self.cell_height))
         self.pacgums: dict[tuple[int], Pacgum] = pacgums
+        self.pacgums_skin = pygame.transform.scale(
+                    pygame.image.load("./assets/skin/other/dot.png"),
+                    (self.cell_width, self.cell_height))
         self.super_pacgums: dict[tuple[int], SuperPacgum] = super_pacgums
-        pygame.init()
+        self.super_pacgums_skin = pygame.transform.scale(
+                    pygame.image.load("./assets/skin/other/sdot.png"),
+                    (self.cell_width, self.cell_height))
+        self._btn_game_rect = pygame.Rect(0, 0, 0, 0)
+        self.hud_font = pygame.font.Font("assets/fonts/shlop rg.otf", 22)
+        self._btn_back_rect = pygame.Rect(0, 0, 0, 0)
 
     def manage_mouse_click(self, btn_game, btn_high_score, btn_theme):
         """Managed mouse click"""
@@ -190,6 +215,10 @@ class Visualizer:
         btn_high_score.create_boxed_text(True)
         btn_theme.create_boxed_text(True)
 
+        self._btn_game_rect = btn_game.rect
+        self._btn_high_score_rect = btn_high_score.rect
+        self._btn_theme_rect = btn_theme.rect
+
         self.manage_mouse_click(btn_game, btn_high_score, btn_theme)
 
     def run(self) -> None:
@@ -201,6 +230,11 @@ class Visualizer:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    x, y = event.pos
+                    if hasattr(self, '_btn_game_rect') and self._btn_game_rect.collidepoint(x, y):
+                        self._show_game()
+                        return
             self.screen.blit(self.bg, (0, 0))
             self._show_main_menu()
             pygame.display.flip()
@@ -246,14 +280,7 @@ class Visualizer:
             (126, 29, 29),
         )
         btn_back_to_main_menu.create_boxed_text(False)
-        if pygame.mouse.get_focused():
-            x, y = pygame.mouse.get_pos()
-            if btn_back_to_main_menu.rect.collidepoint(x, y):
-                btn_back_to_main_menu.set_color((200, 200, 200))
-                pressed = pygame.mouse.get_pressed()
-                if pressed[0]:
-                    self.run()
-                    return
+        self._btn_back_rect = btn_back_to_main_menu.rect
 
         curr_x = self.PADDING
         curr_y = self.PADDING
@@ -347,20 +374,18 @@ class Visualizer:
         pygame.draw.line(self.screen, (0, 0, 0), (x1, y2), (x2, y2), 3)
 
         # affichage du text dans le HUD
-        font = pygame.font.Font("assets/fonts/shlop rg.otf", 22)
-        life_nb = font.render("Life number: ", False, (0, 0, 0))
-        time = font.render("Time: ", False, (0, 0, 0))
-        current_score = font.render("Current score: ", False, (0, 0, 0))
-        highest_score = font.render("Highest score: ", False, (0, 0, 0))
+        life_nb = self.hud_font.render("Life number: ", False, (0, 0, 0))
+        timer = self.hud_font.render("Time: ", False, (0, 0, 0))
+        current_score = self.hud_font.render("Current score: ", False, (0, 0, 0))
+        highest_score = self.hud_font.render("Highest score: ", False, (0, 0, 0))
         self.screen.blit(life_nb, (x1 + 5, y1))
-        self.screen.blit(time, (x1 + 5, y1 + 25))
+        self.screen.blit(timer, (x1 + 5, y1 + 25))
         self.screen.blit(current_score, (x1 + 5, y1 + 50))
         self.screen.blit(highest_score, (x1 + 5, y1 + 75))
 
         # affichage des valeurs NB LIFE, TIME, HIGHSCORE ...
-        player_lives = font.render(f"{self.player.lives}", False, (0, 0, 0))
+        player_lives = self.hud_font.render(f"{self.player.lives}", False, (0, 0, 0))
         self.screen.blit(player_lives, (x1 + life_nb.get_width() + 5, y1))
-        pass
 
     def _reset_all_param(self) -> None:
         """Reset param for all ghosts and the player"""
@@ -395,6 +420,13 @@ class Visualizer:
                                 if event.type == pygame.KEYDOWN:
                                     if event.key == pygame.K_SPACE:
                                         is_paused = False
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    x, y = event.pos
+                    if self._btn_back_rect.collidepoint(x, y):
+                        game_running = False
+                        self.run()
+                        return
+                    
             self.screen.blit(self.bg, (0, 0))
             self.blinky.play()
             self.inky.play()
@@ -408,74 +440,53 @@ class Visualizer:
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
             # moins bon en perf de recharger l'image a chaque fois
             self._print_skin(
-                pygame.transform.scale(
-                    pygame.image.load(self.blinky.actual_skin),
-                    (self.cell_width, self.cell_height),
-                ),
+                self.blinky_skin,
                 self.blinky.pixel_x,
                 self.blinky.pixel_y,
             )
             self._print_skin(
-                pygame.transform.scale(
-                    pygame.image.load(self.pinky.actual_skin),
-                    (self.cell_width, self.cell_height),
-                ),
+                self.pinky_skin,
                 self.pinky.pixel_x,
                 self.pinky.pixel_y,
             )
             self._print_skin(
-                pygame.transform.scale(
-                    pygame.image.load(self.inky.actual_skin),
-                    (self.cell_width, self.cell_height),
-                ),
+                self.inky_skin,
                 self.inky.pixel_x,
                 self.inky.pixel_y,
             )
             self._print_skin(
-                pygame.transform.scale(
-                    pygame.image.load(self.clyde.actual_skin),
-                    (self.cell_width, self.cell_height),
-                ),
+                self.clyde_skin,
                 self.clyde.pixel_x,
                 self.clyde.pixel_y,
             )
             for pacgum in self.pacgums.values():
                 if pacgum.visible:
                     self._print_skin(
-                        pygame.transform.scale(
-                            pygame.image.load(pacgum.skin),
-                            (self.cell_width, self.cell_height),
-                        ),
+                        self.pacgums_skin,
                         pacgum.pixel_x, pacgum.pixel_y
                     )
             for super_pacgum in self.super_pacgums.values():
                 if super_pacgum.visible:
-                    self._print_skin(
-                        pygame.transform.scale(
-                            pygame.image.load(super_pacgum.skin),
-                            (self.cell_width, self.cell_height)
-                        ),
+                    self._print_skin(self.super_pacgums_skin,
                         super_pacgum.pixel_x, super_pacgum.pixel_y
                     )
             # Si le zombie attrape le joueur, Game Over
-            if not self.player.pacgum_effect:
-                if (
-                    ((self.player.x == self.blinky.x) and (self.player.y == self.blinky.y))
-                    or ((self.player.x == self.pinky.x) and (self.player.y == self.pinky.y))
-                    or ((self.player.x == self.inky.x) and (self.player.y == self.inky.y))
-                    or ((self.player.x == self.clyde.x) and (self.player.y == self.clyde.y))
-                ):
-                    self.player.lives -= 1
-                    if self.player.lives <= 0:
-                        print("Game Over...")
-                        return
-                    pygame.time.wait(1000)
-                    self._reset_all_param()
-                    
-                    self._show_game()
+            for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
+                    if (abs(self.player.pixel_x - ghost.pixel_x) < 0.6 and
+                       abs(self.player.pixel_y - ghost.pixel_y) < 0.6):
+                        if ghost.is_vulnerable:
+                            ghost.reset_param()
+                            self.player.score += 200
+                        else:
+                            self.player.lives -= 1
+                            if self.player.lives <= 0:
+                                print("Game Over...")
+                                return
+                            pygame.time.wait(1000)
+                            self._reset_all_param()
+
             pygame.display.flip()
             clock.tick(60)
-        return
 
     def _show_game_over(self) -> None:
         """The Game Over screen

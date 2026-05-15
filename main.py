@@ -17,7 +17,7 @@ def main():
 
     # Maze genereation
     mazegenerator = MazeGenerator(
-        size=(10, 10),
+        size=(15, 15),
         entry_cell=(0, 0),
         exit_cell=(-1, -1),
         seed=42,
