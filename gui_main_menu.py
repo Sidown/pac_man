@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 from pygame import Surface
 
@@ -11,7 +13,7 @@ class MainMenuScene:
         self.screen: Surface = screen
         self.theme: Theme = theme
         self.WIDTH, self.HEIGHT = width_height
-
+        self.current_scene = "main_menu"
         self.header = Text(
             self.screen,
             self.theme.header_size,
@@ -30,6 +32,7 @@ class MainMenuScene:
             self.theme.text_color,
             self.theme.background_color,
             "New Game",
+            self._game_callback,
             ((self.WIDTH // 2), 250),
             True,
             self.theme.btn_on_mouse_over_background_color,
@@ -43,6 +46,7 @@ class MainMenuScene:
             self.theme.text_color,
             self.theme.background_color,
             "View High Score",
+            "view_high_score_callback",
             ((self.WIDTH // 2), 350),
             True,
             self.theme.btn_on_mouse_over_background_color,
@@ -56,6 +60,7 @@ class MainMenuScene:
             self.theme.text_color,
             self.theme.background_color,
             "View Instructions",
+            "view_instruction_callback",
             ((self.WIDTH // 2), 450),
             True,
             self.theme.btn_on_mouse_over_background_color,
@@ -69,36 +74,27 @@ class MainMenuScene:
             self.theme.text_color,
             self.theme.background_color,
             "Exit",
+            self._exit_callback,
             ((self.WIDTH // 2), 550),
             True,
             self.theme.btn_on_mouse_over_background_color,
             self.theme.btn_on_mouse_over_text_color,
         )
 
+    def _exit_callback(self) -> None:
+        pygame.quit()
+        sys.exit()
+
+    def _game_callback(self) -> None:
+        self.current_scene = "game"
+
     def handle_events(self, events) -> str:
-        if pygame.mouse.get_focused():
-            x, y = pygame.mouse.get_pos()
-            if self.btn_game.rect.collidepoint(x, y):
-                self.btn_game.on_mouse_over()
-                pressed = pygame.mouse.get_pressed()
-                if pressed[0]:
-                    return "game"
-            if self.btn_high_score.rect.collidepoint(x, y):
-                self.btn_high_score.on_mouse_over()
-                pressed = pygame.mouse.get_pressed()
-                if pressed[0]:
-                    return "high-score"
-            if self.btn_instruction.rect.collidepoint(x, y):
-                self.btn_instruction.on_mouse_over()
-                pressed = pygame.mouse.get_pressed()
-                if pressed[0]:
-                    return "instruction"
-            if self.btn_exit.rect.collidepoint(x, y):
-                self.btn_exit.on_mouse_over()
-                pressed = pygame.mouse.get_pressed()
-                if pressed[0]:
-                    return "quit"
-        return "main_menu"
+        for event in events:
+            self.btn_game.handle_event(event)
+            self.btn_high_score.handle_event(event)
+            self.btn_instruction.handle_event(event)
+            self.btn_exit.handle_event(event)
+        return self.current_scene
 
     def update(self):
         pass

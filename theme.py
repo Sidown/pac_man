@@ -76,9 +76,13 @@ class Clickable:
         self,
         on_mouse_over_background_color: tuple[int, int, int],
         on_mouse_over_text_color: tuple[int, int, int],
+        hovered: bool,
+        callback,
     ) -> None:
         self.on_mouse_over_bg_color = on_mouse_over_background_color
         self.on_mouse_over_text_color = on_mouse_over_text_color
+        self.hovered = hovered
+        self.callback = callback
 
 
 class Button(Text, Clickable):
@@ -90,6 +94,7 @@ class Button(Text, Clickable):
         font_color: tuple[int, int, int],
         background_color: tuple[int, int, int],
         text: str,
+        callback,
         coordinate: tuple[int, int],
         center_x: bool,
         on_mouse_over_background_color: tuple[int, int, int],
@@ -107,7 +112,11 @@ class Button(Text, Clickable):
             center_x,
         )
         Clickable.__init__(
-            self, on_mouse_over_background_color, on_mouse_over_text_color
+            self,
+            on_mouse_over_background_color,
+            on_mouse_over_text_color,
+            False,
+            callback,
         )
         # calculate the coordinate of the rect
         self.displayed_text = self.font.render(
@@ -127,7 +136,6 @@ class Button(Text, Clickable):
 
     def on_mouse_over(self) -> None:
         """Display an animation during if the mouse is over the element"""
-
         # print the rect and the text on the surface.
         pygame.draw.rect(self.surface, self.on_mouse_over_bg_color, self.rect)
         if self.center_x:
@@ -137,4 +145,16 @@ class Button(Text, Clickable):
             )
         else:
             self.surface.blit(self.displayed_text, (self.x, self.y))
-        pygame.display.flip()
+
+    def draw(self, screen) -> None:
+        color = self.on_mouse_over_bg_color if self.hovered else self.background_color
+        pygame.draw.rect(screen, color, self.rect)
+        text_surf = self.font.render(self.text, True, self.font_color)
+        text_rect = text_surf.get_rect(center=self.rect.center)
+        screen.blit(text_surf, text_rect)
+
+    def handle_event(self, event) -> None:
+        if event.type == pygame.MOUSEMOTION:
+            self.hovered = self.rect.collidepoint(event.pos)
+        elif event.type == pygame.MOUSEBUTTONDOWN and self.hovered:
+            self.callback()

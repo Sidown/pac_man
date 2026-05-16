@@ -1,5 +1,3 @@
-import sys
-
 import pygame
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Surface
@@ -314,7 +312,6 @@ class GameScene:
         self.inky.play()
         self.pinky.play()
         self.clyde.play()
-        # ca ne marche pas pour les deplacement du player.
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:

@@ -228,7 +228,7 @@ class Ghost(ABC):
                     direction_x, direction_y = directions[move_chosen]
                     move = (self.x + direction_x, self.y + direction_y)
                     self.direction = move_chosen
-                # si pass de mouvement autre que demi tour : demi tour
+                # si pas de mouvement autre que demi tour : demi tour
                 elif moves:
                     move_chosen = moves[0]
                     direction_x, direction_y = directions[move_chosen]
