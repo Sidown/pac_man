@@ -41,11 +41,15 @@ class Visualizer:
         ) / self.maze_height
         self.player: Player = player
         self.player.skin = pygame.transform.scale(
-            pygame.image.load("assets/skin/skin_survivor.png"),
+            pygame.image.load(self.player.skin_path),
             (self.cell_width, self.cell_height),
         )
         self.vulnerable_skin = pygame.transform.scale(
             pygame.image.load("./assets/skin/ghosts/blue_ghost.png"),
+            (self.cell_width, self.cell_height),
+        )
+        self.eyes_skin = pygame.transform.scale(
+            pygame.image.load("./assets/skin/ghosts/eyes.png"),
             (self.cell_width, self.cell_height),
         )
         self.blinky: Blinky = blinky
@@ -423,6 +427,10 @@ class Visualizer:
                     and abs(self.player.pixel_y - ghost.pixel_y) < 0.6
                 ):
                     if ghost.is_vulnerable:
+                        # skin de ghost devient eyes.png
+                        # ghost.skin = self.eyes_skin
+                        # ghost fait le chemin pour aller a son spawn
+                        #  reset param
                         ghost.reset_param()
                         self.player.score += 200
                     else:
@@ -433,7 +441,7 @@ class Visualizer:
                         pygame.time.wait(1000)
                         self._reset_all_param()
             pygame.display.flip()
-            clock.tick(10)
+            clock.tick(20)
         return
 
     def _show_game_over(self) -> None:

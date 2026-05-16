@@ -49,7 +49,6 @@ class Text:
         text: str,
         coordinate: tuple[int, int],
         center_x: bool,
-        center_y: bool,
     ) -> None:
         self.surface: Surface = surface
         self.font_size: int = font_size
@@ -60,18 +59,16 @@ class Text:
         self.text: str = text
         self.x, self.y = coordinate
         self.center_x: bool = center_x
-        self.center_y: bool = center_y
 
-    def create(self) -> None:
+    def draw(self, screen: Surface) -> None:
         """Create a Text instance."""
         displayed_text = self.font.render(self.text, False, self.font_color)
 
         if self.center_x:
-            self.x = self.x - (displayed_text.get_width() / 2)
-        if self.center_y:
-            self.y = self.y - (displayed_text.get_height() / 2)
-
-        self.surface.blit(displayed_text, (self.x, self.y))
+            center_x = self.x - (displayed_text.get_width() / 2)
+            screen.blit(displayed_text, (center_x, self.y))
+        else:
+            screen.blit(displayed_text, (self.x, self.y))
 
 
 class Clickable:
@@ -95,7 +92,6 @@ class Button(Text, Clickable):
         text: str,
         coordinate: tuple[int, int],
         center_x: bool,
-        center_y: bool,
         on_mouse_over_background_color: tuple[int, int, int],
         on_mouse_over_text_color: tuple[int, int, int],
     ):
@@ -109,7 +105,6 @@ class Button(Text, Clickable):
             text,
             coordinate,
             center_x,
-            center_y,
         )
         Clickable.__init__(
             self, on_mouse_over_background_color, on_mouse_over_text_color
@@ -121,19 +116,25 @@ class Button(Text, Clickable):
         x1 = self.x
         y1 = self.y
 
-        if self.center_x:
-            x1 = x1 - (self.displayed_text.get_width() / 2)
-        if self.center_y:
-            y1 = y1 - (self.displayed_text.get_height() / 2)
-
         x2 = self.displayed_text.get_width()
         y2 = self.displayed_text.get_height()
 
-        self.rect = pygame.Rect(x1, y1, x2, y2)
+        if self.center_x:
+            center_x = x1 - (self.displayed_text.get_width() / 2)
+            self.rect = pygame.Rect(center_x, y1, x2, y2)
+        else:
+            self.rect = pygame.Rect(x1, y1, x2, y2)
 
     def on_mouse_over(self) -> None:
         """Display an animation during if the mouse is over the element"""
 
         # print the rect and the text on the surface.
         pygame.draw.rect(self.surface, self.on_mouse_over_bg_color, self.rect)
-        self.surface.blit(self.displayed_text, (self.x, self.y))
+        if self.center_x:
+            self.surface.blit(
+                self.displayed_text,
+                (self.x - (self.displayed_text.get_width() / 2), self.y),
+            )
+        else:
+            self.surface.blit(self.displayed_text, (self.x, self.y))
+        pygame.display.flip()

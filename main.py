@@ -3,10 +3,10 @@ from mazegenerator.mazegenerator import MazeGenerator
 
 import parser
 from ghost import Blinky, Clyde, Inky, Pinky, Player
+from gui_main_loop import Visualizer
 from not_corner import not_corner
 from pacgum import Pacgum, SuperPacgum
 from theme import Theme
-from visualizer import Visualizer
 
 
 def main():

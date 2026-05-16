@@ -18,8 +18,8 @@ class Player:
         maze_height: int,
         maze_width: int,
         maze: MazeGenerator,
-        pacgums: dict[tuple[int], Pacgum],
-        super_pacgums: dict[tuple[int], SuperPacgum],
+        pacgums: dict[tuple[int, int], Pacgum],
+        super_pacgums: dict[tuple[int, int], SuperPacgum],
     ):
         self.skin_path: str = skin_path
         self.lives: int = lives
@@ -37,8 +37,8 @@ class Player:
         self.score: int = 0
         self.speed: float = 0.10
         self.maze = maze
-        self.pacgums: dict[tuple[int], Pacgum] = pacgums
-        self.super_pacgums: dict[tuple[int], SuperPacgum] = super_pacgums
+        self.pacgums: dict[tuple[int, int], Pacgum] = pacgums
+        self.super_pacgums: dict[tuple[int, int], SuperPacgum] = super_pacgums
         self.pacgum_effect: bool = False
         self.timer_effect = 0
 
