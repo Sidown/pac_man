@@ -13,16 +13,16 @@ class GameOverScene:
         self.WIDTH, self.HEIGHT = width_height
         self.PADDING = 80
 
-    def handle_events(self):
+    def handle_events(self, events):
         return "game_over"
 
     def update(self):
         pass
 
-    def draw(self, screen):
+    def draw(self):
         self.screen.fill(self.theme.background_color)
         game_over_text = pygame.font.Font(self.theme.font_path, 56).render(
-            "Game Over ... Fucki.. looser !!!!!", True, (255, 0, 100)
+            "Game Over ... looser !!!!!", True, (255, 0, 100)
         )
         self.screen.blit(
             game_over_text,

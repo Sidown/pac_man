@@ -14,6 +14,7 @@ class GameScene:
     def __init__(
         self, screen: Surface, theme: Theme, width_height: tuple[int, int]
     ) -> None:
+        self.current_scene = "game"
         self.screen: Surface = screen
         self.theme: Theme = theme
         self.WIDTH, self.HEIGHT = width_height
@@ -288,6 +289,9 @@ class GameScene:
         self.pinky.reset_param()
         self.clyde.reset_param()
 
+    def _game_over(self) -> None:
+        self.current_scene = "game_over"
+
     def handle_events(self, events) -> str:
         for event in events:
             if event.type == pygame.KEYDOWN:
@@ -301,7 +305,7 @@ class GameScene:
                     self.player.queud_direction = "W"
                 if event.key == pygame.K_SPACE:
                     self.paused = not self.paused
-        return "game"
+        return self.current_scene
 
     def update(self):
         if self.paused:
@@ -339,7 +343,7 @@ class GameScene:
                     self.player.lives -= 1
                     if self.player.lives <= 0:
                         print("Game Over...")
-                        # aller sur le screen gameover avec un callback ?
+                        self._game_over()
                     pygame.time.wait(1000)
                     self._reset_all_param()
 
@@ -361,7 +365,6 @@ class GameScene:
         else:
             self._print_maze()
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
-            # moins bon en perf de recharger l'image a chaque fois
             blinky_surface = (
                 self.vulnerable_skin if self.blinky.is_vulnerable else self.blinky_skin
             )
