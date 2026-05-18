@@ -3,7 +3,7 @@ from collections import deque
 from math import dist
 
 from mazegenerator.mazegenerator import MazeGenerator
-from pygame import Surface
+from pygame import Surface, transform, image
 
 from pacgum import Pacgum, SuperPacgum
 
@@ -13,15 +13,16 @@ class Player:
 
     def __init__(
         self,
-        skin_path: str,
         lives: int,
         maze_height: int,
         maze_width: int,
         maze: MazeGenerator,
         pacgums: dict[tuple[int, int], Pacgum],
         super_pacgums: dict[tuple[int, int], SuperPacgum],
+        cell_height,
+        cell_width
     ):
-        self.skin_path: str = skin_path
+        self.maze = maze
         self.lives: int = lives
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
@@ -33,10 +34,24 @@ class Player:
         self.move_progress: float = 1.0
         self.direction: str = ""
         self.queud_direction: str = ""
-        self.skin: Surface | None = None
+        self.skin: Surface | None = transform.scale(
+            image.load("assets/skin/pacman.png"),
+            (cell_width, cell_height),
+        )
+        self.skin_dict = {"N": [transform.scale(
+                image.load(f"assets/skin/pacman-up/{i}.png"),
+                (cell_width, cell_height)) for i in range(1, 4)],
+                "S": [transform.scale(
+                image.load(f"assets/skin/pacman-down/{i}.png"),
+                (cell_width, cell_height)) for i in range(1, 4)],
+                "W": [transform.scale(
+                image.load(f"assets/skin/pacman-left/{i}.png"),
+                (cell_width, cell_height)) for i in range(1, 4)],
+                "E": [transform.scale(
+                image.load(f"assets/skin/pacman-right/{i}.png"),
+                (cell_width, cell_height)) for i in range(1, 4)]}
         self.score: int = 0
         self.speed: float = 0.10
-        self.maze = maze
         self.pacgums: dict[tuple[int, int], Pacgum] = pacgums
         self.super_pacgums: dict[tuple[int, int], SuperPacgum] = super_pacgums
         self.pacgum_effect: bool = False
@@ -152,11 +167,26 @@ class Ghost(ABC):
         spawn_y: int,
         maze: MazeGenerator,
         player: Player,
+        cell_width,
+        cell_height,
         is_frozen: bool = False,
     ):
-        self.actual_skin = skin
-        self.default_skin = skin
-        self.vulnerable_skin = "./assets/skin/ghosts/blue_ghost.png"
+        self.actual_skin = transform.scale(
+            image.load(skin),
+            (cell_width, cell_height),
+        )
+        self.default_skin = transform.scale(
+            image.load(skin),
+            (cell_width, cell_height),
+        )
+        self.vulnerable_skin = transform.scale(
+            image.load("./assets/skin/ghosts/blue_ghost.png"),
+            (cell_width, cell_height),
+        )
+        self.return_spawn_skin = transform.scale(
+            image.load("./assets/skin/ghosts/eyes.png"),
+            (cell_width, cell_height),
+        )
         self.x = spawn_x
         self.y = spawn_y
         self.next_x = spawn_x
@@ -291,8 +321,8 @@ class Blinky(Ghost):  # chases, dest player pos
     during Scatter mode. He also has an "angry" mode that is triggered when there are a
     certain number of dots left in the maze."""
 
-    def __init__(self, skin, spawn_x, spawn_y, maze, player, is_frozen=False):
-        super().__init__(skin, spawn_x, spawn_y, maze, player, is_frozen)
+    def __init__(self, skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen = False):
+        super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
 
     def next_move(self) -> tuple[int, int]:
         if self.player_boosted():
@@ -360,8 +390,8 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
     game's coding, if Pac-Man faces upwards, Pinky's target will be 2 Pac-Dots in front of and 2
     to the left of Pac-Man. During Scatter mode, she heads towards the upper-left corner."""
 
-    def __init__(self, skin, spawn_x, spawn_y, maze, player, is_frozen=False):
-        super().__init__(skin, spawn_x, spawn_y, maze, player, is_frozen)
+    def __init__(self, skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen = False):
+        super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
 
     def next_move(self) -> tuple[int, int]:
         if self.player_boosted():
@@ -443,10 +473,8 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
     Blinky and Pac-Man, where the distance Blinky is from Pinky's target is doubled to
     get Inky's target. He heads to the lower-right corner during Scatter mode."""
 
-    def __init__(
-        self, skin, spawn_x, spawn_y, maze, player, blinky, pinky, is_frozen=False
-    ):
-        super().__init__(skin, spawn_x, spawn_y, maze, player, is_frozen)
+    def __init__(self, skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, blinky, pinky, is_frozen = False):
+        super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
         self.blinky = blinky
         self.pinky = pinky
 
@@ -517,9 +545,9 @@ class Clyde(Ghost):  # weird
     """Chases directly after Pac-Man, but tries to head to his Scatter corner when within
     an 8-Dot radius of Pac-Man. His Scatter Mode corner is the lower-left."""
 
-    def __init__(self, skin, spawn_x, spawn_y, maze, player, is_frozen=False):
-        super().__init__(skin, spawn_x, spawn_y, maze, player, is_frozen)
-
+    def __init__(self, skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen = False):
+        super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
+        
     def next_move(self) -> tuple[int, int]:
         if self.player_boosted():
             self.is_vulnerable = True

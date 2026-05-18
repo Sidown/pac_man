@@ -42,32 +42,40 @@ class GameScene:
             for x, _ in enumerate(row):
                 if self.maze.maze[y][x] != 15 and not_corner(self.maze, x, y):
                     self.pacgums.update(
-                        {(x, y): Pacgum(20, (x, y), "./assets/skin/other/dot.png")}
+                        {(x, y): Pacgum(20, (x, y), "./assets/skin/other/dot.png",
+                                        self.cell_width, self.cell_height)}
                     )
         super_pacgums_coord = [
             (0, 0),
             (0, len(self.maze.maze) - 1),
             (len(self.maze.maze[0]) - 1, 0),
-            (len(self.maze.maze[0]) - 1, len(self.maze.maze) - 1),
+            (len(self.maze.maze[0]) - 1, len(self.maze.maze) - 1)
         ]
         self.super_pacgums = {}
         for coord in super_pacgums_coord:
             self.super_pacgums.update(
-                {coord: SuperPacgum(100, coord, "./assets/skin/other/sdot.png")}
+                {coord: SuperPacgum(100, coord, "./assets/skin/other/sdot.png",
+                                    self.cell_width, self.cell_height)}
             )
 
         self.player = Player(
-            "assets/skin/pacman.png",
             3,
             14,
             14,
             self.maze,
             self.pacgums,
             self.super_pacgums,
+            self.cell_height,
+            self.cell_width
         )
 
         self.blinky = Blinky(
-            "./assets/skin/ghosts/blinky.png", 0, 0, self.maze, self.player
+            "./assets/skin/ghosts/blinky.png",
+            0, 0,
+            self.maze,
+            self.player,
+            self.cell_width,
+            self.cell_height
         )
         self.pinky = Pinky(
             "./assets/skin/ghosts/pinky.png",
@@ -75,6 +83,8 @@ class GameScene:
             len(self.maze.maze) - 1,
             self.maze,
             self.player,
+            self.cell_width,
+            self.cell_height
         )
         self.inky = Inky(
             "./assets/skin/ghosts/inky.png",
@@ -82,8 +92,10 @@ class GameScene:
             0,
             self.maze,
             self.player,
+            self.cell_width,
+            self.cell_height,
             self.blinky,
-            self.pinky,
+            self.pinky
         )
         self.clyde = Clyde(
             "./assets/skin/ghosts/clyde.png",
@@ -91,45 +103,10 @@ class GameScene:
             len(self.maze.maze) - 1,
             self.maze,
             self.player,
+            self.cell_width,
+            self.cell_height
         )
 
-        self.player.skin = pygame.transform.scale(
-            pygame.image.load(self.player.skin_path),
-            (self.cell_width, self.cell_height),
-        )
-        self.vulnerable_skin = pygame.transform.scale(
-            pygame.image.load("./assets/skin/ghosts/blue_ghost.png"),
-            (self.cell_width, self.cell_height),
-        )
-        self.eyes_skin = pygame.transform.scale(
-            pygame.image.load("./assets/skin/ghosts/eyes.png"),
-            (self.cell_width, self.cell_height),
-        )
-        self.blinky_skin = pygame.transform.scale(
-            pygame.image.load(self.blinky.actual_skin),
-            (self.cell_width, self.cell_height),
-        )
-        self.pinky_skin = pygame.transform.scale(
-            pygame.image.load(self.pinky.actual_skin),
-            (self.cell_width, self.cell_height),
-        )
-        self.inky_skin = pygame.transform.scale(
-            pygame.image.load(self.inky.actual_skin),
-            (self.cell_width, self.cell_height),
-        )
-        self.clyde_skin = pygame.transform.scale(
-            pygame.image.load(self.clyde.actual_skin),
-            (self.cell_width, self.cell_height),
-        )
-        self.pacgums_skin = pygame.transform.scale(
-            pygame.image.load("./assets/skin/other/dot.png"),
-            (self.cell_width, self.cell_height),
-        )
-
-        self.super_pacgums_skin = pygame.transform.scale(
-            pygame.image.load("./assets/skin/other/sdot.png"),
-            (self.cell_width, self.cell_height),
-        )
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
@@ -165,27 +142,15 @@ class GameScene:
             self.skin_timer = 0
             self.skin_index = (
                 (self.skin_index + 1) % 3
-            ) + 1  # car 3 images par pacman direction.
+            )  # car 3 images par pacman direction.
         if self.player.direction == "N":
-            self.player.skin = pygame.transform.scale(
-                pygame.image.load(f"assets/skin/pacman-up/{self.skin_index}.png"),
-                (self.cell_width, self.cell_height),
-            )
+            self.player.skin = self.player.skin_dict["N"][self.skin_index]
         if self.player.direction == "S":
-            self.player.skin = pygame.transform.scale(
-                pygame.image.load(f"assets/skin/pacman-down/{self.skin_index}.png"),
-                (self.cell_width, self.cell_height),
-            )
+            self.player.skin = self.player.skin_dict["S"][self.skin_index ]
         if self.player.direction == "W":
-            self.player.skin = pygame.transform.scale(
-                pygame.image.load(f"assets/skin/pacman-left/{self.skin_index}.png"),
-                (self.cell_width, self.cell_height),
-            )
+            self.player.skin = self.player.skin_dict["W"][self.skin_index]
         if self.player.direction == "E":
-            self.player.skin = pygame.transform.scale(
-                pygame.image.load(f"assets/skin/pacman-right/{self.skin_index}.png"),
-                (self.cell_width, self.cell_height),
-            )
+            self.player.skin = self.player.skin_dict["E"][self.skin_index]
 
     def _show_maze(self, curr_x, curr_y):
         """Show the maze"""
@@ -388,7 +353,8 @@ class GameScene:
             self._print_maze()
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
             blinky_surface = (
-                self.vulnerable_skin if self.blinky.is_vulnerable else self.blinky_skin
+                self.blinky.vulnerable_skin if self.blinky.is_vulnerable
+                else self.blinky.default_skin
             )
             self._print_skin(
                 blinky_surface,
@@ -396,7 +362,8 @@ class GameScene:
                 self.blinky.pixel_y,
             )
             pinky_surface = (
-                self.vulnerable_skin if self.pinky.is_vulnerable else self.pinky_skin
+                self.pinky.vulnerable_skin if self.pinky.is_vulnerable
+                else self.pinky.default_skin
             )
             self._print_skin(
                 pinky_surface,
@@ -404,7 +371,8 @@ class GameScene:
                 self.pinky.pixel_y,
             )
             inky_surface = (
-                self.vulnerable_skin if self.inky.is_vulnerable else self.inky_skin
+                self.inky.vulnerable_skin if self.inky.is_vulnerable
+                else self.inky.default_skin
             )
             self._print_skin(
                 inky_surface,
@@ -412,7 +380,8 @@ class GameScene:
                 self.inky.pixel_y,
             )
             clyde_surface = (
-                self.vulnerable_skin if self.clyde.is_vulnerable else self.clyde_skin
+                self.clyde.vulnerable_skin if self.clyde.is_vulnerable
+                else self.clyde.default_skin
             )
             self._print_skin(
                 clyde_surface,
@@ -421,11 +390,11 @@ class GameScene:
             )
             for pacgum in self.pacgums.values():
                 if pacgum.visible:
-                    self._print_skin(self.pacgums_skin, pacgum.pixel_x, pacgum.pixel_y)
+                    self._print_skin(pacgum.skin, pacgum.pixel_x, pacgum.pixel_y)
             for super_pacgum in self.super_pacgums.values():
                 if super_pacgum.visible:
                     self._print_skin(
-                        self.super_pacgums_skin,
+                        super_pacgum.skin,
                         super_pacgum.pixel_x,
                         super_pacgum.pixel_y,
                     )
