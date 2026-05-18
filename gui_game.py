@@ -153,6 +153,12 @@ class GameScene:
             )
             width += life_skin.get_width() + 5
 
+    def _print_score(self) -> None:
+        score_text = pygame.font.Font(
+            self.theme.font_path, self.theme.text_size
+        ).render(f"Score: {self.player.score}", True, self.theme.text_color)
+        self.screen.blit(score_text, (self.PADDING, 15))
+
     def _update_pacman_skin(self) -> None:
         self.skin_timer += self.animation_speed
         if self.skin_timer >= 1:
@@ -424,3 +430,4 @@ class GameScene:
                         super_pacgum.pixel_y,
                     )
             self._print_life()
+            self._print_score()
