@@ -110,17 +110,19 @@ class GameScene:
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
-
-    def _print_life(self) -> None:
-        nb_life = self.player.lives
-        life_skin = pygame.transform.scale(
+        self.life_skin = pygame.transform.scale(
             pygame.image.load("assets/skin/pacman.png"),
             (self.cell_width, self.cell_height),
         )
+        self.score_font = pygame.font.Font(
+            self.theme.font_path, self.theme.text_size)
+
+    def _print_life(self) -> None:
+        nb_life = self.player.lives
         width = 0
         for life in range(nb_life):
             self.screen.blit(
-                life_skin,
+                self.life_skin,
                 (
                     self.PADDING + width,
                     self.PADDING
@@ -128,12 +130,10 @@ class GameScene:
                     + (2 * self.cell_height),
                 ),
             )
-            width += life_skin.get_width() + 5
+            width += self.life_skin.get_width() + 5
 
     def _print_score(self) -> None:
-        score_text = pygame.font.Font(
-            self.theme.font_path, self.theme.text_size
-        ).render(f"Score: {self.player.score}", True, self.theme.text_color)
+        score_text = self.score_font.render(f"Score: {self.player.score}", True, self.theme.text_color)
         self.screen.blit(score_text, (self.PADDING, 15))
 
     def _update_pacman_skin(self) -> None:
@@ -302,18 +302,9 @@ class GameScene:
         self.inky.play()
         self.pinky.play()
         self.clyde.play()
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    self.player.queud_direction = "N"
-                if event.key == pygame.K_DOWN:
-                    self.player.queud_direction = "S"
-                if event.key == pygame.K_RIGHT:
-                    self.player.queud_direction = "E"
-                if event.key == pygame.K_LEFT:
-                    self.player.queud_direction = "W"
         self.player.update_player()
-        self._update_pacman_skin()
+        if self.player.direction != "":
+            self._update_pacman_skin()
         for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
             if (
                 abs(self.player.pixel_x - ghost.pixel_x) < 0.6
