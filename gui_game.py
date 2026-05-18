@@ -303,21 +303,16 @@ class GameScene:
         self.pinky.play()
         self.clyde.play()
         self.player.update_player()
-        if self.player.direction != "":
-            self.player.update_player()
         for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
             if ghost.collide_with_player():
                 if ghost.is_vulnerable:
-                    # skin de ghost devient eyes.png
-                    # ghost.skin = self.eyes_skin
-                    # ghost fait le chemin pour aller a son spawn
-                    #  reset param
                     ghost.die()
-                else:
+                elif not ghost.died:
                     self.player.lives -= 1
                     if self.player.lives <= 0:
                         print("Game Over...")
                         self._game_over()
+                        return
                     pygame.time.wait(1000)
                     self._reset_all_param()
 
