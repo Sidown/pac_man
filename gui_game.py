@@ -134,6 +134,25 @@ class GameScene:
         self.skin_timer = 0
         self.animation_speed = 0.3
 
+    def _print_life(self) -> None:
+        nb_life = self.player.lives
+        life_skin = pygame.transform.scale(
+            pygame.image.load("assets/skin/pacman.png"),
+            (self.cell_width, self.cell_height),
+        )
+        width = 0
+        for life in range(nb_life):
+            self.screen.blit(
+                life_skin,
+                (
+                    self.PADDING + width,
+                    self.PADDING
+                    + (self.maze_height * self.cell_height)
+                    + (2 * self.cell_height),
+                ),
+            )
+            width += life_skin.get_width() + 5
+
     def _update_pacman_skin(self) -> None:
         self.skin_timer += self.animation_speed
         if self.skin_timer >= 1:
@@ -404,3 +423,4 @@ class GameScene:
                         super_pacgum.pixel_x,
                         super_pacgum.pixel_y,
                     )
+            self._print_life()
