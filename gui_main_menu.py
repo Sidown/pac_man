@@ -107,7 +107,6 @@ class MainMenuScene:
         pass
 
     def draw(self):
-        print(self.current_scene)
         self.screen.fill(self.theme.background_color)
         self.header.draw(self.screen)
         self.btn_game.draw(self.screen)

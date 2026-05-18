@@ -39,6 +39,5 @@ class HighScoreScene:
         pass
 
     def draw(self):
-        print(self.current_scene)
         self.screen.fill(self.theme.background_color)
         self.btn_back_to_menu.draw(self.screen)
