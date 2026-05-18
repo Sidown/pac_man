@@ -193,7 +193,7 @@ class Ghost(ABC):
         self.next_y = spawn_y
         self.pixel_x = float(spawn_x)
         self.pixel_y = float(spawn_y)
-        self.alive = True
+        self.died = False
         self.spawn = (spawn_x, spawn_y)
         self.target: tuple[int] = self.spawn
         self.is_vulnerable = False
@@ -277,13 +277,16 @@ class Ghost(ABC):
         """Respawn the ghost when killed"""
         self.x = self.spawn[0]
         self.y = self.spawn[1]
-        self.alive = True
 
     def die(self):
         """Kill the ghost"""
-        # self.alive = False
-        self.reset_param()
-        # self.respawn_timer = 10
+        self.died = True
+        self.x, self.y = (
+            self.next_x,
+            self.next_y,
+        ) = self.spawn
+        self.actual_skin = self.default_skin
+        self.is_vulnerable = False
 
     def get_moves_possible(self, maze: MazeGenerator, x, y):
         """get a list of possible moves"""
@@ -310,6 +313,7 @@ class Ghost(ABC):
         ) = self.spawn
         self.actual_skin = self.default_skin
         self.is_vulnerable = False
+        self.died = False
 
     def player_boosted(self) -> bool:
         """check if the player is boosted with super pacgums"""
@@ -325,7 +329,7 @@ class Blinky(Ghost):  # chases, dest player pos
         super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
 
     def next_move(self) -> tuple[int, int]:
-        if self.player_boosted():
+        if self.player_boosted() and not self.died:
             self.is_vulnerable = True
         else:
             self.is_vulnerable = False
@@ -394,11 +398,11 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
         super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
 
     def next_move(self) -> tuple[int, int]:
-        if self.player_boosted():
+        if self.player_boosted() and not self.died:
             self.is_vulnerable = True
         else:
             self.is_vulnerable = False
-        if self.is_frozen or not self.alive:
+        if self.is_frozen:
             return (self.x, self.y)
 
         if self.is_vulnerable:
@@ -479,11 +483,11 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
         self.pinky = pinky
 
     def next_move(self) -> tuple[int, int]:
-        if self.player_boosted():
+        if self.player_boosted() and not self.died:
             self.is_vulnerable = True
         else:
             self.is_vulnerable = False
-        if self.is_frozen or not self.alive:
+        if self.is_frozen:
             return (self.x, self.y)
 
         if self.is_vulnerable:
@@ -547,13 +551,13 @@ class Clyde(Ghost):  # weird
 
     def __init__(self, skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen = False):
         super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
-        
+
     def next_move(self) -> tuple[int, int]:
-        if self.player_boosted():
+        if self.player_boosted() and not self.died:
             self.is_vulnerable = True
         else:
             self.is_vulnerable = False
-        if self.is_frozen or not self.alive:
+        if self.is_frozen:
             return (self.x, self.y)
 
         if (

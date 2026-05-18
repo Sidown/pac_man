@@ -324,7 +324,7 @@ class GameScene:
                     # ghost.skin = self.eyes_skin
                     # ghost fait le chemin pour aller a son spawn
                     #  reset param
-                    ghost.reset_param()
+                    ghost.die()
                     self.player.score += 200
                 else:
                     self.player.lives -= 1
