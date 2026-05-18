@@ -46,7 +46,7 @@ class MainMenuScene:
             self.theme.text_color,
             self.theme.background_color,
             "View High Score",
-            "view_high_score_callback",
+            self._highscore_callback,
             ((self.WIDTH // 2), 350),
             True,
             self.theme.btn_on_mouse_over_background_color,
@@ -60,7 +60,7 @@ class MainMenuScene:
             self.theme.text_color,
             self.theme.background_color,
             "View Instructions",
-            "view_instruction_callback",
+            self._instruction_callback,
             ((self.WIDTH // 2), 450),
             True,
             self.theme.btn_on_mouse_over_background_color,
@@ -88,7 +88,14 @@ class MainMenuScene:
     def _game_callback(self) -> None:
         self.current_scene = "game"
 
+    def _instruction_callback(self) -> None:
+        self.current_scene = "instruction"
+
+    def _highscore_callback(self) -> None:
+        self.current_scene = "high_score"
+
     def handle_events(self, events) -> str:
+        self.current_scene = "main_menu"
         for event in events:
             self.btn_game.handle_event(event)
             self.btn_high_score.handle_event(event)
