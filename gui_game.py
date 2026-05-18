@@ -136,21 +136,21 @@ class GameScene:
         score_text = self.score_font.render(f"Score: {self.player.score}", True, self.theme.text_color)
         self.screen.blit(score_text, (self.PADDING, 15))
 
-    def _update_pacman_skin(self) -> None:
-        self.skin_timer += self.animation_speed
-        if self.skin_timer >= 1:
-            self.skin_timer = 0
-            self.skin_index = (
-                (self.skin_index + 1) % 3
-            )  # car 3 images par pacman direction.
-        if self.player.direction == "N":
-            self.player.skin = self.player.skin_dict["N"][self.skin_index]
-        if self.player.direction == "S":
-            self.player.skin = self.player.skin_dict["S"][self.skin_index ]
-        if self.player.direction == "W":
-            self.player.skin = self.player.skin_dict["W"][self.skin_index]
-        if self.player.direction == "E":
-            self.player.skin = self.player.skin_dict["E"][self.skin_index]
+    # def _update_pacman_skin(self) -> None:
+    #     self.skin_timer += self.animation_speed
+    #     if self.skin_timer >= 1:
+    #         self.skin_timer = 0
+    #         self.skin_index = (
+    #             (self.skin_index + 1) % 3
+    #         )  # car 3 images par pacman direction.
+    #     if self.player.direction == "N":
+    #         self.player.skin = self.player.skin_dict["N"][self.skin_index]
+    #     if self.player.direction == "S":
+    #         self.player.skin = self.player.skin_dict["S"][self.skin_index ]
+    #     if self.player.direction == "W":
+    #         self.player.skin = self.player.skin_dict["W"][self.skin_index]
+    #     if self.player.direction == "E":
+    #         self.player.skin = self.player.skin_dict["E"][self.skin_index]
 
     def _show_maze(self, curr_x, curr_y):
         """Show the maze"""
@@ -304,19 +304,15 @@ class GameScene:
         self.clyde.play()
         self.player.update_player()
         if self.player.direction != "":
-            self._update_pacman_skin()
+            self.player.update_player()
         for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
-            if (
-                abs(self.player.pixel_x - ghost.pixel_x) < 0.6
-                and abs(self.player.pixel_y - ghost.pixel_y) < 0.6
-            ):
+            if ghost.collide_with_player():
                 if ghost.is_vulnerable:
                     # skin de ghost devient eyes.png
                     # ghost.skin = self.eyes_skin
                     # ghost fait le chemin pour aller a son spawn
                     #  reset param
                     ghost.die()
-                    self.player.score += 200
                 else:
                     self.player.lives -= 1
                     if self.player.lives <= 0:
@@ -343,39 +339,23 @@ class GameScene:
         else:
             self._print_maze()
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
-            blinky_surface = (
-                self.blinky.vulnerable_skin if self.blinky.is_vulnerable
-                else self.blinky.default_skin
-            )
             self._print_skin(
-                blinky_surface,
+                self.blinky.current_skin,
                 self.blinky.pixel_x,
                 self.blinky.pixel_y,
             )
-            pinky_surface = (
-                self.pinky.vulnerable_skin if self.pinky.is_vulnerable
-                else self.pinky.default_skin
-            )
             self._print_skin(
-                pinky_surface,
+                self.pinky.current_skin,
                 self.pinky.pixel_x,
                 self.pinky.pixel_y,
             )
-            inky_surface = (
-                self.inky.vulnerable_skin if self.inky.is_vulnerable
-                else self.inky.default_skin
-            )
             self._print_skin(
-                inky_surface,
+                self.inky.current_skin,
                 self.inky.pixel_x,
                 self.inky.pixel_y,
             )
-            clyde_surface = (
-                self.clyde.vulnerable_skin if self.clyde.is_vulnerable
-                else self.clyde.default_skin
-            )
             self._print_skin(
-                clyde_surface,
+                self.clyde.current_skin,
                 self.clyde.pixel_x,
                 self.clyde.pixel_y,
             )

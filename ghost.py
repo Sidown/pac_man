@@ -56,6 +56,9 @@ class Player:
         self.super_pacgums: dict[tuple[int, int], SuperPacgum] = super_pacgums
         self.pacgum_effect: bool = False
         self.timer_effect = 0
+        self.skin_timer = 0
+        self.skin_index = 0
+        self.animation_speed = 0.3
 
     def reset_param(self) -> None:
         """Reset the player parameters for a new game."""
@@ -99,7 +102,7 @@ class Player:
         return False
 
     def update_player(self):
-        """update the player position and player movement pixel by pixel"""
+        """update the player position, player movement pixel by pixel and player skin"""
         if self.timer_effect > 0:
             self.timer_effect -= 1
         if self.timer_effect == 0 and self.pacgum_effect is True:
@@ -155,6 +158,22 @@ class Player:
                 self.score += self.super_pacgums[self.x, self.y].points
                 self.pacgum_effect = True
                 self.timer_effect = 360
+        
+        self.skin_timer += self.animation_speed
+        if self.skin_timer >= 1:
+            self.skin_timer = 0
+            self.skin_index = (
+                (self.skin_index + 1) % 3
+            )  # car 3 images par pacman direction.
+        if self.direction == "N":
+            self.skin = self.skin_dict["N"][self.skin_index]
+        if self.direction == "S":
+            self.skin = self.skin_dict["S"][self.skin_index ]
+        if self.direction == "W":
+            self.skin = self.skin_dict["W"][self.skin_index]
+        if self.direction == "E":
+            self.skin = self.skin_dict["E"][self.skin_index]
+
 
 
 class Ghost(ABC):
@@ -287,6 +306,7 @@ class Ghost(ABC):
         ) = self.spawn
         self.actual_skin = self.default_skin
         self.is_vulnerable = False
+        self.player.score += 200
 
     def get_moves_possible(self, maze: MazeGenerator, x, y):
         """get a list of possible moves"""
@@ -318,6 +338,20 @@ class Ghost(ABC):
     def player_boosted(self) -> bool:
         """check if the player is boosted with super pacgums"""
         return self.player.pacgum_effect
+    
+    def collide_with_player(self) -> bool:
+        """check if the ghost collide with the player"""
+        if (
+                abs(self.player.pixel_x - self.pixel_x) < 0.6
+                and abs(self.player.pixel_y - self.pixel_y) < 0.6
+            ):
+            return True
+        return False
+    
+    @property
+    def current_skin(self):
+        return (self.vulnerable_skin if self.is_vulnerable
+                else self.default_skin)
 
 
 class Blinky(Ghost):  # chases, dest player pos
