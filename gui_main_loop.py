@@ -5,6 +5,8 @@ from pygame import Surface, time
 
 from gui_game import GameScene
 from gui_game_over import GameOverScene
+from gui_highscore import HighScoreScene
+from gui_instruction import InstructionScene
 from gui_main_menu import MainMenuScene
 from theme import Theme
 
@@ -33,6 +35,12 @@ class Visualizer:
             ),
             "game": GameScene(self.screen, self.theme, (self.WIDTH, self.HEIGHT)),
             "game_over": GameOverScene(
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT)
+            ),
+            "instruction": InstructionScene(
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT)
+            ),
+            "high_score": HighScoreScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
             ),
         }
