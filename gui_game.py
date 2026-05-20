@@ -23,6 +23,7 @@ class GameScene:
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
+        self.current_level_index = 0
         self.life_skin = pygame.transform.scale(
             pygame.image.load("assets/skin/pacman.png"),
             (self.cell_width, self.cell_height),
@@ -249,6 +250,19 @@ class GameScene:
                         return
                     pygame.time.wait(1000)
                     self._reset_all_param()
+        if all(not pacgum.visible for pacgum in self.pacgums.values()):
+            self._next_level()
+        
+    def _next_level(self):
+        self.current_level_index += 1
+        if self.current_level_index >= len(self.game.level_configs):
+            self.current_scene = "game_over"
+            return
+        old_score = self.player.score
+        old_lives = self.player.lives
+        self._load_level(self.current_level_index)
+        self.player.score = old_score
+        self.player.lives = old_lives
 
     def draw(self):
         self.screen.fill(self.theme.game_background_color)
