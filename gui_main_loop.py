@@ -52,6 +52,9 @@ class Visualizer:
                 pygame.quit()
                 sys.exit()
             next_scene = scenes[current_scene].handle_events(events)
+            if current_scene != "game" and next_scene == "game":
+                scenes["game"] = GameScene(self.screen, self.theme,
+                                           (self.WIDTH, self.HEIGHT))
             current_scene = next_scene
 
             scenes[current_scene].update()

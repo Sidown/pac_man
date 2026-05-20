@@ -2,9 +2,8 @@ import pygame
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Surface
 
-from ghost import Blinky, Clyde, Inky, Pinky, Player
-from not_corner import not_corner
-from pacgum import Pacgum, SuperPacgum
+from game import Game
+from player import Player
 from theme import Theme
 
 
@@ -18,95 +17,9 @@ class GameScene:
         self.WIDTH, self.HEIGHT = width_height
         self.PADDING = 80
         self.paused = False
-        self.maze = MazeGenerator(
-            size=(15, 15),
-            entry_cell=(0, 0),
-            exit_cell=(-1, -1),
-            seed=42,
-        )
-        self.maze.generate()
-        self.maze_height = len(self.maze.maze)
-        self.maze_width = len(self.maze.maze[0])
-        self.border_size = 5
-        self.cell_width = (
-            self.WIDTH - (2 * self.PADDING) - ((self.maze_width + 1) * self.border_size)
-        ) / self.maze_width
-        self.cell_height = (
-            self.HEIGHT
-            - (2 * self.PADDING)
-            - ((self.maze_height + 1) * self.border_size)
-        ) / self.maze_height
-
-        self.pacgums = {}
-        for y, row in enumerate(self.maze.maze):
-            for x, _ in enumerate(row):
-                if self.maze.maze[y][x] != 15 and not_corner(self.maze, x, y):
-                    self.pacgums.update(
-                        {(x, y): Pacgum(20, (x, y), "./assets/skin/other/dot.png",
-                                        self.cell_width, self.cell_height)}
-                    )
-        super_pacgums_coord = [
-            (0, 0),
-            (0, len(self.maze.maze) - 1),
-            (len(self.maze.maze[0]) - 1, 0),
-            (len(self.maze.maze[0]) - 1, len(self.maze.maze) - 1)
-        ]
-        self.super_pacgums = {}
-        for coord in super_pacgums_coord:
-            self.super_pacgums.update(
-                {coord: SuperPacgum(100, coord, "./assets/skin/other/sdot.png",
-                                    self.cell_width, self.cell_height)}
-            )
-
-        self.player = Player(
-            3,
-            14,
-            14,
-            self.maze,
-            self.pacgums,
-            self.super_pacgums,
-            self.cell_height,
-            self.cell_width
-        )
-
-        self.blinky = Blinky(
-            "./assets/skin/ghosts/blinky.png",
-            0, 0,
-            self.maze,
-            self.player,
-            self.cell_width,
-            self.cell_height
-        )
-        self.pinky = Pinky(
-            "./assets/skin/ghosts/pinky.png",
-            0,
-            len(self.maze.maze) - 1,
-            self.maze,
-            self.player,
-            self.cell_width,
-            self.cell_height
-        )
-        self.inky = Inky(
-            "./assets/skin/ghosts/inky.png",
-            len(self.maze.maze[0]) - 1,
-            0,
-            self.maze,
-            self.player,
-            self.cell_width,
-            self.cell_height,
-            self.blinky,
-            self.pinky
-        )
-        self.clyde = Clyde(
-            "./assets/skin/ghosts/clyde.png",
-            len(self.maze.maze[0]) - 1,
-            len(self.maze.maze) - 1,
-            self.maze,
-            self.player,
-            self.cell_width,
-            self.cell_height
-        )
-
+        self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING)
+        self.current_level = 0
+        self._load_level(self.current_level)
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
@@ -116,6 +29,27 @@ class GameScene:
         )
         self.score_font = pygame.font.Font(
             self.theme.font_path, self.theme.text_size)
+
+    def _load_level(self, index: int) -> None:
+        level = self.game.get_level(index)
+        self.maze = level.maze
+        self.maze_height = len(self.maze.maze)
+        self.maze_width = len(self.maze.maze[0])
+        self.cell_width = level.cell_width
+        self.cell_height = level.cell_height
+        self.pacgums = level.pacgums
+        self.super_pacgums = level.super_pacgums
+        self.player = level.player
+        self.blinky = level.ghosts["blinky"]
+        self.pinky = level.ghosts["pinky"]
+        self.inky = level.ghosts["inky"]
+        self.clyde = level.ghosts["clyde"]
+        self.life_skin = pygame.transform.scale(
+            pygame.image.load("assets/skin/pacman.png"),
+            (self.cell_width, self.cell_height)
+        )
+        self.score_font = pygame.font.Font(self.theme.font_path,
+                                           self.theme.text_size)
 
     def _print_life(self) -> None:
         nb_life = self.player.lives

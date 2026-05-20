@@ -100,71 +100,68 @@ class Player:
         """update the player position, player movement pixel by pixel and player skin"""
         if self.timer_effect > 0:
             self.timer_effect -= 1
-        if self.timer_effect == 0 and self.pacgum_effect is True:
+        if self.timer_effect == 0 and self.pacgum_effect:
             self.pacgum_effect = False
+        
+        DIRECTIONS = {"N": (0,-1), "S": (0,1), "E": (1,0), "W": (-1,0)}
+        opposite = opposite = {"N": "S", "S": "N", "E": "W", "W": "E"}
+
+        if self.move_progress < 1.0 and self.queud_direction == opposite.get(self.direction):
+            self.next_x, self.next_y, self.x, self.y = (
+                self.x, self.y, self.next_x, self.next_y
+            )
+            self.direction = self.queud_direction
+            self.move_progress = 1.0 - self.move_progress
+            self.queud_direction = ""
+
         if self.move_progress >= 1.0:
             self.x = self.next_x
             self.y = self.next_y
-            direction_x, direction_y = {
-                "N": (0, -1),
-                "S": (0, 1),
-                "E": (1, 0),
-                "W": (-1, 0),
-            }.get(self.queud_direction, (0, 0))
 
-            new_x, new_y = self.x + direction_x, self.y + direction_y
-            if direction_x != 0 or direction_y != 0:
-                if self._is_neighbor(
-                    (self.x, self.y),
-                    (new_x, new_y),
-                    self.maze.maze[self.y][self.x],
-                ):
+            moved = False
+            for direction in [self.queud_direction, self.direction]:
+                if not direction:
+                    continue
+
+                direction_x, direction_y = DIRECTIONS.get(direction, (0, 0))
+                new_x, new_y = self.x + direction_x, self.y + direction_y
+                
+                if self._is_neighbor((self.x, self.y), (new_x, new_y),
+                                     self.maze.maze[self.y][self.x]):
                     self.next_x, self.next_y = new_x, new_y
-                    self.direction = self.queud_direction
+                    self.direction = direction
                     self.move_progress = 0.0
-
-            direction_x, direction_y = {
-                "N": (0, -1),
-                "S": (0, 1),
-                "E": (1, 0),
-                "W": (-1, 0),
-            }.get(self.direction, (0, 0))
-            new_x, new_y = self.x + direction_x, self.y + direction_y
-            if direction_x != 0 or direction_y != 0:
-                if self._is_neighbor(
-                    (self.x, self.y),
-                    (new_x, new_y),
-                    self.maze.maze[self.y][self.x],
-                ):
-                    self.next_x, self.next_y = new_x, new_y
-                    self.move_progress = 0.0
-                    return
-
+                    moved = True
+                    break
+                    
+            if not moved:
+                self.pixel_x = float(self.x)
+                self.pixel_y = float(self.y)
+                self._update_skin()
+                return
+            
         self.move_progress = min(1.0, self.move_progress + self.speed)
         self.pixel_x = self.x + (self.next_x - self.x) * self.move_progress
         self.pixel_y = self.y + (self.next_y - self.y) * self.move_progress
+
         if (self.x, self.y) in self.pacgums:
-            if self.pacgums[self.x, self.y].visible:
-                self.pacgums[self.x, self.y].visible = False
-                self.score += self.pacgums[self.x, self.y].points
+            if self.pacgums[(self.x, self.y)].visible:
+                self.pacgums[(self.x, self.y)].visible = False
+                self.score += self.pacgums[(self.x, self.y)].points
+        
         if (self.x, self.y) in self.super_pacgums:
-            if self.super_pacgums[self.x, self.y].visible:
-                self.super_pacgums[self.x, self.y].visible = False
-                self.score += self.super_pacgums[self.x, self.y].points
+            if self.super_pacgums[(self.x, self.y)].visible:
+                self.super_pacgums[(self.x, self.y)].visible = False
+                self.score += self.super_pacgums[(self.x, self.y)].points
                 self.pacgum_effect = True
                 self.timer_effect = 360
         
-        self.skin_timer += self.animation_speed
-        if self.skin_timer >= 1:
-            self.skin_timer = 0
-            self.skin_index = (
-                (self.skin_index + 1) % 3
-            )  # car 3 images par pacman direction.
-        if self.direction == "N":
-            self.skin = self.skin_dict["N"][self.skin_index]
-        if self.direction == "S":
-            self.skin = self.skin_dict["S"][self.skin_index ]
-        if self.direction == "W":
-            self.skin = self.skin_dict["W"][self.skin_index]
-        if self.direction == "E":
-            self.skin = self.skin_dict["E"][self.skin_index]
+        self._update_skin()
+
+    def _update_skin(self):
+        if self.direction:
+            self.skin_timer += self.animation_speed
+            if self.skin_timer >= 1:
+                self.skin_timer = 0
+                self.skin_index = (self.skin_index + 1) % 3
+            self.skin = self.skin_dict[self.direction][self.skin_index]
