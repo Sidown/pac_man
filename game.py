@@ -49,7 +49,8 @@ class Level:
         self.pacgums: dict[tuple[int], Pacgum] = {}
         for y, row in enumerate(self.maze.maze):
             for x, _ in enumerate(row):
-                if self.maze.maze[y][x] != 15 and not_corner(self.maze, x, y):
+                if (self.maze.maze[y][x] != 15 and not_corner(self.maze, x, y) and
+                    (x, y) != (len(self.maze.maze[0]) // 2, len(self.maze.maze) // 2)):
                     self.pacgums.update(
                         {(x, y): Pacgum(pacgum_points, (x, y),
                                         "./assets/skin/other/dot.png",
