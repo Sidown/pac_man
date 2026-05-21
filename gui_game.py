@@ -4,6 +4,7 @@ from pygame import Surface
 
 from game import Game
 from player import Player
+from score import HighScore
 from theme import Theme
 
 
@@ -28,8 +29,9 @@ class GameScene:
             pygame.image.load("assets/skin/pacman.png"),
             (self.cell_width, self.cell_height),
         )
-        self.score_font = pygame.font.Font(
-            self.theme.font_path, self.theme.text_size)
+        self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
+        self.highscore: HighScore = HighScore()
+        self.highscore.load_high_score()
 
     def _load_level(self, index: int) -> None:
         level = self.game.get_level(index)
@@ -47,10 +49,9 @@ class GameScene:
         self.clyde = level.ghosts["clyde"]
         self.life_skin = pygame.transform.scale(
             pygame.image.load("assets/skin/pacman.png"),
-            (self.cell_width, self.cell_height)
+            (self.cell_width, self.cell_height),
         )
-        self.score_font = pygame.font.Font(self.theme.font_path,
-                                           self.theme.text_size)
+        self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
 
     def _print_life(self) -> None:
         nb_life = self.player.lives
@@ -68,7 +69,9 @@ class GameScene:
             width += self.life_skin.get_width() + 5
 
     def _print_score(self) -> None:
-        score_text = self.score_font.render(f"Score: {self.player.score}", True, self.theme.text_color)
+        score_text = self.score_font.render(
+            f"Score: {self.player.score}", True, self.theme.text_color
+        )
         self.screen.blit(score_text, (self.PADDING, 15))
 
     # def _update_pacman_skin(self) -> None:
@@ -245,17 +248,34 @@ class GameScene:
                 elif not ghost.died:
                     self.player.lives -= 1
                     if self.player.lives <= 0:
-                        print("Game Over...")
+                        # sauvegarder le score. le joueur a perdu
                         self._game_over()
                         return
                     pygame.time.wait(1000)
                     self._reset_all_param()
         if all(not pacgum.visible for pacgum in self.pacgums.values()):
             self._next_level()
-        
+
+    def _print_highscore(self) -> None:
+        """Print the Highscore."""
+        highscore_text = self.score_font.render(
+            f"HighScore: {self.highscore.score[0][1]}", True, self.theme.text_color
+        )
+        self.screen.blit(highscore_text, (self.WIDTH // 2, 15))
+
+    # TODO
+    def _save_score(self) -> None:
+        """
+        Creer une popup pour saisir le nom du joueur
+        creer le score et le mettre dans Highscore
+        sauvegarder
+        """
+        pass
+
     def _next_level(self):
         self.current_level_index += 1
         if self.current_level_index >= len(self.game.level_configs):
+            # sauvegarder le score. le joueur a gagne
             self.current_scene = "game_over"
             return
         old_score = self.player.score
@@ -314,3 +334,4 @@ class GameScene:
                     )
             self._print_life()
             self._print_score()
+            self._print_highscore()
