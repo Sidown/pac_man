@@ -4,6 +4,7 @@ from pacgum import Pacgum, SuperPacgum
 from mazegenerator.mazegenerator import MazeGenerator
 from parser import Config, parser
 from not_corner import not_corner
+import random
 
 class Game:
     def __init__(self, window_size, padding):
@@ -31,14 +32,23 @@ class Game:
                 self.window_size[1] - (2 * self.padding) -
                 ((maze_height + 1) * self.border_size)
             ) / maze_height
-            self._loaded_levels[index] = Level(
-                (maze_width, maze_height),
-                self.config.points_per_pacgum,
-                self.config.points_per_super_pacgum,
-                cell_width, cell_height,
-                self.config.lives,
-                self.config.seed
-            )
+            if index == 0:
+                self._loaded_levels[index] = Level(
+                    (maze_width, maze_height),
+                    self.config.points_per_pacgum,
+                    self.config.points_per_super_pacgum,
+                    cell_width, cell_height,
+                    self.config.lives,
+                    self.config.seed
+                )
+            else:
+                self._loaded_levels[index] = Level(
+                    (maze_width, maze_height),
+                    self.config.points_per_pacgum,
+                    self.config.points_per_super_pacgum,
+                    cell_width, cell_height,
+                    self.config.lives,
+                    random.random())
         return self._loaded_levels[index]
    
 
