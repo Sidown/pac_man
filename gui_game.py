@@ -11,15 +11,20 @@ from theme import Theme
 
 class GameScene(Scene):
     def __init__(
-        self, screen: Surface, theme: Theme, width_height: tuple[int, int]
+        self,
+        screen: Surface,
+        theme: Theme,
+        width_height: tuple[int, int],
+        player: Player,
     ) -> None:
         self.current_scene = "game"
         self.screen: Surface = screen
         self.theme: Theme = theme
+        self.player: Player = player
         self.WIDTH, self.HEIGHT = width_height
         self.PADDING = 80
         self.paused = False
-        self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING)
+        self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING, self.player)
         self.current_level = 0
         self._load_level(self.current_level)
         self.skin_index = 0
@@ -33,6 +38,7 @@ class GameScene(Scene):
         self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
         self.highscore: HighScore = HighScore()
         self.highscore.load_high_score()
+        self.player._set_skins(self.cell_width, self.cell_height)
 
     def _load_level(self, index: int) -> None:
         level = self.game.get_level(index)
@@ -43,7 +49,7 @@ class GameScene(Scene):
         self.cell_height = level.cell_height
         self.pacgums = level.pacgums
         self.super_pacgums = level.super_pacgums
-        self.player = level.player
+        # self.player = level.player
         self.blinky = level.ghosts["blinky"]
         self.pinky = level.ghosts["pinky"]
         self.inky = level.ghosts["inky"]
@@ -53,6 +59,7 @@ class GameScene(Scene):
             (self.cell_width, self.cell_height),
         )
         self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
+        self.player._set_pacgum_pos(self.pacgums, self.super_pacgums)
 
     def _print_life(self) -> None:
         nb_life = self.player.lives
@@ -74,22 +81,6 @@ class GameScene(Scene):
             f"Score: {self.player.score}", True, self.theme.text_color
         )
         self.screen.blit(score_text, (self.PADDING, 15))
-
-    # def _update_pacman_skin(self) -> None:
-    #     self.skin_timer += self.animation_speed
-    #     if self.skin_timer >= 1:
-    #         self.skin_timer = 0
-    #         self.skin_index = (
-    #             (self.skin_index + 1) % 3
-    #         )  # car 3 images par pacman direction.
-    #     if self.player.direction == "N":
-    #         self.player.skin = self.player.skin_dict["N"][self.skin_index]
-    #     if self.player.direction == "S":
-    #         self.player.skin = self.player.skin_dict["S"][self.skin_index ]
-    #     if self.player.direction == "W":
-    #         self.player.skin = self.player.skin_dict["W"][self.skin_index]
-    #     if self.player.direction == "E":
-    #         self.player.skin = self.player.skin_dict["E"][self.skin_index]
 
     def _show_maze(self, curr_x, curr_y):
         """Show the maze"""
@@ -241,7 +232,7 @@ class GameScene(Scene):
         self.inky.play()
         self.pinky.play()
         self.clyde.play()
-        self.player.update_player()
+        self.player.update_player(self.maze)
         for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
             if ghost.collide_with_player():
                 if ghost.is_vulnerable:

@@ -10,7 +10,7 @@ from player import Player
 
 
 class Game:
-    def __init__(self, window_size, padding):
+    def __init__(self, window_size, padding, player):
         self.config: Config = parser("./config.json")
         self.levels: list[Level] = []
         for level in self.config.levels:
@@ -21,6 +21,7 @@ class Game:
             self.padding = padding
             self.level_configs = self.config.levels
             self._loaded_levels: dict[int, Level] = {}
+            self.player = player
 
     def get_level(self, index: int):
         if index not in self._loaded_levels:
@@ -46,6 +47,7 @@ class Game:
                     cell_height,
                     self.config.lives,
                     self.config.seed,
+                    self.player,
                 )
             else:
                 self._loaded_levels[index] = Level(
@@ -56,6 +58,7 @@ class Game:
                     cell_height,
                     self.config.lives,
                     random.random(),
+                    self.player,
                 )
         return self._loaded_levels[index]
 
@@ -70,9 +73,11 @@ class Level:
         cell_height,
         player_lives,
         seed,
+        player,
     ):
         self.maze: MazeGenerator = MazeGenerator(size, seed=seed)
         self.pacgums: dict[tuple[int], Pacgum] = {}
+        self.player = player
         for y, row in enumerate(self.maze.maze):
             for x, _ in enumerate(row):
                 if (
@@ -112,17 +117,6 @@ class Level:
                     )
                 }
             )
-
-        self.player: Player = Player(
-            player_lives,
-            len(self.maze.maze),
-            len(self.maze.maze[0]),
-            self.maze,
-            self.pacgums,
-            self.super_pacgums,
-            cell_height,
-            cell_width,
-        )
 
         blinky = Blinky(
             "./assets/skin/ghosts/blinky.png",

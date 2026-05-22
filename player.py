@@ -10,26 +10,35 @@ class Player:
     def __init__(
         self,
         lives: int,
-        maze_height: int,
-        maze_width: int,
-        maze: MazeGenerator,
-        pacgums: dict[tuple[int, int], Pacgum],
-        super_pacgums: dict[tuple[int, int], SuperPacgum],
-        cell_height,
-        cell_width,
+        spawn_x: int,
+        spawn_y: int,
+        # maze: MazeGenerator,
+        # pacgums: dict[tuple[int, int], Pacgum],
+        # super_pacgums: dict[tuple[int, int], SuperPacgum],
+        # cell_height,
+        # cell_width,
     ):
-        self.maze = maze
+        # self.maze = maze
         self.lives: int = lives
-        self.x: int = maze_width // 2
-        self.y: int = maze_height // 2
-        self.spawn: tuple[int, int] = (self.x, self.y)
-        self.next_x: int = maze_width // 2
-        self.next_y: int = maze_height // 2
-        self.pixel_x = float(maze_width // 2)
-        self.pixel_y = float(maze_height // 2)
+        self.x: int = spawn_x
+        self.y: int = spawn_y
+        self.spawn: tuple[int, int] = (spawn_x, spawn_y)
+        self.next_x: int = self.x
+        self.next_y: int = self.y
+        self.pixel_x = float(self.x)
+        self.pixel_y = float(self.y)
         self.move_progress: float = 1.0
         self.direction: str = ""
         self.queud_direction: str = ""
+        self.score: int = 0
+        self.speed: float = 0.10
+        self.pacgum_effect: bool = False
+        self.timer_effect = 0
+        self.skin_timer = 0
+        self.skin_index = 0
+        self.animation_speed = 0.3
+
+    def _set_skins(self, cell_width, cell_height) -> None:
         self.skin: Surface | None = transform.scale(
             image.load("assets/skin/pacman.png"),
             (cell_width, cell_height),
@@ -64,15 +73,14 @@ class Player:
                 for i in range(1, 4)
             ],
         }
-        self.score: int = 0
-        self.speed: float = 0.10
+
+    def _set_pacgum_pos(
+        self,
+        pacgums: dict[tuple[int, int], Pacgum],
+        super_pacgums: dict[tuple[int, int], SuperPacgum],
+    ) -> None:
         self.pacgums: dict[tuple[int, int], Pacgum] = pacgums
         self.super_pacgums: dict[tuple[int, int], SuperPacgum] = super_pacgums
-        self.pacgum_effect: bool = False
-        self.timer_effect = 0
-        self.skin_timer = 0
-        self.skin_index = 0
-        self.animation_speed = 0.3
 
     def reset_param(self) -> None:
         """Reset the player parameters for a new game."""
@@ -90,32 +98,23 @@ class Player:
         """A function to know if the movement to the next cell is possible."""
         curr_x, curr_y = current_cell
         next_x, next_y = next_cell
-        # print(f"curr_x: {curr_x} | curr_y: {curr_y}")
-        # print(f"next_x: {next_x} | next_y: {next_y}")
-        # if player want to go up:
         if curr_y > next_y:
-            # print("I want to go up")
             if not opp_code & 0b0001:
                 return True
-        # if player want to go down:
         elif curr_y < next_y:
-            # print("I want to go to down")
             if not opp_code & 0b0100:
                 return True
-        # if player want to go right:
         elif curr_x < next_x:
-            # print("I want to go to the right")
             if not opp_code & 0b0010:
                 return True
         elif curr_x > next_x:
-            # print("I want to go to the left")
             if not opp_code & 0b1000:
                 return True
         else:
             return False
         return False
 
-    def update_player(self):
+    def update_player(self, maze: MazeGenerator):
         """update the player position, player movement pixel by pixel and player skin"""
         if self.timer_effect > 0:
             self.timer_effect -= 1
@@ -151,7 +150,7 @@ class Player:
                 new_x, new_y = self.x + direction_x, self.y + direction_y
 
                 if self._is_neighbor(
-                    (self.x, self.y), (new_x, new_y), self.maze.maze[self.y][self.x]
+                    (self.x, self.y), (new_x, new_y), maze.maze[self.y][self.x]
                 ):
                     self.next_x, self.next_y = new_x, new_y
                     self.direction = direction
