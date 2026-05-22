@@ -9,6 +9,7 @@ from gui_game_over import GameOverScene
 from gui_highscore import HighScoreScene
 from gui_instruction import InstructionScene
 from gui_main_menu import MainMenuScene
+from parser import Config, parser
 from player import Player
 from theme import Theme
 
@@ -31,6 +32,7 @@ class Visualizer:
         """The full game visualisation"""
         pygame.display.set_caption("Pac-Man")
         running = True
+
         scenes = {
             "main_menu": MainMenuScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)

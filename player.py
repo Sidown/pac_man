@@ -23,10 +23,10 @@ class Player:
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
         self.spawn: tuple[int, int] = (self.x, self.y)
-        self.next_x: int = self.x
-        self.next_y: int = self.y
-        self.pixel_x = float(self.x)
-        self.pixel_y = float(self.y)
+        self.next_x: int = maze_width // 2
+        self.next_y: int = maze_height // 2
+        self.pixel_x = float(maze_width // 2)
+        self.pixel_y = float(maze_height // 2)
         self.move_progress: float = 1.0
         self.direction: str = ""
         self.queud_direction: str = ""
