@@ -1,10 +1,11 @@
 import pygame
 from pygame import Surface
 
+from scene import Scene
 from theme import Button, TextInput, Theme
 
 
-class GameOverScene:
+class GameOverScene(Scene):
     def __init__(
         self, screen: Surface, theme: Theme, width_height: tuple[int, int]
     ) -> None:

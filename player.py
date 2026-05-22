@@ -1,6 +1,7 @@
 from mazegenerator.mazegenerator import MazeGenerator
+from pygame import Surface, image, transform
+
 from pacgum import Pacgum, SuperPacgum
-from pygame import Surface, transform, image
 
 
 class Player:
@@ -15,17 +16,17 @@ class Player:
         pacgums: dict[tuple[int, int], Pacgum],
         super_pacgums: dict[tuple[int, int], SuperPacgum],
         cell_height,
-        cell_width
+        cell_width,
     ):
         self.maze = maze
         self.lives: int = lives
         self.x: int = maze_width // 2
         self.y: int = maze_height // 2
         self.spawn: tuple[int, int] = (self.x, self.y)
-        self.next_x: int = maze_width // 2
-        self.next_y: int = maze_height // 2
-        self.pixel_x = float(maze_width // 2)
-        self.pixel_y = float(maze_height // 2)
+        self.next_x: int = self.x
+        self.next_y: int = self.y
+        self.pixel_x = float(self.x)
+        self.pixel_y = float(self.y)
         self.move_progress: float = 1.0
         self.direction: str = ""
         self.queud_direction: str = ""
@@ -33,18 +34,36 @@ class Player:
             image.load("assets/skin/pacman.png"),
             (cell_width, cell_height),
         )
-        self.skin_dict = {"N": [transform.scale(
-                image.load(f"assets/skin/pacman-up/{i}.png"),
-                (cell_width, cell_height)) for i in range(1, 4)],
-                "S": [transform.scale(
-                image.load(f"assets/skin/pacman-down/{i}.png"),
-                (cell_width, cell_height)) for i in range(1, 4)],
-                "W": [transform.scale(
-                image.load(f"assets/skin/pacman-left/{i}.png"),
-                (cell_width, cell_height)) for i in range(1, 4)],
-                "E": [transform.scale(
-                image.load(f"assets/skin/pacman-right/{i}.png"),
-                (cell_width, cell_height)) for i in range(1, 4)]}
+        self.skin_dict = {
+            "N": [
+                transform.scale(
+                    image.load(f"assets/skin/pacman-up/{i}.png"),
+                    (cell_width, cell_height),
+                )
+                for i in range(1, 4)
+            ],
+            "S": [
+                transform.scale(
+                    image.load(f"assets/skin/pacman-down/{i}.png"),
+                    (cell_width, cell_height),
+                )
+                for i in range(1, 4)
+            ],
+            "W": [
+                transform.scale(
+                    image.load(f"assets/skin/pacman-left/{i}.png"),
+                    (cell_width, cell_height),
+                )
+                for i in range(1, 4)
+            ],
+            "E": [
+                transform.scale(
+                    image.load(f"assets/skin/pacman-right/{i}.png"),
+                    (cell_width, cell_height),
+                )
+                for i in range(1, 4)
+            ],
+        }
         self.score: int = 0
         self.speed: float = 0.10
         self.pacgums: dict[tuple[int, int], Pacgum] = pacgums
@@ -102,13 +121,18 @@ class Player:
             self.timer_effect -= 1
         if self.timer_effect == 0 and self.pacgum_effect:
             self.pacgum_effect = False
-        
-        DIRECTIONS = {"N": (0,-1), "S": (0,1), "E": (1,0), "W": (-1,0)}
+
+        DIRECTIONS = {"N": (0, -1), "S": (0, 1), "E": (1, 0), "W": (-1, 0)}
         opposite = opposite = {"N": "S", "S": "N", "E": "W", "W": "E"}
 
-        if self.move_progress < 1.0 and self.queud_direction == opposite.get(self.direction):
+        if self.move_progress < 1.0 and self.queud_direction == opposite.get(
+            self.direction
+        ):
             self.next_x, self.next_y, self.x, self.y = (
-                self.x, self.y, self.next_x, self.next_y
+                self.x,
+                self.y,
+                self.next_x,
+                self.next_y,
             )
             self.direction = self.queud_direction
             self.move_progress = 1.0 - self.move_progress
@@ -125,21 +149,22 @@ class Player:
 
                 direction_x, direction_y = DIRECTIONS.get(direction, (0, 0))
                 new_x, new_y = self.x + direction_x, self.y + direction_y
-                
-                if self._is_neighbor((self.x, self.y), (new_x, new_y),
-                                     self.maze.maze[self.y][self.x]):
+
+                if self._is_neighbor(
+                    (self.x, self.y), (new_x, new_y), self.maze.maze[self.y][self.x]
+                ):
                     self.next_x, self.next_y = new_x, new_y
                     self.direction = direction
                     self.move_progress = 0.0
                     moved = True
                     break
-                    
+
             if not moved:
                 self.pixel_x = float(self.x)
                 self.pixel_y = float(self.y)
                 self._update_skin()
                 return
-            
+
         self.move_progress = min(1.0, self.move_progress + self.speed)
         self.pixel_x = self.x + (self.next_x - self.x) * self.move_progress
         self.pixel_y = self.y + (self.next_y - self.y) * self.move_progress
@@ -148,14 +173,14 @@ class Player:
             if self.pacgums[(self.x, self.y)].visible:
                 self.pacgums[(self.x, self.y)].visible = False
                 self.score += self.pacgums[(self.x, self.y)].points
-        
+
         if (self.x, self.y) in self.super_pacgums:
             if self.super_pacgums[(self.x, self.y)].visible:
                 self.super_pacgums[(self.x, self.y)].visible = False
                 self.score += self.super_pacgums[(self.x, self.y)].points
                 self.pacgum_effect = True
                 self.timer_effect = 360
-        
+
         self._update_skin()
 
     def _update_skin(self):

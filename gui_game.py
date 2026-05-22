@@ -4,11 +4,12 @@ from pygame import Surface
 
 from game import Game
 from player import Player
+from scene import Scene
 from score import HighScore
 from theme import Theme
 
 
-class GameScene:
+class GameScene(Scene):
     def __init__(
         self, screen: Surface, theme: Theme, width_height: tuple[int, int]
     ) -> None:
@@ -259,7 +260,7 @@ class GameScene:
     def _print_highscore(self) -> None:
         """Print the Highscore."""
         highscore_text = self.score_font.render(
-            f"HighScore: {self.highscore.score[0][1]}", True, self.theme.text_color
+            f"HighScore: {self.highscore.scores[0][1]}", True, self.theme.text_color
         )
         self.screen.blit(highscore_text, (self.WIDTH // 2, 15))
 
@@ -276,7 +277,7 @@ class GameScene:
         self.current_level_index += 1
         if self.current_level_index >= len(self.game.level_configs):
             # sauvegarder le score. le joueur a gagne
-            self.current_scene = "game_over"
+            self.current_scene = "game_over"  # changer la scene, c'est victory_scene
             return
         old_score = self.player.score
         old_lives = self.player.lives
