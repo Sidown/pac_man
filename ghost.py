@@ -116,7 +116,8 @@ class Ghost(ABC):
             self.move_progress = 0.0
 
         self.move_progress = min(1.0, self.move_progress + self.speed)
-        self.pixel_coord = (self.coord[0] + (self.next_coord[0] - self.coord[0]) * self.move_progress, self.coord[1] + (self.next_coord[1] - self.coord[1]) * self.move_progress)
+        self.pixel_coord = (self.coord[0] + (self.next_coord[0] - self.coord[0]) * self.move_progress,
+                            self.coord[1] + (self.next_coord[1] - self.coord[1]) * self.move_progress)
 
     def respawn(self):
         """Respawn the ghost when killed"""
@@ -192,6 +193,10 @@ class Ghost(ABC):
         else:
             self.is_vulnerable = False
 
+    @abstractmethod
+    def set_parameters(self):
+        pass
+
 
 class Blinky(Ghost):  # chases, dest player pos
     """Follows Pac-Man directly during Chase mode, and heads to the upper-right corner
@@ -200,6 +205,12 @@ class Blinky(Ghost):  # chases, dest player pos
 
     def __init__(self, skin, is_frozen = False):
         super().__init__(skin, is_frozen)
+
+    def set_parameters(self, maze, player):
+        self.spawn = (len(maze.maze[0]), 0)
+        self.coord = self.spawn
+        self.target = (player.x, player.y)
+        self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
 
     def next_move(self, player, maze) -> tuple[int, int]:
         if self.is_frozen:
@@ -261,32 +272,38 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
     game's coding, if Pac-Man faces upwards, Pinky's target will be 2 Pac-Dots in front of and 2
     to the left of Pac-Man. During Scatter mode, she heads towards the upper-left corner."""
 
-    def __init__(self, skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen = False):
-        super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
+    def __init__(self, skin, is_frozen = False):
+        super().__init__(skin, is_frozen)
+
+    def set_parameters(self, player):
+        self.spawn = (0, 0)
+        self.coord = self.spawn
+        self.target = (player.x, player.y)
+        self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
         
-    def next_move(self, maze) -> tuple[int, int]:
+    def next_move(self, maze, player) -> tuple[int, int]:
         if self.is_frozen:
             return self.coord
 
         if self.is_vulnerable or self.died:
             self.target = self.spawn
         else:
-            if self.player.direction == "UP" and self.player.y - 2 >= 0:
-                self.target = (self.player.x, self.player.y - 2)
+            if player.direction == "UP" and player.y - 2 >= 0:
+                self.target = (player.x, player.y - 2)
             elif (
-                self.player.direction == "DOWN"
-                and self.player.y + 2 <= maze._height - 1
+                player.direction == "DOWN"
+                and player.y + 2 <= maze._height - 1
             ):
-                self.target = (self.player.x, self.player.y + 2)
+                self.target = (player.x, player.y + 2)
             elif (
-                self.player.direction == "RIGHT"
-                and self.player.x + 2 <= maze._width - 1
+                player.direction == "RIGHT"
+                and player.x + 2 <= maze._width - 1
             ):
-                self.target = (self.player.x + 2, self.player.y)
-            elif self.player.direction == "LEFT" and self.player.x - 2 >= 0:
-                self.target = (self.player.x - 2, self.player.y)
+                self.target = (player.x + 2, player.y)
+            elif player.direction == "LEFT" and player.x - 2 >= 0:
+                self.target = (player.x - 2, player.y)
             else:
-                self.target = (self.player.x, self.player.y)
+                self.target = (player.x, player.y)
 
         if self.coord == self.target:
             return self.coord
@@ -344,7 +361,13 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
         self.blinky = blinky
         self.pinky = pinky
 
-    def next_move(self, maze) -> tuple[int, int]:
+    def set_parameters(self, maze, player):
+        self.spawn = (len(maze.maze[0]), len[maze.maze])
+        self.coord = self.spawn
+        self.target = (player.x, player.y)
+        self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
+
+    def next_move(self, maze, pinky, blinky) -> tuple[int, int]:
         if self.is_frozen:
             return self.coord
 
@@ -352,8 +375,8 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
             self.target = self.spawn
         else:
             self.target = (
-                self.blinky.target[0] - self.pinky.target[0],
-                self.blinky.target[1] - self.pinky.target[1],
+                blinky.target[0] - pinky.target[0],
+                blinky.target[1] - pinky.target[1],
             )
 
         if self.coord == self.target:
@@ -409,17 +432,23 @@ class Clyde(Ghost):  # weird
     def __init__(self, skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen = False):
         super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
 
-    def next_move(self, maze) -> tuple[int, int]:
+    def set_parameters(self, maze, player):
+        self.spawn = (0, len[maze.maze])
+        self.coord = self.spawn
+        self.target = (player.x, player.y)
+        self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
+
+    def next_move(self, maze, player) -> tuple[int, int]:
         if self.is_frozen:
             return self.coord
 
         if (
             self.is_vulnerable or self.died
-            or dist(self.coord, (self.player.x, self.player.y)) <= 3
+            or dist(self.coord, (player.x, player.y)) <= 3
         ):
             self.target = self.spawn
         else:
-            self.target = (self.player.x, self.player.y)
+            self.target = (player.x, player.y)
         
         if self.coord == self.target:
             return self.coord
