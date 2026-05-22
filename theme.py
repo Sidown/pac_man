@@ -158,3 +158,44 @@ class Button(Text, Clickable):
             self.hovered = self.rect.collidepoint(event.pos)
         elif event.type == pygame.MOUSEBUTTONDOWN and self.hovered:
             self.callback()
+
+
+class TextInput:
+    """Rect de couleur
+    si l'utilisateur passe ca souris dessus et click, la couleur change.
+    si il tape des lettres, elles apparaissent a l'ecran et sont dans une variable.
+    lorsque le user click sur ENTER, on sauvegarde la valeur grave a une methode."""
+
+    def __init__(
+        self, screen: Surface, coordinate: tuple[int, int], width: int, height: int
+    ) -> None:
+        self.screen: Surface = screen
+        self.x: int = coordinate[0]
+        self.y: int = coordinate[1]
+        self.width: int = width
+        self.height: int = height
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.text: str = ""
+        self.font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 28)
+
+    def draw(self) -> None:
+        displayed_text = self.font.render("Enter your Name:", False, (0, 0, 0))
+        self.screen.blit(displayed_text, (self.x, self.y - 35))
+        pygame.draw.rect(self.screen, (145, 145, 145), self.rect)
+        if self.text == "":
+            return
+        displayed_text = self.font.render(self.text, False, (0, 0, 0))
+        self.screen.blit(displayed_text, (self.x, self.y + 10))
+
+    def handle_event(self, event) -> None:
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                # le user a click sur ENTER, il faut verifier puis sauvegarder son nom.
+                self.text = ""
+                return
+            if event.key == pygame.K_BACKSPACE:
+                self.text = self.text[:-1]
+            else:
+                if len(self.text) < 10:
+                    self.text += event.unicode
+            print(self.text)

@@ -3,11 +3,14 @@ import sys
 import pygame
 from pygame import Surface, time
 
+from game import Game
 from gui_game import GameScene
 from gui_game_over import GameOverScene
 from gui_highscore import HighScoreScene
 from gui_instruction import InstructionScene
 from gui_main_menu import MainMenuScene
+from parser import Config, parser
+from player import Player
 from theme import Theme
 
 
@@ -29,6 +32,7 @@ class Visualizer:
         """The full game visualisation"""
         pygame.display.set_caption("Pac-Man")
         running = True
+
         scenes = {
             "main_menu": MainMenuScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
@@ -53,8 +57,9 @@ class Visualizer:
                 sys.exit()
             next_scene = scenes[current_scene].handle_events(events)
             if current_scene != "game" and next_scene == "game":
-                scenes["game"] = GameScene(self.screen, self.theme,
-                                           (self.WIDTH, self.HEIGHT))
+                scenes["game"] = GameScene(
+                    self.screen, self.theme, (self.WIDTH, self.HEIGHT)
+                )
             current_scene = next_scene
 
             scenes[current_scene].update()

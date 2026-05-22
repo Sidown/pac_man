@@ -1,10 +1,11 @@
 import pygame
 from pygame import Surface
 
+from scene import Scene
 from theme import Button, Theme
 
 
-class InstructionScene:
+class InstructionScene(Scene):
     def __init__(
         self, screen: Surface, theme: Theme, width_height: tuple[int, int]
     ) -> None:
