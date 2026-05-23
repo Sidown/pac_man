@@ -18,8 +18,8 @@ class Ghost(ABC):
         # spawn_y: int,
         # maze: MazeGenerator,
         # player: Player,
-        # cell_width,
-        # cell_height,
+        cell_width,
+        cell_height,
         is_frozen: bool = False,
     ):
         self.actual_skin = transform.scale(
@@ -57,14 +57,15 @@ class Ghost(ABC):
         """Abstract method to get the next move of the ghost"""
         pass
 
-    def play(self, maze):
+    def play(self, maze: MazeGenerator, player):
         """Move the ghost"""
         if self.move_progress >= 1.0:
             self.coord = self.next_coord
-            self._update_vulnerability()
-            move = self.next_move()
+            self._update_vulnerability(player)
+            move = self.next_move(maze, player)
 
-            opposite = {"UP": "DOWN", "DOWN": "UP", "LEFT": "RIGHT", "RIGHT": "LEFT"}
+            opposite = {"UP": "DOWN", "DOWN": "UP",
+                        "LEFT": "RIGHT", "RIGHT": "LEFT"}
             directions = {
                 "UP": (0, -1),
                 "DOWN": (0, 1),
@@ -88,36 +89,45 @@ class Ghost(ABC):
                     self.direction
                 ):
                     moves = self.get_moves_possible(maze, self.coord)
-                    forward = [m for m in moves if m != opposite.get(self.direction)]
+                    forward = [m for m in moves if
+                               m != opposite.get(self.direction)]
                     if forward:
                         move_chosen = forward[0]
                         direction_x, direction_y = directions[move_chosen]
-                        move = (self.coord[0] + direction_x, self.coord[1] + direction_y)
+                        move = (self.coord[0] + direction_x,
+                                self.coord[1] + direction_y)
                         self.direction = move_chosen
 
             # force un mouvement si pas de deplacement
             if move == self.coord:
                 moves = self.get_moves_possible(maze, self.coord)
-                forward = [m for m in moves if m != opposite.get(self.direction)]
+                forward = [m for m in moves if
+                           m != opposite.get(self.direction)]
                 # check si mouvement autre que demi tour possible
                 if forward:
                     move_chosen = forward[0]
                     direction_x, direction_y = directions[move_chosen]
-                    move = (self.coord[0] + direction_x, self.coord[1] + direction_y)
+                    move = (self.coord[0] + direction_x,
+                            self.coord[1] + direction_y)
                     self.direction = move_chosen
                 # si pas de mouvement autre que demi tour : demi tour
                 elif moves:
                     move_chosen = moves[0]
                     direction_x, direction_y = directions[move_chosen]
-                    move = (self.coord[0] + direction_x, self.coord[1] + direction_y)
+                    move = (self.coord[0] + direction_x,
+                            self.coord[1] + direction_y)
                     self.direction = move_chosen
 
             self.next_coord = (move[0], move[1])
             self.move_progress = 0.0
 
         self.move_progress = min(1.0, self.move_progress + self.speed)
-        self.pixel_coord = (self.coord[0] + (self.next_coord[0] - self.coord[0]) * self.move_progress,
-                            self.coord[1] + (self.next_coord[1] - self.coord[1]) * self.move_progress)
+        self.pixel_coord = (self.coord[0] + (self.next_coord[0] -
+                                             self.coord[0]) *
+                                             self.move_progress,
+                            self.coord[1] + (self.next_coord[1] -
+                                             self.coord[1]) *
+                                             self.move_progress)
 
     def respawn(self):
         """Respawn the ghost when killed"""
@@ -129,12 +139,12 @@ class Ghost(ABC):
         self.target = self.spawn
         self.speed = 0.2
         self.is_vulnerable = False
-        self.player.score += 200
 
-    def get_moves_possible(self, maze: MazeGenerator, coord):
+    def get_moves_possible(self, maze: MazeGenerator, coord: tuple[int]):
         """get a list of possible moves"""
         possible = []
-        if coord[0] >= len(maze.maze[0]) or coord[1] >= len(maze.maze) or coord[0] < 0 or coord[1] < 0:
+        if (coord[0] >= len(maze.maze[0]) or coord[1] >= len(maze.maze)
+           or coord[0] < 0 or coord[1] < 0):
             return []
         current_case_value = maze.maze[coord[1]][coord[0]]
         if not (current_case_value & 1):
@@ -156,19 +166,19 @@ class Ghost(ABC):
         self.died = False
         self.just_respawned = False
 
-    def player_boosted(self) -> bool:
+    def player_boosted(self, player) -> bool:
         """check if the player is boosted with super pacgums"""
-        return self.player.pacgum_effect
-    
+        return player.pacgum_effect
+
     def collide_with_player(self, player) -> bool:
         """check if the ghost collide with the player"""
         if (
-                abs(player.pixel_coord[0] - self.coord[0]) < 0.6
-                and abs(player.pixel_coord[1] - self.coord[1]) < 0.6
-            ):
+                abs(player.pixel_x - self.pixel_coord[0]) < 0.6
+                and abs(player.pixel_y - self.pixel_coord[1]) < 0.6
+           ):
             return True
         return False
-    
+
     @property
     def current_skin(self):
         if self.died:
@@ -176,8 +186,8 @@ class Ghost(ABC):
         if self.is_vulnerable:
             return self.vulnerable_skin
         return self.default_skin
-    
-    def _update_vulnerability(self):
+
+    def _update_vulnerability(self, player):
         if self.died:
             self.is_vulnerable = False
             if self.coord == self.spawn:
@@ -185,10 +195,10 @@ class Ghost(ABC):
                 self.speed = 0.05
                 self.just_respawned = True
         elif self.just_respawned:
-            if not self.player_boosted():
+            if not self.player_boosted(player):
                 self.just_respawned = False
             self.is_vulnerable = False
-        elif self.player_boosted():
+        elif self.player_boosted(player):
             self.is_vulnerable = True
         else:
             self.is_vulnerable = False
@@ -199,20 +209,23 @@ class Ghost(ABC):
 
 
 class Blinky(Ghost):  # chases, dest player pos
-    """Follows Pac-Man directly during Chase mode, and heads to the upper-right corner
-    during Scatter mode. He also has an "angry" mode that is triggered when there are a
+    """Follows Pac-Man directly during Chase mode,
+    and heads to the upper-right corner
+    during Scatter mode. He also has an "angry" mode that is
+    triggered when there are a
     certain number of dots left in the maze."""
 
-    def __init__(self, skin, is_frozen = False):
-        super().__init__(skin, is_frozen)
+    def __init__(self, skin, cell_width, cell_height, is_frozen=False):
+        super().__init__(skin, cell_width, cell_height, is_frozen)
 
     def set_parameters(self, maze, player):
-        self.spawn = (len(maze.maze[0]), 0)
+        self.spawn = (len(maze.maze[0]) - 1, 0)
         self.coord = self.spawn
+        self.next_coord = self.spawn
         self.target = (player.x, player.y)
         self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
 
-    def next_move(self, player, maze) -> tuple[int, int]:
+    def next_move(self, maze, player) -> tuple[int, int]:
         if self.is_frozen:
             return self.coord
 
@@ -249,7 +262,7 @@ class Blinky(Ghost):  # chases, dest player pos
                 self.direction = move_name
                 return first_step
 
-            for move in self.get_moves_possible(maze, self.coord):
+            for move in self.get_moves_possible(maze, (current_x, current_y)):
                 new_x, new_y = current_x, current_y
                 if move == "UP":
                     new_y -= 1
@@ -268,16 +281,19 @@ class Blinky(Ghost):  # chases, dest player pos
 
 
 class Pinky(Ghost):  # ambushes, dest 2 case devant le player
-    """Chases towards the spot 2 Pac-Dots in front of Pac-Man. Due to a bug in the original
-    game's coding, if Pac-Man faces upwards, Pinky's target will be 2 Pac-Dots in front of and 2
-    to the left of Pac-Man. During Scatter mode, she heads towards the upper-left corner."""
+    """Chases towards the spot 2 Pac-Dots in front of Pac-Man.
+    Due to a bug in the original game's coding, if Pac-Man faces upwards,
+    Pinky's target will be 2 Pac-Dots in front of and 2
+    to the left of Pac-Man. During Scatter mode,
+    she heads towards the upper-left corner."""
 
-    def __init__(self, skin, is_frozen = False):
-        super().__init__(skin, is_frozen)
+    def __init__(self, skin, cell_width, cell_height, is_frozen=False):
+        super().__init__(skin, cell_width, cell_height, is_frozen)
 
     def set_parameters(self, player):
         self.spawn = (0, 0)
         self.coord = self.spawn
+        self.next_coord = self.spawn
         self.target = (player.x, player.y)
         self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
         
@@ -333,7 +349,9 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
                 self.direction = move_name
                 return first_step
 
-            for move in self.get_moves_possible(self.maze, current_x, current_y):
+            for move in self.get_moves_possible(maze,
+                                                (current_x,
+                                                 current_y)):
                 new_x, new_y = current_x, current_y
                 if move == "UP":
                     new_y -= 1
@@ -351,23 +369,32 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
         return self.coord
 
 
-class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky target * 2
-    """During Chase mode, his target is a bit complex. His target is relative to both
-    Blinky and Pac-Man, where the distance Blinky is from Pinky's target is doubled to
-    get Inky's target. He heads to the lower-right corner during Scatter mode."""
+class Inky(Ghost): 
+    """During Chase mode, his target is a bit complex.
+    His target is relative to both Blinky and Pac-Man, where the distance
+    Blinky is from Pinky's target is doubled to get Inky's target.
+    He heads to the lower-right corner during Scatter mode."""
 
-    def __init__(self, skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, blinky, pinky, is_frozen = False):
-        super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
-        self.blinky = blinky
-        self.pinky = pinky
+    def __init__(self, skin, cell_width, cell_height, is_frozen=False):
+        super().__init__(skin, cell_width, cell_height, is_frozen)
 
-    def set_parameters(self, maze, player):
-        self.spawn = (len(maze.maze[0]), len[maze.maze])
+    def play(self, maze, player, blinky=None, pinky=None):
+        if blinky:
+            self._blinky = blinky
+        if pinky:
+            self._pinky = pinky
+        super().play(maze, player)
+
+    def set_parameters(self, maze, player, blinky, pinky):
+        self.spawn = (len(maze.maze[0]) - 1, len(maze.maze) - 1)
         self.coord = self.spawn
+        self.next_coord = self.spawn
         self.target = (player.x, player.y)
         self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
+        self._blinky = blinky
+        self._pinky = pinky
 
-    def next_move(self, maze, pinky, blinky) -> tuple[int, int]:
+    def next_move(self, maze, player) -> tuple[int, int]:
         if self.is_frozen:
             return self.coord
 
@@ -375,8 +402,8 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
             self.target = self.spawn
         else:
             self.target = (
-                blinky.target[0] - pinky.target[0],
-                blinky.target[1] - pinky.target[1],
+                self._blinky.target[0] - self._pinky.target[0],
+                self._blinky.target[1] - self._pinky.target[1],
             )
 
         if self.coord == self.target:
@@ -407,7 +434,8 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
                 self.direction = move_name
                 return first_step
 
-            for move in self.get_moves_possible(self.maze, current_x, current_y):
+            for move in self.get_moves_possible(maze, (current_x,
+                                                current_y)):
                 new_x, new_y = current_x, current_y
                 if move == "UP":
                     new_y -= 1
@@ -426,15 +454,18 @@ class Inky(Ghost):  # unpredictable, dest = distance entre blinky et pinky targe
 
 
 class Clyde(Ghost):  # weird
-    """Chases directly after Pac-Man, but tries to head to his Scatter corner when within
-    an 8-Dot radius of Pac-Man. His Scatter Mode corner is the lower-left."""
+    """Chases directly after Pac-Man, but tries to
+    head to his Scatter corner when within
+    an 8-Dot radius of Pac-Man.
+    His Scatter Mode corner is the lower-left."""
 
-    def __init__(self, skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen = False):
-        super().__init__(skin, spawn_x, spawn_y, maze, player, cell_width, cell_height, is_frozen)
+    def __init__(self, skin, cell_width, cell_height, is_frozen=False):
+        super().__init__(skin, cell_width, cell_height, is_frozen)
 
     def set_parameters(self, maze, player):
-        self.spawn = (0, len[maze.maze])
+        self.spawn = (0, len(maze.maze) - 1)
         self.coord = self.spawn
+        self.next_coord = self.spawn
         self.target = (player.x, player.y)
         self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
 
@@ -478,7 +509,8 @@ class Clyde(Ghost):  # weird
                 self.direction = move_name
                 return first_step
 
-            for move in self.get_moves_possible(self.maze, current_x, current_y):
+            for move in self.get_moves_possible(maze, (current_x,
+                                                current_y)):
                 new_x, new_y = current_x, current_y
                 if move == "UP":
                     new_y -= 1
