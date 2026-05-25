@@ -7,9 +7,6 @@ from theme import Theme
 
 def main():
 
-    # Parsing
-    config = parser.parser("./config.json")
-
     theme = Theme(
         background_color=(25, 25, 166),
         game_background_color=(0, 0, 0),

@@ -11,6 +11,7 @@ from gui_instruction import InstructionScene
 from gui_main_menu import MainMenuScene
 from parser import Config, parser
 from player import Player
+from score import HighScore
 from theme import Theme
 
 
@@ -33,11 +34,13 @@ class Visualizer:
         pygame.display.set_caption("Pac-Man")
         running = True
 
-        # charge la config
+        highscore: HighScore = HighScore()
 
-        nb_lives = 5
-        spawn_x = 7
-        spawn_y = 7
+        # charge la config
+        config: Config = parser("json_file/config.json")
+        nb_lives = config.lives
+        spawn_x = config.levels[0]["width"] // 2
+        spawn_y = config.levels[0]["height"] // 2
 
         # creer le player
         player: Player = Player(nb_lives, spawn_x, spawn_y)
@@ -46,10 +49,15 @@ class Visualizer:
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
             ),
             "game": GameScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT), player
+                self.screen,
+                self.theme,
+                (self.WIDTH, self.HEIGHT),
+                config,
+                player,
+                highscore,
             ),
             "game_over": GameOverScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT)
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT), player, highscore
             ),
             "instruction": InstructionScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
@@ -68,7 +76,12 @@ class Visualizer:
             next_scene = scenes[current_scene].handle_events(events)
             if current_scene != "game" and next_scene == "game":
                 scenes["game"] = GameScene(
-                    self.screen, self.theme, (self.WIDTH, self.HEIGHT), player
+                    self.screen,
+                    self.theme,
+                    (self.WIDTH, self.HEIGHT),
+                    config,
+                    player,
+                    highscore,
                 )
             current_scene = next_scene
 

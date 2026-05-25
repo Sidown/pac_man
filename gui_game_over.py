@@ -1,17 +1,26 @@
 import pygame
 from pygame import Surface
 
+from player import Player
 from scene import Scene
+from score import HighScore
 from theme import Button, TextInput, Theme
 
 
 class GameOverScene(Scene):
     def __init__(
-        self, screen: Surface, theme: Theme, width_height: tuple[int, int]
+        self,
+        screen: Surface,
+        theme: Theme,
+        width_height: tuple[int, int],
+        player: Player,
+        highscore: HighScore,
     ) -> None:
         self.screen: Surface = screen
         self.theme: Theme = theme
         self.WIDTH, self.HEIGHT = width_height
+        self.player: Player = player
+        self.highscore: HighScore = highscore
         self.PADDING = 80
         self.current_scene = "game_over"
         self.game_over_text = pygame.font.Font(self.theme.font_path, 56).render(
@@ -30,7 +39,9 @@ class GameOverScene(Scene):
             self.theme.btn_on_mouse_over_background_color,
             self.theme.btn_on_mouse_over_text_color,
         )
-        self.text_input_name = TextInput(self.screen, (350, self.WIDTH // 2), 250, 60)
+        self.text_input_name = TextInput(
+            self.screen, (350, self.WIDTH // 2), 250, 60, self.player, self.highscore
+        )
 
     def _back_to_menu_callback(self) -> None:
         self.current_scene = "main_menu"

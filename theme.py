@@ -1,6 +1,9 @@
 import pygame
 from pygame import Surface
 
+from player import Player
+from score import HighScore
+
 
 class Theme:
     def __init__(
@@ -167,13 +170,21 @@ class TextInput:
     lorsque le user click sur ENTER, on sauvegarde la valeur grave a une methode."""
 
     def __init__(
-        self, screen: Surface, coordinate: tuple[int, int], width: int, height: int
+        self,
+        screen: Surface,
+        coordinate: tuple[int, int],
+        width: int,
+        height: int,
+        player: Player,
+        highscore: HighScore,
     ) -> None:
         self.screen: Surface = screen
         self.x: int = coordinate[0]
         self.y: int = coordinate[1]
         self.width: int = width
         self.height: int = height
+        self.player: Player = player
+        self.highscore: HighScore = highscore
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.text: str = ""
         self.font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 28)
@@ -190,8 +201,9 @@ class TextInput:
     def handle_event(self, event) -> None:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
-                # le user a click sur ENTER, il faut verifier puis sauvegarder son nom.
-                self.text = ""
+                # check que self.text est au bon format
+                # sauvegarder ca dans le json.
+                self.highscore.save_high_score(self.text, self.player.score)
                 return
             if event.key == pygame.K_BACKSPACE:
                 self.text = self.text[:-1]

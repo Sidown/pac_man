@@ -3,6 +3,7 @@ from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Surface
 
 from game import Game
+from parser import Config
 from player import Player
 from scene import Scene
 from score import HighScore
@@ -15,7 +16,9 @@ class GameScene(Scene):
         screen: Surface,
         theme: Theme,
         width_height: tuple[int, int],
+        config: Config,
         player: Player,
+        highscore: HighScore,
     ) -> None:
         self.current_scene = "game"
         self.screen: Surface = screen
@@ -24,7 +27,7 @@ class GameScene(Scene):
         self.WIDTH, self.HEIGHT = width_height
         self.PADDING = 80
         self.paused = False
-        self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING, self.player)
+        self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING, config, self.player)
         self.current_level = 0
         self._load_level(self.current_level)
         self.skin_index = 0
@@ -36,7 +39,7 @@ class GameScene(Scene):
             (self.cell_width, self.cell_height),
         )
         self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
-        self.highscore: HighScore = HighScore()
+        self.highscore: HighScore = highscore
         self.highscore.load_high_score()
         self.player._set_skins(self.cell_width, self.cell_height)
 
@@ -250,19 +253,14 @@ class GameScene(Scene):
 
     def _print_highscore(self) -> None:
         """Print the Highscore."""
+        if len(self.highscore.scores) == 0:
+            highest_score = 0
+        else:
+            highest_score = self.highscore.scores[0][1]
         highscore_text = self.score_font.render(
-            f"HighScore: {self.highscore.scores[0][1]}", True, self.theme.text_color
+            f"HighScore: {highest_score}", True, self.theme.text_color
         )
         self.screen.blit(highscore_text, (self.WIDTH // 2, 15))
-
-    # TODO
-    def _save_score(self) -> None:
-        """
-        Creer une popup pour saisir le nom du joueur
-        creer le score et le mettre dans Highscore
-        sauvegarder
-        """
-        pass
 
     def _next_level(self):
         self.current_level_index += 1

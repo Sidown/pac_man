@@ -10,12 +10,10 @@ from player import Player
 
 
 class Game:
-    def __init__(self, window_size, padding, player):
-        self.config: Config = parser("./config.json")
+    def __init__(self, window_size, padding, config, player):
+        self.config: Config = config
         self.levels: list[Level] = []
         for level in self.config.levels:
-            maze_width = level["width"]
-            maze_height = level["height"]
             self.border_size = 5
             self.window_size = window_size
             self.padding = padding
