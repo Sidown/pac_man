@@ -73,6 +73,16 @@ class Level:
     ):
         self.maze: MazeGenerator = MazeGenerator(size, seed=seed)
         self.pacgums: dict[tuple[int], Pacgum] = {}
+        # self.pacgums.update(
+        #     {
+        #         (7, 7): Pacgum(
+        #             pacgum_points,
+        #             (7, 7),
+        #             "./assets/skin/other/dot.png",
+        #             cell_width,
+        #             cell_height,
+        #         )
+        #     })
         for y, row in enumerate(self.maze.maze):
             for x, _ in enumerate(row):
                 if (
