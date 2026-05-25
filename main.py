@@ -16,7 +16,7 @@ def main():
         title_color=(255, 255, 0),
         text_color=(255, 255, 255),
         wall_color=(25, 25, 166),
-        wall_size=3,
+        wall_size=5,
         btn_background_color=(0, 0, 0),
         btn_text_color=(255, 255, 255),
         btn_on_mouse_over_text_color=(255, 255, 0),
