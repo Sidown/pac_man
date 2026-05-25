@@ -210,4 +210,3 @@ class TextInput:
             else:
                 if len(self.text) < 10:
                     self.text += event.unicode
-            print(self.text)

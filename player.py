@@ -12,13 +12,7 @@ class Player:
         lives: int,
         spawn_x: int,
         spawn_y: int,
-        # maze: MazeGenerator,
-        # pacgums: dict[tuple[int, int], Pacgum],
-        # super_pacgums: dict[tuple[int, int], SuperPacgum],
-        # cell_height,
-        # cell_width,
     ):
-        # self.maze = maze
         self.lives: int = lives
         self.x: int = spawn_x
         self.y: int = spawn_y

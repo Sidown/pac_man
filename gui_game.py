@@ -103,8 +103,8 @@ class GameScene(Scene):
                     self.cell_width,
                     self.cell_height,
                     opp_code,
-                    self.theme.wall_size,
-                    self.theme.wall_color,
+                    # self.theme.wall_size,
+                    # self.theme.wall_color,
                     print_right,
                     print_down,
                 )
@@ -128,8 +128,6 @@ class GameScene(Scene):
         cell_width: int | float,
         cell_height: int | float,
         opp_code: int,
-        border_size: int,
-        wall_color: tuple[int, int, int],
         print_east: bool,
         print_down: bool,
     ) -> None:
@@ -271,6 +269,10 @@ class GameScene(Scene):
         old_score = self.player.score
         old_lives = self.player.lives
         self._load_level(self.current_level_index)
+        # remettre le player a son spawn
+        # TODO: CHECK LE SPAWN HORS 42.
+        self.player.spawn = (self.maze_width // 2, self.maze_height // 2)
+        self.player.reset_param()
         self.player.score = old_score
         self.player.lives = old_lives
 
