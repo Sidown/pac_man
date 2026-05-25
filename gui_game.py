@@ -29,22 +29,17 @@ class GameScene(Scene):
         self.paused = False
         self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING, config, self.player)
         self.current_level = 0
-        self._load_level(self.current_level)
+        # self.load_level(self.current_level)
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
         self.current_level_index = 0
-        self.life_skin = pygame.transform.scale(
-            pygame.image.load("assets/skin/pacman.png"),
-            (self.cell_width, self.cell_height),
-        )
         self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
         self.highscore: HighScore = highscore
         self.highscore.load_high_score()
-        self.player._set_skins(self.cell_width, self.cell_height)
 
-    def _load_level(self, index: int) -> None:
-        level = self.game.get_level(index)
+    def load_level(self) -> None:
+        level = self.game.get_level(self.current_level_index)
         self.maze = level.maze
         self.maze_height = len(self.maze.maze)
         self.maze_width = len(self.maze.maze[0])
@@ -63,6 +58,7 @@ class GameScene(Scene):
         )
         self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
         self.player._set_pacgum_pos(self.pacgums, self.super_pacgums)
+        self.player._set_skins(self.cell_width, self.cell_height)
 
     def _print_life(self) -> None:
         nb_life = self.player.lives
@@ -70,12 +66,7 @@ class GameScene(Scene):
         for life in range(nb_life):
             self.screen.blit(
                 self.life_skin,
-                (
-                    self.PADDING + width,
-                    self.PADDING
-                    + (self.maze_height * self.cell_height)
-                    + (2 * self.cell_height),
-                ),
+                (self.PADDING + width, self.HEIGHT - self.PADDING),
             )
             width += self.life_skin.get_width() + 5
 
@@ -229,15 +220,22 @@ class GameScene(Scene):
     def update(self):
         if self.paused:
             return
-        self.blinky.play()
-        self.inky.play()
-        self.pinky.play()
-        self.clyde.play()
+        remaining_pacgums = 0
+        for key in self.pacgums.keys():
+            if self.pacgums[key].visible:
+                remaining_pacgums += 1
+        if remaining_pacgums <= len(self.pacgums) // 5:
+            self.blinky.angry_mod
+        self.blinky.play(self.maze, self.player)
+        self.inky.play(self.maze, self.player, self.blinky, self.pinky)
+        self.pinky.play(self.maze, self.player)
+        self.clyde.play(self.maze, self.player)
         self.player.update_player(self.maze)
         for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
-            if ghost.collide_with_player():
+            if ghost.collide_with_player(self.player):
                 if ghost.is_vulnerable:
                     ghost.die()
+                    self.player.score += 200
                 elif not ghost.died:
                     self.player.lives -= 1
                     if self.player.lives <= 0:
@@ -296,23 +294,23 @@ class GameScene(Scene):
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
             self._print_skin(
                 self.blinky.current_skin,
-                self.blinky.pixel_x,
-                self.blinky.pixel_y,
+                self.blinky.pixel_coord[0],
+                self.blinky.pixel_coord[1],
             )
             self._print_skin(
                 self.pinky.current_skin,
-                self.pinky.pixel_x,
-                self.pinky.pixel_y,
+                self.pinky.pixel_coord[0],
+                self.pinky.pixel_coord[1],
             )
             self._print_skin(
                 self.inky.current_skin,
-                self.inky.pixel_x,
-                self.inky.pixel_y,
+                self.inky.pixel_coord[0],
+                self.inky.pixel_coord[1],
             )
             self._print_skin(
                 self.clyde.current_skin,
-                self.clyde.pixel_x,
-                self.clyde.pixel_y,
+                self.clyde.pixel_coord[0],
+                self.clyde.pixel_coord[1],
             )
             for pacgum in self.pacgums.values():
                 if pacgum.visible:

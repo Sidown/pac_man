@@ -83,6 +83,7 @@ class Visualizer:
                     player,
                     highscore,
                 )
+                scenes["game"].load_level()
             current_scene = next_scene
 
             scenes[current_scene].update()

@@ -116,44 +116,29 @@ class Level:
                 }
             )
 
-        blinky = Blinky(
-            "./assets/skin/ghosts/blinky.png",
-            0,
-            0,
-            self.maze,
-            self.player,
-            cell_width,
-            cell_height,
-        )
+        blinky = Blinky("./assets/skin/ghosts/blinky.png", cell_width, cell_height)
+        blinky.set_parameters(self.maze, self.player)
+
         pinky = Pinky(
             "./assets/skin/ghosts/pinky.png",
-            0,
-            len(self.maze.maze) - 1,
-            self.maze,
-            self.player,
             cell_width,
             cell_height,
         )
+        pinky.set_parameters(self.player)
+
         inky = Inky(
             "./assets/skin/ghosts/inky.png",
-            len(self.maze.maze[0]) - 1,
-            0,
-            self.maze,
-            self.player,
             cell_width,
             cell_height,
-            blinky,
-            pinky,
         )
+        inky.set_parameters(self.maze, self.player, blinky, pinky)
+
         clyde = Clyde(
             "./assets/skin/ghosts/clyde.png",
-            len(self.maze.maze[0]) - 1,
-            len(self.maze.maze) - 1,
-            self.maze,
-            self.player,
             cell_width,
             cell_height,
         )
+        clyde.set_parameters(self.maze, self.player)
 
         self.ghosts: dict[str, Ghost] = {
             "blinky": blinky,
@@ -161,5 +146,6 @@ class Level:
             "inky": inky,
             "clyde": clyde,
         }
+
         self.cell_width = cell_width
         self.cell_height = cell_height
