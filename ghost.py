@@ -57,69 +57,68 @@ class Ghost(ABC):
 
     def play(self, maze: MazeGenerator, player, cheat):
         """Move the ghost"""
-        if cheat.freeze:
-            return
         if self.move_progress >= 1.0:
             self.coord = self.next_coord
-            self._update_vulnerability(player)
-            move = self.next_move(maze, player, cheat)
+            if not cheat.freeze:
+                self._update_vulnerability(player)
+                move = self.next_move(maze, player, cheat)
 
-            opposite = {"UP": "DOWN", "DOWN": "UP",
-                        "LEFT": "RIGHT", "RIGHT": "LEFT"}
-            directions = {
-                "UP": (0, -1),
-                "DOWN": (0, 1),
-                "LEFT": (-1, 0),
-                "RIGHT": (1, 0),
-            }
+                opposite = {"UP": "DOWN", "DOWN": "UP",
+                            "LEFT": "RIGHT", "RIGHT": "LEFT"}
+                directions = {
+                    "UP": (0, -1),
+                    "DOWN": (0, 1),
+                    "LEFT": (-1, 0),
+                    "RIGHT": (1, 0),
+                }
 
-            # check si next move est un demi tour
-            if move != self.coord:
-                direction_x = move[0] - self.coord[0]
-                direction_y = move[1] - self.coord[1]
-                current_direction = next(
-                    (
-                        direction
-                        for direction, (dx, dy) in directions.items()
-                        if dx == direction_x and dy == direction_y
-                    ),
-                    None,
-                )
-                if current_direction and current_direction == opposite.get(
-                    self.direction
-                ):
+                # check si next move est un demi tour
+                if move != self.coord:
+                    direction_x = move[0] - self.coord[0]
+                    direction_y = move[1] - self.coord[1]
+                    current_direction = next(
+                        (
+                            direction
+                            for direction, (dx, dy) in directions.items()
+                            if dx == direction_x and dy == direction_y
+                        ),
+                        None,
+                    )
+                    if current_direction and current_direction == opposite.get(
+                        self.direction
+                    ):
+                        moves = self.get_moves_possible(maze, self.coord)
+                        forward = [m for m in moves if
+                                m != opposite.get(self.direction)]
+                        if forward:
+                            move_chosen = forward[0]
+                            direction_x, direction_y = directions[move_chosen]
+                            move = (self.coord[0] + direction_x,
+                                    self.coord[1] + direction_y)
+                            self.direction = move_chosen
+
+                # force un mouvement si pas de deplacement
+                if move == self.coord:
                     moves = self.get_moves_possible(maze, self.coord)
                     forward = [m for m in moves if
-                               m != opposite.get(self.direction)]
+                            m != opposite.get(self.direction)]
+                    # check si mouvement autre que demi tour possible
                     if forward:
                         move_chosen = forward[0]
                         direction_x, direction_y = directions[move_chosen]
                         move = (self.coord[0] + direction_x,
                                 self.coord[1] + direction_y)
                         self.direction = move_chosen
+                    # si pas de mouvement autre que demi tour : demi tour
+                    elif moves:
+                        move_chosen = moves[0]
+                        direction_x, direction_y = directions[move_chosen]
+                        move = (self.coord[0] + direction_x,
+                                self.coord[1] + direction_y)
+                        self.direction = move_chosen
 
-            # force un mouvement si pas de deplacement
-            if move == self.coord:
-                moves = self.get_moves_possible(maze, self.coord)
-                forward = [m for m in moves if
-                           m != opposite.get(self.direction)]
-                # check si mouvement autre que demi tour possible
-                if forward:
-                    move_chosen = forward[0]
-                    direction_x, direction_y = directions[move_chosen]
-                    move = (self.coord[0] + direction_x,
-                            self.coord[1] + direction_y)
-                    self.direction = move_chosen
-                # si pas de mouvement autre que demi tour : demi tour
-                elif moves:
-                    move_chosen = moves[0]
-                    direction_x, direction_y = directions[move_chosen]
-                    move = (self.coord[0] + direction_x,
-                            self.coord[1] + direction_y)
-                    self.direction = move_chosen
-
-            self.next_coord = (move[0], move[1])
-            self.move_progress = 0.0
+                self.next_coord = (move[0], move[1])
+                self.move_progress = 0.0
 
         self.move_progress = min(1.0, self.move_progress + self.speed)
         self.pixel_coord = (self.coord[0] + (self.next_coord[0] -

@@ -58,6 +58,7 @@ class Visualizer:
                 config,
                 player,
                 highscore,
+                cheat
             ),
             "game_over": GameOverScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT), player, highscore
@@ -89,6 +90,7 @@ class Visualizer:
                     config,
                     player,
                     highscore,
+                    cheat
                 )
                 scenes["game"].load_level()
             current_scene = next_scene

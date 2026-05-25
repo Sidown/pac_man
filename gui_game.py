@@ -19,6 +19,7 @@ class GameScene(Scene):
         config: Config,
         player: Player,
         highscore: HighScore,
+        cheat
     ) -> None:
         self.current_scene = "game"
         self.screen: Surface = screen
@@ -37,6 +38,7 @@ class GameScene(Scene):
         self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
         self.highscore: HighScore = highscore
         self.highscore.load_high_score()
+        self.cheat = cheat
 
     def load_level(self) -> None:
         level = self.game.get_level(self.current_level_index)
@@ -226,10 +228,10 @@ class GameScene(Scene):
                 remaining_pacgums += 1
         if remaining_pacgums <= len(self.pacgums) // 5:
             self.blinky.angry_mod
-        self.blinky.play(self.maze, self.player, self.game.cheat)
-        self.inky.play(self.maze, self.player, self.game.cheat, self.blinky, self.pinky)
-        self.pinky.play(self.maze, self.player, self.game.cheat)
-        self.clyde.play(self.maze, self.player, self.game.cheat)
+        self.blinky.play(self.maze, self.player, self.cheat)
+        self.inky.play(self.maze, self.player, self.cheat, self.blinky, self.pinky)
+        self.pinky.play(self.maze, self.player, self.cheat)
+        self.clyde.play(self.maze, self.player, self.cheat)
         self.player.update_player(self.maze)
         for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
             if ghost.collide_with_player(self.player):
