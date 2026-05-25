@@ -60,6 +60,7 @@ class Visualizer:
                 scenes["game"] = GameScene(
                     self.screen, self.theme, (self.WIDTH, self.HEIGHT)
                 )
+                scenes["game"].load_level()
             current_scene = next_scene
 
             scenes[current_scene].update()

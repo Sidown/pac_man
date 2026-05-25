@@ -21,21 +21,17 @@ class GameScene(Scene):
         self.paused = False
         self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING)
         self.current_level = 0
-        self._load_level(self.current_level)
+        # self.load_level(self.current_level)
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
         self.current_level_index = 0
-        self.life_skin = pygame.transform.scale(
-            pygame.image.load("assets/skin/pacman.png"),
-            (self.cell_width, self.cell_height),
-        )
         self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
         self.highscore: HighScore = HighScore()
         self.highscore.load_high_score()
 
-    def _load_level(self, index: int) -> None:
-        level = self.game.get_level(index)
+    def load_level(self) -> None:
+        level = self.game.get_level(self.current_level_index)
         self.maze = level.maze
         self.maze_height = len(self.maze.maze)
         self.maze_width = len(self.maze.maze[0])
@@ -281,7 +277,7 @@ class GameScene(Scene):
             return
         old_score = self.player.score
         old_lives = self.player.lives
-        self._load_level(self.current_level_index)
+        self.load_level()
         self.player.score = old_score
         self.player.lives = old_lives
 
