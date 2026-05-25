@@ -69,10 +69,14 @@ def config_check(config: Config) -> bool:
         if len(level) < 2:
             errors.append("A level must have a width and a height key")
         try:
-            if level['width'] <= 0:
-                errors.append("The width of a level must be postive int")
-            if level['height'] <= 0:
-                errors.append("The height of a level must be positive int")
+            if level['width'] <= 2:
+                errors.append("The width of a level must be at least 3")
+            if level['width'] > 20:
+                errors.append("The width of a level should not be >20")
+            if level['height'] <= 2:
+                errors.append("The height of a level must be at least 3")
+            if level['height'] > 20:
+                errors.append("The height of a level should not be >20")
         except KeyError:
             errors.append("Level must have a width an height key")
     if errors: 
