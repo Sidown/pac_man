@@ -226,10 +226,10 @@ class GameScene(Scene):
                 remaining_pacgums += 1
         if remaining_pacgums <= len(self.pacgums) // 5:
             self.blinky.angry_mod
-        self.blinky.play(self.maze, self.player)
-        self.inky.play(self.maze, self.player, self.blinky, self.pinky)
-        self.pinky.play(self.maze, self.player)
-        self.clyde.play(self.maze, self.player)
+        self.blinky.play(self.maze, self.player, self.game.cheat)
+        self.inky.play(self.maze, self.player, self.game.cheat, self.blinky, self.pinky)
+        self.pinky.play(self.maze, self.player, self.game.cheat)
+        self.clyde.play(self.maze, self.player, self.game.cheat)
         self.player.update_player(self.maze)
         for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
             if ghost.collide_with_player(self.player):

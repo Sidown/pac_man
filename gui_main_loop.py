@@ -9,10 +9,12 @@ from gui_game_over import GameOverScene
 from gui_highscore import HighScoreScene
 from gui_instruction import InstructionScene
 from gui_main_menu import MainMenuScene
+from gui_cheat import CheatScene
 from parser import Config, parser
 from player import Player
 from score import HighScore
 from theme import Theme
+from cheat import Cheat
 
 
 class Visualizer:
@@ -44,6 +46,7 @@ class Visualizer:
 
         # creer le player
         player: Player = Player(nb_lives, spawn_x, spawn_y)
+        cheat: Cheat = Cheat()
         scenes = {
             "main_menu": MainMenuScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
@@ -66,6 +69,9 @@ class Visualizer:
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
             ),
         }
+        scenes.update({"cheat": CheatScene(
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT), cheat
+            )})
         current_scene = "main_menu"
         clock = time.Clock()
         while running:
@@ -73,6 +79,7 @@ class Visualizer:
             if any(event.type == pygame.QUIT for event in events):
                 pygame.quit()
                 sys.exit()
+
             next_scene = scenes[current_scene].handle_events(events)
             if current_scene != "game" and next_scene == "game":
                 scenes["game"] = GameScene(

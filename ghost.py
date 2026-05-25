@@ -20,7 +20,6 @@ class Ghost(ABC):
         # player: Player,
         cell_width,
         cell_height,
-        is_frozen: bool = False,
     ):
         self.actual_skin = transform.scale(
             image.load(skin),
@@ -45,7 +44,6 @@ class Ghost(ABC):
         self.spawn: tuple[int] = (0, 0)
         self.target: tuple[int] = self.spawn
         self.is_vulnerable = False
-        self.is_frozen = is_frozen
         self.respawn_timer = 0
         self.speed = 0.05
         self.move_progress = 1.0
@@ -57,12 +55,14 @@ class Ghost(ABC):
         """Abstract method to get the next move of the ghost"""
         pass
 
-    def play(self, maze: MazeGenerator, player):
+    def play(self, maze: MazeGenerator, player, cheat):
         """Move the ghost"""
+        if cheat.freeze:
+            return
         if self.move_progress >= 1.0:
             self.coord = self.next_coord
             self._update_vulnerability(player)
-            move = self.next_move(maze, player)
+            move = self.next_move(maze, player, cheat)
 
             opposite = {"UP": "DOWN", "DOWN": "UP",
                         "LEFT": "RIGHT", "RIGHT": "LEFT"}
@@ -217,8 +217,8 @@ class Blinky(Ghost):  # chases, dest player pos
     triggered when there are a
     certain number of dots left in the maze."""
 
-    def __init__(self, skin, cell_width, cell_height, is_frozen=False):
-        super().__init__(skin, cell_width, cell_height, is_frozen)
+    def __init__(self, skin, cell_width, cell_height):
+        super().__init__(skin, cell_width, cell_height)
         self.angry_skin = transform.scale(
             image.load("assets/skin/ghosts/angry_blinky.jpg"),
             (cell_width, cell_height),
@@ -236,8 +236,8 @@ class Blinky(Ghost):  # chases, dest player pos
         self.speed = 0.08
         self.default_skin = self.angry_skin
 
-    def next_move(self, maze, player) -> tuple[int, int]:
-        if self.is_frozen:
+    def next_move(self, maze, player, cheat) -> tuple[int, int]:
+        if cheat.freeze:
             return self.coord
 
         if self.is_vulnerable or self.died:
@@ -298,8 +298,8 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
     to the left of Pac-Man. During Scatter mode,
     she heads towards the upper-left corner."""
 
-    def __init__(self, skin, cell_width, cell_height, is_frozen=False):
-        super().__init__(skin, cell_width, cell_height, is_frozen)
+    def __init__(self, skin, cell_width, cell_height):
+        super().__init__(skin, cell_width, cell_height)
 
     def set_parameters(self, player):
         self.spawn = (0, 0)
@@ -308,8 +308,8 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
         self.target = (player.x, player.y)
         self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
         
-    def next_move(self, maze, player) -> tuple[int, int]:
-        if self.is_frozen:
+    def next_move(self, maze, player, cheat) -> tuple[int, int]:
+        if cheat.freeze:
             return self.coord
 
         if self.is_vulnerable or self.died:
@@ -386,15 +386,15 @@ class Inky(Ghost):
     Blinky is from Pinky's target is doubled to get Inky's target.
     He heads to the lower-right corner during Scatter mode."""
 
-    def __init__(self, skin, cell_width, cell_height, is_frozen=False):
-        super().__init__(skin, cell_width, cell_height, is_frozen)
+    def __init__(self, skin, cell_width, cell_height):
+        super().__init__(skin, cell_width, cell_height)
 
-    def play(self, maze, player, blinky=None, pinky=None):
+    def play(self, maze, player, cheat, blinky=None, pinky=None):
         if blinky:
             self._blinky = blinky
         if pinky:
             self._pinky = pinky
-        super().play(maze, player)
+        super().play(maze, player, cheat)
 
     def set_parameters(self, maze, player, blinky, pinky):
         self.spawn = (len(maze.maze[0]) - 1, len(maze.maze) - 1)
@@ -405,8 +405,8 @@ class Inky(Ghost):
         self._blinky = blinky
         self._pinky = pinky
 
-    def next_move(self, maze, player) -> tuple[int, int]:
-        if self.is_frozen:
+    def next_move(self, maze, player, cheat) -> tuple[int, int]:
+        if cheat.freeze:
             return self.coord
 
         if self.is_vulnerable or self.died:
@@ -472,8 +472,8 @@ class Clyde(Ghost):  # weird
     an 8-Dot radius of Pac-Man.
     His Scatter Mode corner is the lower-left."""
 
-    def __init__(self, skin, cell_width, cell_height, is_frozen=False):
-        super().__init__(skin, cell_width, cell_height, is_frozen)
+    def __init__(self, skin, cell_width, cell_height):
+        super().__init__(skin, cell_width, cell_height)
 
     def set_parameters(self, maze, player):
         self.spawn = (0, len(maze.maze) - 1)
@@ -482,8 +482,8 @@ class Clyde(Ghost):  # weird
         self.target = (player.x, player.y)
         self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
 
-    def next_move(self, maze, player) -> tuple[int, int]:
-        if self.is_frozen:
+    def next_move(self, maze, player, cheat) -> tuple[int, int]:
+        if cheat.freeze:
             return self.coord
 
         if (
