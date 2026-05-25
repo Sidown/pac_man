@@ -400,6 +400,8 @@ class Inky(Ghost):
 
         if self.is_vulnerable or self.died:
             self.target = self.spawn
+        elif dist(self.coord, (player.x, player.y)) <= 3:
+            self.target = (player.x, player.y)
         else:
             self.target = (
                 self._blinky.target[0] - self._pinky.target[0],
