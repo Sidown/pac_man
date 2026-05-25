@@ -184,7 +184,9 @@ class Ghost(ABC):
         if self.died:
             return self.return_spawn_skin
         if self.is_vulnerable:
+            self.speed = 0.03
             return self.vulnerable_skin
+        self.speed = 0.05
         return self.default_skin
 
     def _update_vulnerability(self, player):
@@ -217,6 +219,10 @@ class Blinky(Ghost):  # chases, dest player pos
 
     def __init__(self, skin, cell_width, cell_height, is_frozen=False):
         super().__init__(skin, cell_width, cell_height, is_frozen)
+        self.angry_skin = transform.scale(
+            image.load("assets/skin/ghosts/angry_blinky.jpg"),
+            (cell_width, cell_height),
+        )
 
     def set_parameters(self, maze, player):
         self.spawn = (len(maze.maze[0]) - 1, 0)
@@ -224,6 +230,11 @@ class Blinky(Ghost):  # chases, dest player pos
         self.next_coord = self.spawn
         self.target = (player.x, player.y)
         self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
+
+    @property
+    def angry_mod(self):
+        self.speed = 0.08
+        self.default_skin = self.angry_skin
 
     def next_move(self, maze, player) -> tuple[int, int]:
         if self.is_frozen:

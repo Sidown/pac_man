@@ -231,6 +231,12 @@ class GameScene(Scene):
     def update(self):
         if self.paused:
             return
+        remaining_pacgums = 0
+        for key in self.pacgums.keys():
+            if self.pacgums[key].visible:
+                remaining_pacgums += 1
+        if remaining_pacgums <= len(self.pacgums) // 5:
+            self.blinky.angry_mod
         self.blinky.play(self.maze, self.player)
         self.inky.play(self.maze, self.player, self.blinky, self.pinky)
         self.pinky.play(self.maze, self.player)
