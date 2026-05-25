@@ -237,15 +237,16 @@ class GameScene(Scene):
     def update(self):
         if self.paused:
             return
-        self.blinky.play()
-        self.inky.play()
-        self.pinky.play()
-        self.clyde.play()
+        self.blinky.play(self.maze, self.player)
+        self.inky.play(self.maze, self.player, self.blinky, self.pinky)
+        self.pinky.play(self.maze, self.player)
+        self.clyde.play(self.maze, self.player)
         self.player.update_player()
         for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
-            if ghost.collide_with_player():
+            if ghost.collide_with_player(self.player):
                 if ghost.is_vulnerable:
                     ghost.die()
+                    self.player.score += 200
                 elif not ghost.died:
                     self.player.lives -= 1
                     if self.player.lives <= 0:
@@ -305,23 +306,23 @@ class GameScene(Scene):
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
             self._print_skin(
                 self.blinky.current_skin,
-                self.blinky.pixel_x,
-                self.blinky.pixel_y,
+                self.blinky.pixel_coord[0],
+                self.blinky.pixel_coord[1],
             )
             self._print_skin(
                 self.pinky.current_skin,
-                self.pinky.pixel_x,
-                self.pinky.pixel_y,
+                self.pinky.pixel_coord[0],
+                self.pinky.pixel_coord[1],
             )
             self._print_skin(
                 self.inky.current_skin,
-                self.inky.pixel_x,
-                self.inky.pixel_y,
+                self.inky.pixel_coord[0],
+                self.inky.pixel_coord[1],
             )
             self._print_skin(
                 self.clyde.current_skin,
-                self.clyde.pixel_x,
-                self.clyde.pixel_y,
+                self.clyde.pixel_coord[0],
+                self.clyde.pixel_coord[1],
             )
             for pacgum in self.pacgums.values():
                 if pacgum.visible:
