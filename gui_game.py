@@ -58,9 +58,7 @@ class GameScene(Scene):
                 self.life_skin,
                 (
                     self.PADDING + width,
-                    self.PADDING
-                    + (self.maze_height * self.cell_height)
-                    + (2 * self.cell_height),
+                    self.HEIGHT - self.PADDING
                 ),
             )
             width += self.life_skin.get_width() + 5
