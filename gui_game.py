@@ -15,6 +15,9 @@ from cheat import Cheat
 
 
 class GameScene(Scene):
+    """
+    the main scene of the game
+    """
     def __init__(
         self,
         screen: Surface,
@@ -25,6 +28,17 @@ class GameScene(Scene):
         highscore: HighScore,
         cheat: Cheat,
     ) -> None:
+        """
+        Initialise the GameScene
+        arguments:
+        screen -> the pygame surface
+        theme -> the visual theme
+        width_height -> width and height of the window in pixels
+        config -> the game configuration
+        player -> the player
+        highscore -> the highscore manager
+        cheat -> the cheat class
+        """
         self.current_scene = "game"
         self.screen: Surface = screen
         self.theme: Theme = theme
@@ -64,11 +78,10 @@ class GameScene(Scene):
             caption="Skip Levels"
         )
 
-    def _cheat_callback(self) -> None:
-        self.current_scene = "cheat"
-        self.load_level()
-
     def load_level(self) -> None:
+        """
+        Load the current level from the Game class
+        """
         level = self.game.get_level(self.current_level_index)
         self.maze = level.maze
         self.maze_height = len(self.maze.maze)
@@ -95,6 +108,9 @@ class GameScene(Scene):
         self.player.reset_param()
 
     def _print_life(self) -> None:
+        """
+        Draw player life
+        """
         nb_life = self.player.lives
         width = 0
         for life in range(nb_life):
@@ -105,6 +121,9 @@ class GameScene(Scene):
             width += self.life_skin.get_width() + 5
 
     def _print_level(self) -> None:
+        """
+        display the current level number
+        """
         level_text = self.score_font.render(
             f"level: {self.current_level_index}", True, self.theme.text_color
         )
@@ -117,12 +136,21 @@ class GameScene(Scene):
         )
 
     def _print_score(self) -> None:
+        """
+        display the current player score
+        """
         score_text = self.score_font.render(
             f"Score: {self.player.score}", True, self.theme.text_color
         )
         self.screen.blit(score_text, (self.PADDING, 15))
 
-    def _show_maze(self, curr_x: int, curr_y: int) -> None:
+    def _show_maze(self, curr_x: float, curr_y: float) -> None:
+        """
+        print every cell of the maze
+        arguments:
+        curr_x -> starting pixel x coord
+        curr_y -> starting pixel y coord
+        """
         """Show the maze"""
         for row_nb in range(self.maze_height):
             print_down = False
@@ -166,6 +194,17 @@ class GameScene(Scene):
         print_east: bool,
         print_down: bool,
     ) -> None:
+        """
+        draw the wall of a cell maze
+        arguments:
+        x -> pixel x coord of the cell
+        y -> pixel y coord of the cell
+        cell_width -> width of the cell in pixel
+        cell_height -> height of the cell in pixel
+        opp_code -> wall bitmask for the cell
+        print_east -> if need to print the east border for last column
+        print_down -> if need to print the south border for lar row
+        """
         # upper border
         if opp_code & 0b0001:
             pygame.draw.line(
@@ -223,7 +262,13 @@ class GameScene(Scene):
             )
 
     def _print_skin(self, skin: Surface, x_cell: int, y_cell: int) -> None:
-        """A function that print a Skin on the maze."""
+        """
+        A function that print a Skin on the maze.
+        arguments:
+        skin -> the skin to draw
+        x_cell -> x position of the cell
+        y_cell -> y position of the cell
+        """
         self.screen.blit(
             skin,
             (
@@ -245,9 +290,19 @@ class GameScene(Scene):
         self.clyde.reset_param()
 
     def _game_over(self) -> None:
+        """
+        change the scene for the game over scene
+        """
         self.current_scene = "game_over"
 
     def handle_events(self, events: list[Event]) -> str:
+        """
+        handle keyboard input and cheat checkbox events
+        arguments:
+        events -> list of pygame events to process
+        return value:
+        the scene to display next
+        """
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
@@ -272,6 +327,9 @@ class GameScene(Scene):
         return self.current_scene
 
     def update(self) -> None:
+        """
+        Move ghost, update player and check collision
+        """
         if self.paused:
             return
         remaining_pacgums = 0
@@ -313,6 +371,10 @@ class GameScene(Scene):
         self.screen.blit(highscore_text, (self.WIDTH // 2, 15))
 
     def _next_level(self) -> None:
+        """
+        Advance to the next level or show victory scene if all levels
+        are done
+        """
         self.current_level_index += 1
         if self.current_level_index >= len(self.game.level_configs):
             self.current_scene = "victory"
@@ -329,6 +391,12 @@ class GameScene(Scene):
         self.player.lives = old_lives
 
     def _invincibility(self, cheat: Cheat) -> None:
+        """
+        Activate or desactivate the invincibility cheat depending on
+        the corresponding checkbox
+        arguments:
+        cheat -> the cheat class
+        """
         if self.invincibility_checkbox.checked:
             cheat.invincible = True
             print(f"invincibility checked, value: {cheat.invincible}")
@@ -337,6 +405,12 @@ class GameScene(Scene):
             print(f"invincibility unchecked, value: {cheat.invincible}")
 
     def _freeze_ghost(self, cheat: Cheat) -> None:
+        """
+        Activate or desactivate the freeze ghost cheat depending on
+        the corresponding checkbox
+        arguments:
+        cheat -> the cheat class
+        """
         if self.freeze_checkbox.checked:
             cheat.freeze = True
             print(f"freeze checked, value: {cheat.freeze}")
@@ -345,6 +419,12 @@ class GameScene(Scene):
             print(f"freeze unchecked, value: {cheat.freeze}")
 
     def _skip_level(self, cheat: Cheat) -> None:
+        """
+        Activate or desactivate the skip level cheat depending on
+        the corresponding checkbox
+        arguments:
+        cheat -> the cheat class
+        """
         if self.pacgum_checkbox.checked:
             cheat.skip = True
             print(f"skip checked, value: {cheat.skip}")
@@ -354,6 +434,13 @@ class GameScene(Scene):
 
     def _check_spawn_is_valid(self, coordinate:
                               tuple[int, int]) -> tuple[int, int]:
+        """
+        Find the nearest non closed cell starting from coordinate
+        arguments:
+        coordinate -> starting x,y maze position
+        return value:
+        a valid x,y spawn coord
+        """
         spawn_x, spawn_y = coordinate
         while self.maze.maze[spawn_y][spawn_x] == 15:
             spawn_y = spawn_y - 1
@@ -363,6 +450,9 @@ class GameScene(Scene):
         return (spawn_x, spawn_y)
 
     def draw(self) -> None:
+        """
+        draw the game scene or the pause
+        """
         self.screen.fill(self.theme.game_background_color)
         if self.paused:
             pause_text = pygame.font.Font(self.theme.font_path, 56).render(

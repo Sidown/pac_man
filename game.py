@@ -167,7 +167,6 @@ class Game:
                     self.config.points_per_super_pacgum,
                     cell_width,
                     cell_height,
-                    self.config.lives,
                     self.config.seed,
                     self.player,
                 )
@@ -178,7 +177,6 @@ class Game:
                     self.config.points_per_super_pacgum,
                     cell_width,
                     cell_height,
-                    self.config.lives,
                     random.random(),
                     self.player,
                 )
