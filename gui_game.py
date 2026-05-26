@@ -32,7 +32,6 @@ class GameScene(Scene):
         self.PADDING = 80
         self.paused = False
         self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING, config, self.player)
-        self.current_level = 0
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
@@ -98,6 +97,18 @@ class GameScene(Scene):
                 (self.PADDING + width, self.HEIGHT - self.PADDING),
             )
             width += self.life_skin.get_width() + 5
+
+    def _print_level(self) -> None:
+        level_text = self.score_font.render(
+            f"level: {self.current_level_index}", True, self.theme.text_color
+        )
+        self.screen.blit(
+            level_text,
+            (
+                self.WIDTH - level_text.get_width() - self.PADDING,
+                self.HEIGHT - self.PADDING,
+            ),
+        )
 
     def _print_score(self) -> None:
         score_text = self.score_font.render(
@@ -298,8 +309,7 @@ class GameScene(Scene):
     def _next_level(self):
         self.current_level_index += 1
         if self.current_level_index >= len(self.game.level_configs):
-            # sauvegarder le score. le joueur a gagne
-            self.current_scene = "game_over"  # changer la scene, c'est victory_scene
+            self.current_scene = "victory"
             return
         old_score = self.player.score
         old_lives = self.player.lives
@@ -412,3 +422,4 @@ class GameScene(Scene):
             self._print_life()
             self._print_score()
             self._print_highscore()
+            self._print_level()

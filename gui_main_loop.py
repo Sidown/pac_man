@@ -3,17 +3,18 @@ import sys
 import pygame
 from pygame import Surface, time
 
+from cheat import Cheat
 from game import Game
 from gui_game import GameScene
 from gui_game_over import GameOverScene
 from gui_highscore import HighScoreScene
 from gui_instruction import InstructionScene
 from gui_main_menu import MainMenuScene
+from gui_victory import VictoryScene
 from parser import Config, parser
 from player import Player
 from score import HighScore
 from theme import Theme
-from cheat import Cheat
 
 
 class Visualizer:
@@ -57,7 +58,7 @@ class Visualizer:
                 config,
                 player,
                 highscore,
-                cheat
+                cheat,
             ),
             "game_over": GameOverScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT), player, highscore
@@ -67,6 +68,9 @@ class Visualizer:
             ),
             "high_score": HighScoreScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT), config, highscore
+            ),
+            "victory": VictoryScene(
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT), player, highscore
             ),
         }
         current_scene = "main_menu"
@@ -86,7 +90,7 @@ class Visualizer:
                     config,
                     player,
                     highscore,
-                    cheat
+                    cheat,
                 )
                 scenes["game"].load_level()
             current_scene = next_scene
