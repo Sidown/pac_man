@@ -1,5 +1,6 @@
 import pygame
 from pygame import Surface
+from pygame.event import Event
 
 from player import Player
 from score import HighScore
@@ -81,7 +82,7 @@ class Clickable:
         on_mouse_over_background_color: tuple[int, int, int],
         on_mouse_over_text_color: tuple[int, int, int],
         hovered: bool,
-        callback,
+        callback: callable,
     ) -> None:
         self.on_mouse_over_bg_color = on_mouse_over_background_color
         self.on_mouse_over_text_color = on_mouse_over_text_color
@@ -98,7 +99,7 @@ class Button(Text, Clickable):
         font_color: tuple[int, int, int],
         background_color: tuple[int, int, int],
         text: str,
-        callback,
+        callback: callable,
         coordinate: tuple[int, int],
         center_x: bool,
         on_mouse_over_background_color: tuple[int, int, int],
@@ -150,7 +151,7 @@ class Button(Text, Clickable):
         else:
             self.surface.blit(self.displayed_text, (self.x, self.y))
 
-    def draw(self, screen) -> None:
+    def draw(self, screen: Surface) -> None:
         color = (self.on_mouse_over_bg_color if self.hovered
                  else self.background_color)
         pygame.draw.rect(screen, color, self.rect)
@@ -158,7 +159,7 @@ class Button(Text, Clickable):
         text_rect = text_surf.get_rect(center=self.rect.center)
         screen.blit(text_surf, text_rect)
 
-    def handle_event(self, event) -> None:
+    def handle_event(self, event: Event) -> None:
         if event.type == pygame.MOUSEMOTION:
             self.hovered = self.rect.collidepoint(event.pos)
         elif event.type == pygame.MOUSEBUTTONDOWN and self.hovered:
@@ -212,7 +213,7 @@ class TextInput:
             )
             self.screen.blit(displayed_error, (self.x - 250, self.y + 65))
 
-    def handle_event(self, event) -> bool:
+    def handle_event(self, event: Event) -> bool:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 self.highscore.save_high_score(self.text, self.player.score)

@@ -5,7 +5,7 @@ class Pacgum:
     """class for pacgum"""
 
     def __init__(self, points: int, coord: tuple[int, int],
-                 skin: str, cell_width, cell_height):
+                 skin: str, cell_width: float, cell_height: float) -> None:
         self.points: int = points
         self.visible: bool = True
         self.coord: tuple[int, int] = coord
@@ -20,7 +20,7 @@ class SuperPacgum:
     """class for super pacgum"""
 
     def __init__(self, points: int, coord: tuple[int, int],
-                 skin: str, cell_width, cell_height):
+                 skin: str, cell_width: float, cell_height: float) -> None:
         self.points: int = points
         self.visible: bool = True
         self.coord: tuple[int, int] = coord

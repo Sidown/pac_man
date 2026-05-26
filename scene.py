@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
+from pygame.event import Event
 
 
 class Scene(ABC):
     @abstractmethod
-    def handle_events(self, events) -> str:
+    def handle_events(self, events: list[Event]) -> str:
         pass
 
     @abstractmethod

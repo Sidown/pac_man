@@ -2,6 +2,7 @@ import sys
 
 import pygame
 from pygame import Surface
+from pygame.event import Event
 
 from checkbox import Checkbox
 from game import Game
@@ -10,6 +11,7 @@ from player import Player
 from scene import Scene
 from score import HighScore
 from theme import Theme
+from cheat import Cheat
 
 
 class GameScene(Scene):
@@ -21,13 +23,14 @@ class GameScene(Scene):
         config: Config,
         player: Player,
         highscore: HighScore,
-        cheat,
+        cheat: Cheat,
     ) -> None:
         self.current_scene = "game"
         self.screen: Surface = screen
         self.theme: Theme = theme
         self.player: Player = player
-        self.WIDTH, self.HEIGHT = width_height
+        self.WIDTH: int = width_height[0]
+        self.HEIGHT: int = width_height[1]
         self.PADDING = 80
         self.paused = False
         self.game = Game((self.WIDTH, self.HEIGHT),
@@ -119,7 +122,7 @@ class GameScene(Scene):
         )
         self.screen.blit(score_text, (self.PADDING, 15))
 
-    def _show_maze(self, curr_x, curr_y):
+    def _show_maze(self, curr_x: int, curr_y: int) -> None:
         """Show the maze"""
         for row_nb in range(self.maze_height):
             print_down = False
@@ -219,7 +222,7 @@ class GameScene(Scene):
                 ),
             )
 
-    def _print_skin(self, skin: Surface, x_cell, y_cell) -> None:
+    def _print_skin(self, skin: Surface, x_cell: int, y_cell: int) -> None:
         """A function that print a Skin on the maze."""
         self.screen.blit(
             skin,
@@ -244,7 +247,7 @@ class GameScene(Scene):
     def _game_over(self) -> None:
         self.current_scene = "game_over"
 
-    def handle_events(self, events) -> str:
+    def handle_events(self, events: list[Event]) -> str:
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
@@ -268,7 +271,7 @@ class GameScene(Scene):
 
         return self.current_scene
 
-    def update(self):
+    def update(self) -> None:
         if self.paused:
             return
         remaining_pacgums = 0
@@ -309,7 +312,7 @@ class GameScene(Scene):
         )
         self.screen.blit(highscore_text, (self.WIDTH // 2, 15))
 
-    def _next_level(self):
+    def _next_level(self) -> None:
         self.current_level_index += 1
         if self.current_level_index >= len(self.game.level_configs):
             self.current_scene = "victory"
@@ -325,7 +328,7 @@ class GameScene(Scene):
         self.player.score = old_score
         self.player.lives = old_lives
 
-    def _invincibility(self, cheat):
+    def _invincibility(self, cheat: Cheat) -> None:
         if self.invincibility_checkbox.checked:
             cheat.invincible = True
             print(f"invincibility checked, value: {cheat.invincible}")
@@ -333,7 +336,7 @@ class GameScene(Scene):
             cheat.invincible = False
             print(f"invincibility unchecked, value: {cheat.invincible}")
 
-    def _freeze_ghost(self, cheat):
+    def _freeze_ghost(self, cheat: Cheat) -> None:
         if self.freeze_checkbox.checked:
             cheat.freeze = True
             print(f"freeze checked, value: {cheat.freeze}")
@@ -341,7 +344,7 @@ class GameScene(Scene):
             cheat.freeze = False
             print(f"freeze unchecked, value: {cheat.freeze}")
 
-    def _skip_level(self, cheat):
+    def _skip_level(self, cheat: Cheat) -> None:
         if self.pacgum_checkbox.checked:
             cheat.skip = True
             print(f"skip checked, value: {cheat.skip}")
@@ -359,7 +362,7 @@ class GameScene(Scene):
                 sys.exit()
         return (spawn_x, spawn_y)
 
-    def draw(self):
+    def draw(self) -> None:
         self.screen.fill(self.theme.game_background_color)
         if self.paused:
             pause_text = pygame.font.Font(self.theme.font_path, 56).render(

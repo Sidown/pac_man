@@ -14,7 +14,7 @@ debug:
 
 lint: install
 	flake8 --extend-exclude .venv
-	mypy --follow-imports=skip --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	mypy  . --follow-imports=skip --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +

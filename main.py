@@ -2,7 +2,7 @@ from gui_main_loop import Visualizer
 from theme import Theme
 
 
-def main():
+def main() -> None:
 
     theme = Theme(
         background_color=(25, 25, 166),

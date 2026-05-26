@@ -1,5 +1,6 @@
 import pygame
 from pygame import Surface
+from pygame.event import Event
 
 from scene import Scene
 from theme import Button, Theme
@@ -31,13 +32,13 @@ class InstructionScene(Scene):
     def _back_to_menu_callback(self) -> None:
         self.current_scene = "main_menu"
 
-    def handle_events(self, events) -> str:
+    def handle_events(self, events: list[Event]) -> str:
         self.current_scene = "instruction"
         for event in events:
             self.btn_back_to_menu.handle_event(event)
         return self.current_scene
 
-    def update(self):
+    def update(self) -> None:
         pass
 
     def _print_rules(self) -> None:
@@ -170,7 +171,7 @@ class InstructionScene(Scene):
         )
         self.screen.blit(space_text, (35, 520))
 
-    def draw(self):
+    def draw(self) -> None:
         self.screen.fill(self.theme.background_color)
         self.btn_back_to_menu.draw(self.screen)
         self._print_rules()

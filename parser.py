@@ -15,7 +15,8 @@ class Config(BaseModel):
     levels: list[dict[str, int]]
 
 
-def dict_raise_on_duplicate(pairs):
+def dict_raise_on_duplicate(pairs: dict[str, str | int]
+                            ) -> dict[str, str | int]:
     d = {}
     for k, v in pairs:
         if k in d:
@@ -24,7 +25,7 @@ def dict_raise_on_duplicate(pairs):
     return d
 
 
-def load_config(path: str) -> dict:
+def load_config(path: str) -> dict[str, str | int]:
     try:
         with open(path, "r") as f:
             lines = [line for line in f if not line.strip().startswith("#")]

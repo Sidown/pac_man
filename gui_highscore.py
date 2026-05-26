@@ -1,5 +1,6 @@
 import pygame
 from pygame import Surface
+from pygame.event import Event
 
 from parser import Config
 from scene import Scene
@@ -40,13 +41,13 @@ class HighScoreScene(Scene):
     def _back_to_menu_callback(self) -> None:
         self.current_scene = "main_menu"
 
-    def handle_events(self, events) -> str:
+    def handle_events(self, events: list[Event]) -> str:
         self.current_scene = "high_score"
         for event in events:
             self.btn_back_to_menu.handle_event(event)
         return self.current_scene
 
-    def update(self):
+    def update(self) -> None:
         pass
 
     def _display_title(self) -> None:
@@ -80,7 +81,7 @@ class HighScoreScene(Scene):
             )
             index += 1
 
-    def draw(self):
+    def draw(self) -> None:
         self.screen.fill(self.theme.background_color)
         self.btn_back_to_menu.draw(self.screen)
         self._display_title()

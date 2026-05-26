@@ -12,7 +12,7 @@ class Player:
         lives: int,
         spawn_x: int,
         spawn_y: int,
-    ):
+    ) -> None:
         self.default_lives: int = lives
         self.lives: int = self.default_lives
         self.x: int = spawn_x
@@ -29,11 +29,11 @@ class Player:
         self.speed: float = 0.10
         self.pacgum_effect: bool = False
         self.timer_effect = 0
-        self.skin_timer = 0
+        self.skin_timer = 0.0
         self.skin_index = 0
         self.animation_speed = 0.3
 
-    def _set_skins(self, cell_width, cell_height) -> None:
+    def _set_skins(self, cell_width: float, cell_height: float) -> None:
         self.skin: Surface | None = transform.scale(
             image.load("assets/skin/pacman.png"),
             (cell_width, cell_height),
@@ -115,7 +115,7 @@ class Player:
             return False
         return False
 
-    def update_player(self, maze: MazeGenerator):
+    def update_player(self, maze: MazeGenerator) -> None:
         """update the player position, player movement pixel by
         pixel and player skin"""
         if self.timer_effect > 0:
@@ -184,7 +184,7 @@ class Player:
 
         self._update_skin()
 
-    def _update_skin(self):
+    def _update_skin(self) -> None:
         if self.direction:
             self.skin_timer += self.animation_speed
             if self.skin_timer >= 1:

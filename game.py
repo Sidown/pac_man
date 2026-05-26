@@ -6,72 +6,20 @@ from ghost import Blinky, Clyde, Ghost, Inky, Pinky
 from not_corner import not_corner
 from pacgum import Pacgum, SuperPacgum
 from parser import Config
-
-
-class Game:
-    def __init__(self, window_size, padding, config, player):
-        self.config: Config = config
-        self.levels: list[Level] = []
-        for _ in self.config.levels:
-            self.border_size = 5
-            self.window_size = window_size
-            self.padding = padding
-            self.level_configs = self.config.levels
-            self._loaded_levels: dict[int, Level] = {}
-            self.player = player
-
-    def get_level(self, index: int):
-        if index not in self._loaded_levels:
-            config = self.level_configs[index]
-            maze_width = config["width"]
-            maze_height = config["height"]
-            cell_width = (
-                self.window_size[0]
-                - (2 * self.padding)
-                - ((maze_width + 1) * self.border_size)
-            ) / maze_width
-            cell_height = (
-                self.window_size[1]
-                - (2 * self.padding)
-                - ((maze_height + 1) * self.border_size)
-            ) / maze_height
-            if index == 0:
-                self._loaded_levels[index] = Level(
-                    (maze_width, maze_height),
-                    self.config.points_per_pacgum,
-                    self.config.points_per_super_pacgum,
-                    cell_width,
-                    cell_height,
-                    self.config.lives,
-                    self.config.seed,
-                    self.player,
-                )
-            else:
-                self._loaded_levels[index] = Level(
-                    (maze_width, maze_height),
-                    self.config.points_per_pacgum,
-                    self.config.points_per_super_pacgum,
-                    cell_width,
-                    cell_height,
-                    self.config.lives,
-                    random.random(),
-                    self.player,
-                )
-        return self._loaded_levels[index]
+from player import Player
 
 
 class Level:
     def __init__(
         self,
         size: tuple[int],
-        pacgum_points,
-        super_pacgum_points,
-        cell_width,
-        cell_height,
-        player_lives,
-        seed,
-        player,
-    ):
+        pacgum_points: int,
+        super_pacgum_points: int,
+        cell_width: int,
+        cell_height: int,
+        seed: float,
+        player: Player,
+    ) -> None:
         self.maze: MazeGenerator = MazeGenerator(size, seed=seed)
         self.pacgums: dict[tuple[int], Pacgum] = {}
         self.player = player
@@ -149,3 +97,56 @@ class Level:
 
         self.cell_width = cell_width
         self.cell_height = cell_height
+
+
+class Game:
+    def __init__(self, window_size: int, padding: int, config:
+                 Config, player: Player) -> None:
+        self.config: Config = config
+        self.levels: list[Level] = []
+        for _ in self.config.levels:
+            self.border_size = 5
+            self.window_size = window_size
+            self.padding = padding
+            self.level_configs = self.config.levels
+            self._loaded_levels: dict[int, Level] = {}
+            self.player = player
+
+    def get_level(self, index: int) -> Level:
+        if index not in self._loaded_levels:
+            config = self.level_configs[index]
+            maze_width = config["width"]
+            maze_height = config["height"]
+            cell_width = (
+                self.window_size[0]
+                - (2 * self.padding)
+                - ((maze_width + 1) * self.border_size)
+            ) / maze_width
+            cell_height = (
+                self.window_size[1]
+                - (2 * self.padding)
+                - ((maze_height + 1) * self.border_size)
+            ) / maze_height
+            if index == 0:
+                self._loaded_levels[index] = Level(
+                    (maze_width, maze_height),
+                    self.config.points_per_pacgum,
+                    self.config.points_per_super_pacgum,
+                    cell_width,
+                    cell_height,
+                    self.config.lives,
+                    self.config.seed,
+                    self.player,
+                )
+            else:
+                self._loaded_levels[index] = Level(
+                    (maze_width, maze_height),
+                    self.config.points_per_pacgum,
+                    self.config.points_per_super_pacgum,
+                    cell_width,
+                    cell_height,
+                    self.config.lives,
+                    random.random(),
+                    self.player,
+                )
+        return self._loaded_levels[index]
