@@ -187,7 +187,7 @@ class TextInput:
         self.highscore: HighScore = highscore
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.text: str = ""
-        self.font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 28)
+        self.font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf", 28)
         self.is_valid_name: bool = True
 
     def draw(self) -> None:
@@ -199,7 +199,7 @@ class TextInput:
         displayed_text = self.font.render(self.text, False, (0, 0, 0))
         self.screen.blit(displayed_text, (self.x, self.y + 10))
         if not self.is_valid_name:
-            font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 22)
+            font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf", 22)
             displayed_error = font.render(
                 "Please enter a valid name (<10 char alpha and space only)",
                 False,

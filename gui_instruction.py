@@ -45,7 +45,7 @@ class InstructionScene(Scene):
         instruction = []
         instruction.append(
             pygame.font.Font(self.theme.font_path, 26).render(
-                "INSTRUCTION:", False, self.theme.text_color
+                "INSTRUCTION:", False, self.theme.title_color
             )
         )
         instruction.append(
@@ -156,6 +156,19 @@ class InstructionScene(Scene):
             self.theme.text_color,
         )
         self.screen.blit(right_text, (self.WIDTH // 2 + 86, 600 + 40))
+
+        # SPACE
+        pygame.draw.rect(
+            self.screen,
+            self.theme.game_background_color,
+            (25, 500, 400, 60),
+        )
+        space_text = pygame.font.Font(self.theme.font_path, 18).render(
+            "Press SPACE to pause the game",
+            False,
+            self.theme.text_color,
+        )
+        self.screen.blit(space_text, (35, 520))
 
     def draw(self):
         self.screen.fill(self.theme.background_color)
