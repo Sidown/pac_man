@@ -211,6 +211,7 @@ class TextInput:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 self.highscore.save_high_score(self.text, self.player.score)
+                self.text = ""
                 return True
             if event.key == pygame.K_BACKSPACE:
                 self.text = self.text[:-1]
