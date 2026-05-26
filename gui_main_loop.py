@@ -9,7 +9,6 @@ from gui_game_over import GameOverScene
 from gui_highscore import HighScoreScene
 from gui_instruction import InstructionScene
 from gui_main_menu import MainMenuScene
-from gui_cheat import CheatScene
 from parser import Config, parser
 from player import Player
 from score import HighScore
@@ -70,9 +69,6 @@ class Visualizer:
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
             ),
         }
-        scenes.update({"cheat": CheatScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT), cheat
-            )})
         current_scene = "main_menu"
         clock = time.Clock()
         while running:

@@ -7,7 +7,8 @@ from parser import Config
 from player import Player
 from scene import Scene
 from score import HighScore
-from theme import Theme, Button, Text
+from theme import Theme, Button
+from checkbox import Checkbox
 
 
 class GameScene(Scene):
@@ -40,19 +41,15 @@ class GameScene(Scene):
         self.highscore.load_high_score()
         self.cheat = cheat
 
-        self.btn_cheat = Button(
-            self.screen,
-            self.theme.text_size,
-            self.theme.font_path,
-            self.theme.text_color,
-            (0, 0, 0),
-            "Cheat",
-            self._cheat_callback,
-            ((self.WIDTH // 2), 450),
-            True,
-            (26, 114, 181),
-            self.theme.btn_on_mouse_over_text_color,
-        )
+        self.invincibility_checkbox = Checkbox(self.screen, self.WIDTH // 2.5,
+                                               self.HEIGHT / 3.5, 1,
+                                               caption="Invincibility")
+        self.freeze_checkbox = Checkbox(self.screen, self.WIDTH // 2.5,
+                                               self.HEIGHT / 2.6, 2,
+                                               caption="Freeze Ghosts")
+        self.pacgum_checkbox = Checkbox(self.screen, self.WIDTH // 2.5,
+                                               self.HEIGHT / 2.1, 3,
+                                               caption="Skip Levels")
 
     def _cheat_callback(self) -> None:
         self.current_scene = "cheat"
@@ -236,7 +233,12 @@ class GameScene(Scene):
                     self.paused = not self.paused
                 if event.key == pygame.K_RETURN and self.cheat.skip:
                     self._next_level()
-            self.btn_cheat.handle_event(event)
+            if self.invincibility_checkbox.update_checkbox(event):
+                self._invincibility(self.cheat)
+            if self.freeze_checkbox.update_checkbox(event):
+                self._freeze_ghost(self.cheat)
+            if self.pacgum_checkbox.update_checkbox(event):
+                self._skip_level(self.cheat)
 
         return self.current_scene
 
@@ -297,6 +299,30 @@ class GameScene(Scene):
         self.player.score = old_score
         self.player.lives = old_lives
 
+    def _invincibility(self, cheat):
+        if self.invincibility_checkbox.checked:
+            cheat.invincible = True
+            print(f"invincibility checked, value: {cheat.invincible}")
+        else:
+            cheat.invincible = False
+            print(f"invincibility unchecked, value: {cheat.invincible}")
+
+    def _freeze_ghost(self, cheat):
+        if self.freeze_checkbox.checked:
+            cheat.freeze = True
+            print(f"freeze checked, value: {cheat.freeze}")
+        else:
+            cheat.freeze = False
+            print(f"freeze unchecked, value: {cheat.freeze}")
+
+    def _skip_level(self, cheat):
+        if self.pacgum_checkbox.checked:
+            cheat.skip = True
+            print(f"skip checked, value: {cheat.skip}")
+        else:
+            cheat.skip = False
+            print(f"skip unchecked, value: {cheat.skip}")
+
     def draw(self):
         self.screen.fill(self.theme.game_background_color)
         if self.paused:
@@ -308,11 +334,26 @@ class GameScene(Scene):
                 pause_text.get_rect(
                     center=(
                         (self.WIDTH // 2),
-                        (self.HEIGHT // 2),
+                        (self.PADDING),
                     )
                 ),
             )
-            self.btn_cheat.draw(self.screen)
+            cheat_text = pygame.font.Font(self.theme.font_path, 36).render(
+                "Cheats (for loosers only):", True, (255, 255, 255)
+            )
+            self.screen.blit(
+                cheat_text,
+                cheat_text.get_rect(
+                    center=(
+                        (self.WIDTH // 2),
+                        (self.PADDING * 2),
+                    )
+                ),
+            )
+            self.invincibility_checkbox.draw()
+            self.freeze_checkbox.draw()
+            self.pacgum_checkbox.draw()
+
         else:
             self._print_maze()
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)

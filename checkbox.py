@@ -3,7 +3,7 @@ import theme
 
 class Checkbox:
     def __init__(self, surface, x, y, idnum, color=(230, 230, 230), caption="",
-                 outline_color=(0, 0, 0), check_color=(40, 91, 232), font_size=48, font_color=(230, 230, 230),
+                 outline_color=(0, 0, 0), check_color=(40, 91, 232), font_size=36, font_color=(230, 230, 230),
                  text_offset=(42, 1), font="assets/fonts/Retro Gaming.ttf"):
         self.surface = surface
         self.x = x
