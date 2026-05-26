@@ -234,7 +234,10 @@ class GameScene(Scene):
                     self.player.queud_direction = "W"
                 if event.key == pygame.K_SPACE:
                     self.paused = not self.paused
+                if event.key == pygame.K_RETURN and self.cheat.skip:
+                    self._next_level()
             self.btn_cheat.handle_event(event)
+
         return self.current_scene
 
     def update(self):
@@ -286,7 +289,7 @@ class GameScene(Scene):
             return
         old_score = self.player.score
         old_lives = self.player.lives
-        self._load_level(self.current_level_index)
+        self.load_level()
         # remettre le player a son spawn
         # TODO: CHECK LE SPAWN HORS 42.
         self.player.spawn = (self.maze_width // 2, self.maze_height // 2)
