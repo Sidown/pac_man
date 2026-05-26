@@ -10,18 +10,32 @@ from player import Player
 
 
 class Level:
+    """
+    A level from the game, have the maze, pacgums, super pacgums and ghosts.
+    """
     def __init__(
         self,
-        size: tuple[int],
+        size: tuple[int, int],
         pacgum_points: int,
         super_pacgum_points: int,
-        cell_width: int,
-        cell_height: int,
+        cell_width: float,
+        cell_height: float,
         seed: float,
         player: Player,
     ) -> None:
+        """
+        Build a level.
+        Arguments:
+        size -> width and height of the maze
+        pacgum_points -> number of points gained by pacgum eaten
+        super_pacgum_points -> number of points gained by super pacgums eaten
+        cell_width -> width of a cell in the maze in pixels
+        cell_height -> height of a cell in the maze in pixels
+        seed -> random seed used to generate the maze
+        player -> the player
+        """
         self.maze: MazeGenerator = MazeGenerator(size, seed=seed)
-        self.pacgums: dict[tuple[int], Pacgum] = {}
+        self.pacgums: dict[tuple[int, int], Pacgum] = {}
         self.player = player
         for y, row in enumerate(self.maze.maze):
             for x, _ in enumerate(row):
@@ -100,19 +114,38 @@ class Level:
 
 
 class Game:
-    def __init__(self, window_size: int, padding: int, config:
-                 Config, player: Player) -> None:
+    """
+    The game object that own an create the levels.
+    """
+    def __init__(self, window_size: tuple[int, int],
+                 padding: int, config: Config,
+                 player: Player) -> None:
+        """
+        Initialise the game.
+        Arguments:
+        window_size -> width and height of the game window in pixels
+        padding -> pixel padding around the maze
+        config -> game configuration
+        player -> the player
+        """
         self.config: Config = config
-        self.levels: list[Level] = []
-        for _ in self.config.levels:
-            self.border_size = 5
-            self.window_size = window_size
-            self.padding = padding
-            self.level_configs = self.config.levels
-            self._loaded_levels: dict[int, Level] = {}
-            self.player = player
+        self.border_size = 5
+        self.window_size = window_size
+        self.padding = padding
+        self.level_configs = self.config.levels
+        self._loaded_levels: dict[int, Level] = {}
+        self.player = player
 
     def get_level(self, index: int) -> Level:
+        """
+        Return the level corresponding to the index.
+        The first level always use the given seed in the config.json,
+        the other one will have a random seed.
+        Arguments:
+        index -> index of the level
+        return value:
+        the level created
+        """
         if index not in self._loaded_levels:
             config = self.level_configs[index]
             maze_width = config["width"]

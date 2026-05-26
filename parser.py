@@ -5,6 +5,9 @@ from pydantic import BaseModel, ValidationError
 
 
 class Config(BaseModel):
+    """
+    Pydantic model for the game configuration loaded from the json file.
+    """
     highscore_filename: str
     lives: int
     level_max_time: int
@@ -15,9 +18,20 @@ class Config(BaseModel):
     levels: list[dict[str, int]]
 
 
-def dict_raise_on_duplicate(pairs: dict[str, str | int]
+def dict_raise_on_duplicate(pairs: list[tuple[str, str | int]]
                             ) -> dict[str, str | int]:
-    d = {}
+    """
+    Build a dict from keys and values raising on duplicate keys.
+    Used as the object_pairs_hook for json.load to reject
+    a configuration file with two same keys.
+    Arguments:
+    pairs -> ordered list of key value tuples from the json parser
+    return value:
+    a dict built from pairs
+
+    raise value error if a key appear more than once
+    """
+    d: dict[str, str | int] = {}
     for k, v in pairs:
         if k in d:
             raise ValueError(f'Double key: "{k}"')
@@ -26,6 +40,16 @@ def dict_raise_on_duplicate(pairs: dict[str, str | int]
 
 
 def load_config(path: str) -> dict[str, str | int]:
+    """
+    Read and parse the json config file.
+    Lines that beggin by '#' are ignored before parsing.
+    Arguments:
+    path -> path to the json config file
+    return value:
+    a dict with the type of config as a key and it's value as value
+
+    Raise sys.exit on error on error
+    """
     try:
         with open(path, "r") as f:
             lines = [line for line in f if not line.strip().startswith("#")]
@@ -50,6 +74,16 @@ def load_config(path: str) -> dict[str, str | int]:
 
 
 def config_check(config: Config) -> bool:
+    """
+    Check the config values.
+    arguments:
+    config -> the config parsed in the Config class
+    Return value:
+    true if ok, false in case of errors
+
+    All detected errors are printed to stdout before
+    returning a value
+    """
     errors = []
     try:
         open(f"{config.highscore_filename}", "r")
@@ -106,6 +140,14 @@ def config_check(config: Config) -> bool:
 
 
 def parser(path: str) -> Config:
+    """
+    Load, parse and validate the game configuration from the json file
+    Arguments:
+    path -> path to the json configuration file
+    return value:
+    A validated Config class
+    In case of error raise sys.exit
+    """
     try:
         config = Config(**load_config(path))
         if config_check(config):
