@@ -54,6 +54,7 @@ class GameOverScene(Scene):
             self.btn_back_to_menu.handle_event(event)
             is_completed_name = self.text_input_name.handle_event(event)
         if is_completed_name:
+            self.player.new_game()
             return "main_menu"
         return self.current_scene
 
