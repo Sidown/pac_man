@@ -238,7 +238,7 @@ class GameScene(Scene):
                 if ghost.is_vulnerable:
                     ghost.die()
                     self.player.score += 200
-                elif not ghost.died:
+                elif not ghost.died and not self.cheat.invincible:
                     self.player.lives -= 1
                     if self.player.lives <= 0:
                         # sauvegarder le score. le joueur a perdu
