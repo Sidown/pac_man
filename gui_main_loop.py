@@ -63,7 +63,7 @@ class Visualizer:
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
             ),
             "high_score": HighScoreScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT)
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT), config, highscore
             ),
         }
         current_scene = "main_menu"

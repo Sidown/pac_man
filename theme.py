@@ -188,6 +188,7 @@ class TextInput:
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.text: str = ""
         self.font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 28)
+        self.is_valid_name: bool = True
 
     def draw(self) -> None:
         displayed_text = self.font.render("Enter your Name:", False, (0, 0, 0))
@@ -197,16 +198,30 @@ class TextInput:
             return
         displayed_text = self.font.render(self.text, False, (0, 0, 0))
         self.screen.blit(displayed_text, (self.x, self.y + 10))
+        if not self.is_valid_name:
+            font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 22)
+            displayed_error = font.render(
+                "Please enter a valid name (<10 char alpha and space only)",
+                False,
+                (255, 0, 0),
+            )
+            self.screen.blit(displayed_error, (self.x - 250, self.y + 65))
 
-    def handle_event(self, event) -> None:
+    def handle_event(self, event) -> bool:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
-                # check que self.text est au bon format
-                # sauvegarder ca dans le json.
                 self.highscore.save_high_score(self.text, self.player.score)
-                return
+                return True
             if event.key == pygame.K_BACKSPACE:
                 self.text = self.text[:-1]
             else:
                 if len(self.text) < 10:
-                    self.text += event.unicode
+                    self.is_valid_name = True
+                    if event.unicode.isalpha() or event.unicode.isspace():
+                        self.text += event.unicode
+                        self.is_valid_name = True
+                    else:
+                        self.is_valid_name = False
+                else:
+                    self.is_valid_name = False
+        return False

@@ -48,9 +48,12 @@ class GameOverScene(Scene):
 
     def handle_events(self, events) -> str:
         self.current_scene = "game_over"
+        is_completed_name = False
         for event in events:
             self.btn_back_to_menu.handle_event(event)
-            self.text_input_name.handle_event(event)
+            is_completed_name = self.text_input_name.handle_event(event)
+        if is_completed_name:
+            return "main_menu"
         return self.current_scene
 
     def update(self):
