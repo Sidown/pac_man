@@ -68,20 +68,6 @@ class MainMenuScene(Scene):
             self.theme.btn_on_mouse_over_text_color,
         )
 
-        self.btn_cheat = Button(
-            self.screen,
-            self.theme.text_size,
-            self.theme.font_path,
-            self.theme.text_color,
-            self.theme.background_color,
-            "Cheat",
-            self._cheat_callback,
-            ((self.WIDTH // 2), 550),
-            True,
-            self.theme.btn_on_mouse_over_background_color,
-            self.theme.btn_on_mouse_over_text_color,
-        )
-
         self.btn_exit = Button(
             self.screen,
             self.theme.text_size,
@@ -90,7 +76,7 @@ class MainMenuScene(Scene):
             self.theme.background_color,
             "Exit",
             self._exit_callback,
-            ((self.WIDTH // 2), 650),
+            ((self.WIDTH // 2), 550),
             True,
             self.theme.btn_on_mouse_over_background_color,
             self.theme.btn_on_mouse_over_text_color,
@@ -109,16 +95,12 @@ class MainMenuScene(Scene):
     def _highscore_callback(self) -> None:
         self.current_scene = "high_score"
 
-    def _cheat_callback(self) -> None:
-        self.current_scene = "cheat"
-
     def handle_events(self, events) -> str:
         self.current_scene = "main_menu"
         for event in events:
             self.btn_game.handle_event(event)
             self.btn_high_score.handle_event(event)
             self.btn_instruction.handle_event(event)
-            self.btn_cheat.handle_event(event)
             self.btn_exit.handle_event(event)
         return self.current_scene
 
@@ -131,5 +113,4 @@ class MainMenuScene(Scene):
         self.btn_game.draw(self.screen)
         self.btn_high_score.draw(self.screen)
         self.btn_instruction.draw(self.screen)
-        self.btn_cheat.draw(self.screen)
         self.btn_exit.draw(self.screen)

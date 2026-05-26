@@ -20,8 +20,8 @@ class CheatScene:
             self.theme.font_path,
             self.theme.text_color,
             self.theme.background_color,
-            "Back to Main Menu",
-            self._back_to_menu_callback,
+            "Back To Game",
+            self._back_to_game_callback,
             (50, 50),
             False,
             self.theme.btn_on_mouse_over_background_color,
@@ -37,8 +37,8 @@ class CheatScene:
                                                self.HEIGHT / 1.8, 3,
                                                caption="Skip Levels")
 
-    def _back_to_menu_callback(self) -> None:
-        self.current_scene = "main_menu"
+    def _back_to_game_callback(self) -> None:
+        self.current_scene = "game"
 
     def handle_events(self, events) -> str:
         self.current_scene = "cheat"

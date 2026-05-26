@@ -7,7 +7,7 @@ from parser import Config
 from player import Player
 from scene import Scene
 from score import HighScore
-from theme import Theme
+from theme import Theme, Button, Text
 
 
 class GameScene(Scene):
@@ -39,6 +39,23 @@ class GameScene(Scene):
         self.highscore: HighScore = highscore
         self.highscore.load_high_score()
         self.cheat = cheat
+
+        self.btn_cheat = Button(
+            self.screen,
+            self.theme.text_size,
+            self.theme.font_path,
+            self.theme.text_color,
+            (0, 0, 0),
+            "Cheat",
+            self._cheat_callback,
+            ((self.WIDTH // 2), 450),
+            True,
+            (26, 114, 181),
+            self.theme.btn_on_mouse_over_text_color,
+        )
+
+    def _cheat_callback(self) -> None:
+        self.current_scene = "cheat"
 
     def load_level(self) -> None:
         level = self.game.get_level(self.current_level_index)
@@ -217,6 +234,7 @@ class GameScene(Scene):
                     self.player.queud_direction = "W"
                 if event.key == pygame.K_SPACE:
                     self.paused = not self.paused
+            self.btn_cheat.handle_event(event)
         return self.current_scene
 
     def update(self):
@@ -291,6 +309,7 @@ class GameScene(Scene):
                     )
                 ),
             )
+            self.btn_cheat.draw(self.screen)
         else:
             self._print_maze()
             self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
