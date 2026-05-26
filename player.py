@@ -13,7 +13,8 @@ class Player:
         spawn_x: int,
         spawn_y: int,
     ):
-        self.lives: int = lives
+        self.default_lives: int = lives
+        self.lives: int = self.default_lives
         self.x: int = spawn_x
         self.y: int = spawn_y
         self.spawn: tuple[int, int] = (spawn_x, spawn_y)
@@ -85,6 +86,11 @@ class Player:
         self.direction = self.queud_direction = ""
         self.timer_effect = 0
         self.pacgum_effect = False
+
+    def new_game(self) -> None:
+        self.reset_param()
+        self.score = 0
+        self.lives = self.default_lives
 
     def _is_neighbor(
         self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int

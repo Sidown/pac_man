@@ -44,6 +44,7 @@ class GameOverScene(Scene):
         )
 
     def _back_to_menu_callback(self) -> None:
+        self.player.new_game()
         self.current_scene = "main_menu"
 
     def handle_events(self, events) -> str:

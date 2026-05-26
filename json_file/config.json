@@ -1,6 +1,6 @@
 {
   "highscore_filename": "./json_file/highscore.json",
-  "lives": 1,
+  "lives": 3,
   "level_max_time": 90,
   "seed": 42,
 
@@ -9,8 +9,8 @@
   "points_per_ghost": 200,
 
   "levels": [
-    { "width": 14, "height": 14 },
-    { "width": 10, "height": 10 },
+    { "width": 15, "height": 15 },
+    { "width": 15, "height": 15 },
     { "width": 15, "height": 15 },
     { "width": 15, "height": 15 },
     { "width": 15, "height": 15 },
