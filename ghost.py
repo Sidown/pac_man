@@ -59,8 +59,8 @@ class Ghost(ABC):
         """Move the ghost"""
         if self.move_progress >= 1.0:
             self.coord = self.next_coord
+            self._update_vulnerability(player)
             if not cheat.freeze:
-                self._update_vulnerability(player)
                 move = self.next_move(maze, player, cheat)
 
                 opposite = {"UP": "DOWN", "DOWN": "UP",
