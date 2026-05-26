@@ -1,9 +1,5 @@
 from abc import ABC, abstractmethod
 
-from pygame import Surface
-
-from theme import Theme
-
 
 class Scene(ABC):
     @abstractmethod

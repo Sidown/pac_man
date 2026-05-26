@@ -42,7 +42,8 @@ class VictoryScene(Scene):
             self.theme.btn_on_mouse_over_text_color,
         )
         self.text_input_name = TextInput(
-            self.screen, (350, self.WIDTH // 2), 250, 60, self.player, self.highscore
+            self.screen, (350, self.WIDTH // 2), 250, 60, self.player,
+            self.highscore
         )
 
     def _back_to_menu_callback(self) -> None:

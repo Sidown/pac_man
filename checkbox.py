@@ -1,9 +1,10 @@
 import pygame
-import theme
+
 
 class Checkbox:
     def __init__(self, surface, x, y, idnum, color=(230, 230, 230), caption="",
-                 outline_color=(0, 0, 0), check_color=(40, 91, 232), font_size=36, font_color=(230, 230, 230),
+                 outline_color=(0, 0, 0), check_color=(40, 91, 232),
+                 font_size=36, font_color=(230, 230, 230),
                  text_offset=(42, 1), font="assets/fonts/Retro Gaming.ttf"):
         self.surface = surface
         self.x = x
@@ -26,20 +27,24 @@ class Checkbox:
         self.font = pygame.font.SysFont(self.ft, self.font_size)
         self.font_surf = self.font.render(self.caption, True, self.font_color)
         w, h = self.font.size(self.caption)
-        self.font_pos = (self.x + self.text_offset[0], self.y + self.text_offset[1])
+        self.font_pos = (self.x + self.text_offset[0],
+                         self.y + self.text_offset[1])
         self.surface.blit(self.font_surf, self.font_pos)
 
     def draw(self):
         if self.checked:
             pygame.draw.rect(self.surface, self.color, self.checkbox_obj)
-            pygame.draw.rect(self.surface, self.outline_color, self.checkbox_outline, 1)
-            pygame.draw.rect(self.surface, self.check_color, self.checked_obj, 14)
-        
+            pygame.draw.rect(self.surface, self.outline_color,
+                             self.checkbox_outline, 1)
+            pygame.draw.rect(self.surface, self.check_color,
+                             self.checked_obj, 14)
+
         elif not self.checked:
             pygame.draw.rect(self.surface, self.color, self.checkbox_obj)
-            pygame.draw.rect(self.surface, self.outline_color, self.checkbox_outline, 1)
+            pygame.draw.rect(self.surface, self.outline_color,
+                             self.checkbox_outline, 1)
         self._draw_button_text()
-    
+
     def _update(self, event_object):
         x, y = pygame.mouse.get_pos()
         px, py, w, h = self.checkbox_obj
@@ -55,4 +60,3 @@ class Checkbox:
             self._update(event_object)
             return True
         return False
-

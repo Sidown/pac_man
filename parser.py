@@ -32,7 +32,8 @@ def load_config(path: str) -> dict:
 
             if not config:
                 raise ValueError("Config file empty")
-            return json.loads(config, object_pairs_hook=dict_raise_on_duplicate)
+            return json.loads(config,
+                              object_pairs_hook=dict_raise_on_duplicate)
 
     except json.JSONDecodeError:
         print("Error: JSON not valid")
@@ -57,23 +58,28 @@ def config_check(config: Config) -> bool:
         errors.append(f"Lives must be potive int (currently {config.lives})")
     if config.level_max_time <= 0:
         errors.append(
-            f"Level max time must be positive int (currently {config.level_max_time})"
+            "Level max time must be positive int (currently"
+            f"{config.level_max_time})"
         )
     if config.points_per_pacgum <= 0:
         errors.append(
-            f"Points per pacgum must be positive int (currently {config.points_per_pacgum})"
+            "Points per pacgum must be positive int (currently "
+            f"{config.points_per_pacgum})"
         )
     if config.points_per_super_pacgum <= 0:
         errors.append(
-            f"Point per super pacgum must be positive int (currently {config.points_per_super_pacgum})"
+            "Point per super pacgum must be positive int"
+            f"(currently {config.points_per_super_pacgum})"
         )
     if config.points_per_ghost <= 0:
         errors.append(
-            f"Points per ghost must be postivie int (currently {config.points_per_ghost})"
+            "Points per ghost must be postivie int"
+            f"(currently {config.points_per_ghost})"
         )
     if len(config.levels) < 10:
         errors.append(
-            f"The game must have at least 10 levels (currently {len(config.levels)})"
+            "The game must have at least 10 levels"
+            f"(currently {len(config.levels)})"
         )
     for level in config.levels:
         if len(level) > 2:

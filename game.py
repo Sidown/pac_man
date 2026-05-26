@@ -5,15 +5,14 @@ from mazegenerator.mazegenerator import MazeGenerator
 from ghost import Blinky, Clyde, Ghost, Inky, Pinky
 from not_corner import not_corner
 from pacgum import Pacgum, SuperPacgum
-from parser import Config, parser
-from player import Player
+from parser import Config
 
 
 class Game:
     def __init__(self, window_size, padding, config, player):
         self.config: Config = config
         self.levels: list[Level] = []
-        for level in self.config.levels:
+        for _ in self.config.levels:
             self.border_size = 5
             self.window_size = window_size
             self.padding = padding
@@ -116,7 +115,8 @@ class Level:
                 }
             )
 
-        blinky = Blinky("./assets/skin/ghosts/blinky.png", cell_width, cell_height)
+        blinky = Blinky("./assets/skin/ghosts/blinky.png", cell_width,
+                        cell_height)
         blinky.set_parameters(self.maze, self.player)
 
         pinky = Pinky(

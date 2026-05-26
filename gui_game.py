@@ -1,7 +1,6 @@
 import sys
 
 import pygame
-from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Surface
 
 from checkbox import Checkbox
@@ -10,7 +9,7 @@ from parser import Config
 from player import Player
 from scene import Scene
 from score import HighScore
-from theme import Button, Theme
+from theme import Theme
 
 
 class GameScene(Scene):
@@ -31,12 +30,14 @@ class GameScene(Scene):
         self.WIDTH, self.HEIGHT = width_height
         self.PADDING = 80
         self.paused = False
-        self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING, config, self.player)
+        self.game = Game((self.WIDTH, self.HEIGHT),
+                         self.PADDING, config, self.player)
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
         self.current_level_index = 0
-        self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
+        self.score_font = pygame.font.Font(self.theme.font_path,
+                                           self.theme.text_size)
         self.highscore: HighScore = highscore
         self.highscore.load_high_score()
         self.cheat = cheat
@@ -56,7 +57,8 @@ class GameScene(Scene):
             caption="Freeze Ghosts",
         )
         self.pacgum_checkbox = Checkbox(
-            self.screen, self.WIDTH // 2.5, self.HEIGHT / 2.1, 3, caption="Skip Levels"
+            self.screen, self.WIDTH // 2.5, self.HEIGHT / 2.1, 3,
+            caption="Skip Levels"
         )
 
     def _cheat_callback(self) -> None:
@@ -80,7 +82,8 @@ class GameScene(Scene):
             pygame.image.load("assets/skin/pacman.png"),
             (self.cell_width, self.cell_height),
         )
-        self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
+        self.score_font = pygame.font.Font(self.theme.font_path,
+                                           self.theme.text_size)
         self.player._set_pacgum_pos(self.pacgums, self.super_pacgums)
         self.player._set_skins(self.cell_width, self.cell_height)
         self.player.spawn = self._check_spawn_is_valid(
@@ -134,8 +137,6 @@ class GameScene(Scene):
                     self.cell_width,
                     self.cell_height,
                     opp_code,
-                    # self.theme.wall_size,
-                    # self.theme.wall_color,
                     print_right,
                     print_down,
                 )
@@ -204,7 +205,8 @@ class GameScene(Scene):
                 (x, y + cell_height + self.theme.wall_size),
                 self.theme.wall_size,
             )
-        # si tout les murs sont ferme, c'est le 42 pattern, le mettre en couleur
+        # si tout les murs sont ferme, c'est le 42 pattern,
+        # le mettre en couleur
         if opp_code == 15:
             pygame.draw.rect(
                 self.screen,
@@ -276,7 +278,8 @@ class GameScene(Scene):
         if remaining_pacgums <= len(self.pacgums) // 5:
             self.blinky.angry_mod
         self.blinky.play(self.maze, self.player, self.cheat)
-        self.inky.play(self.maze, self.player, self.cheat, self.blinky, self.pinky)
+        self.inky.play(self.maze, self.player, self.cheat,
+                       self.blinky, self.pinky)
         self.pinky.play(self.maze, self.player, self.cheat)
         self.clyde.play(self.maze, self.player, self.cheat)
         self.player.update_player(self.maze)
@@ -346,7 +349,8 @@ class GameScene(Scene):
             cheat.skip = False
             print(f"skip unchecked, value: {cheat.skip}")
 
-    def _check_spawn_is_valid(self, coordinate: tuple[int, int]) -> tuple[int, int]:
+    def _check_spawn_is_valid(self, coordinate:
+                              tuple[int, int]) -> tuple[int, int]:
         spawn_x, spawn_y = coordinate
         while self.maze.maze[spawn_y][spawn_x] == 15:
             spawn_y = spawn_y - 1
@@ -388,7 +392,8 @@ class GameScene(Scene):
 
         else:
             self._print_maze()
-            self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
+            self._print_skin(self.player.skin, self.player.pixel_x,
+                             self.player.pixel_y)
             self._print_skin(
                 self.blinky.current_skin,
                 self.blinky.pixel_coord[0],
@@ -411,7 +416,8 @@ class GameScene(Scene):
             )
             for pacgum in self.pacgums.values():
                 if pacgum.visible:
-                    self._print_skin(pacgum.skin, pacgum.pixel_x, pacgum.pixel_y)
+                    self._print_skin(pacgum.skin, pacgum.pixel_x,
+                                     pacgum.pixel_y)
             for super_pacgum in self.super_pacgums.values():
                 if super_pacgum.visible:
                     self._print_skin(

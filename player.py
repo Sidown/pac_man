@@ -93,7 +93,8 @@ class Player:
         self.lives = self.default_lives
 
     def _is_neighbor(
-        self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int
+        self, current_cell: tuple[int, int], next_cell: tuple[int, int],
+        opp_code: int
     ) -> bool:
         """A function to know if the movement to the next cell is possible."""
         curr_x, curr_y = current_cell
@@ -115,7 +116,8 @@ class Player:
         return False
 
     def update_player(self, maze: MazeGenerator):
-        """update the player position, player movement pixel by pixel and player skin"""
+        """update the player position, player movement pixel by
+        pixel and player skin"""
         if self.timer_effect > 0:
             self.timer_effect -= 1
         if self.timer_effect == 0 and self.pacgum_effect:

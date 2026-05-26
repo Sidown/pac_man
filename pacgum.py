@@ -4,7 +4,8 @@ from pygame import image, transform
 class Pacgum:
     """class for pacgum"""
 
-    def __init__(self, points: int, coord: tuple[int, int], skin: str, cell_width, cell_height):
+    def __init__(self, points: int, coord: tuple[int, int],
+                 skin: str, cell_width, cell_height):
         self.points: int = points
         self.visible: bool = True
         self.coord: tuple[int, int] = coord
@@ -18,7 +19,8 @@ class Pacgum:
 class SuperPacgum:
     """class for super pacgum"""
 
-    def __init__(self, points: int, coord: tuple[int, int], skin: str, cell_width, cell_height):
+    def __init__(self, points: int, coord: tuple[int, int],
+                 skin: str, cell_width, cell_height):
         self.points: int = points
         self.visible: bool = True
         self.coord: tuple[int, int] = coord

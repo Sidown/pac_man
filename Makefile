@@ -10,11 +10,11 @@ run: install
 	uv run main.py
 
 debug:
-	uv run python -m pdb -m parser
+	uv run python -m pdb -m main.py
 
 lint: install
-	flake8 parser
-	mypy parser --follow-imports=skip --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+	flake8 --extend-exclude .venv
+	mypy --follow-imports=skip --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +

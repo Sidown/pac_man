@@ -1,6 +1,3 @@
-import pygame
-
-import parser
 from gui_main_loop import Visualizer
 from theme import Theme
 

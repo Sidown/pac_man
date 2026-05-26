@@ -3,9 +3,7 @@ from collections import deque
 from math import dist
 
 from mazegenerator.mazegenerator import MazeGenerator
-from pygame import Surface, image, transform
-
-from player import Player
+from pygame import image, transform
 
 
 class Ghost(ABC):
@@ -93,7 +91,8 @@ class Ghost(ABC):
                     ):
                         moves = self.get_moves_possible(maze, self.coord)
                         forward = [
-                            m for m in moves if m != opposite.get(self.direction)
+                            m for m in moves
+                            if m != opposite.get(self.direction)
                         ]
                         if forward:
                             move_chosen = forward[0]
@@ -107,7 +106,8 @@ class Ghost(ABC):
                 # force un mouvement si pas de deplacement
                 if move == self.coord:
                     moves = self.get_moves_possible(maze, self.coord)
-                    forward = [m for m in moves if m != opposite.get(self.direction)]
+                    forward = [m for m in moves
+                               if m != opposite.get(self.direction)]
                     # check si mouvement autre que demi tour possible
                     if forward:
                         move_chosen = forward[0]
@@ -132,8 +132,10 @@ class Ghost(ABC):
 
         self.move_progress = min(1.0, self.move_progress + self.speed)
         self.pixel_coord = (
-            self.coord[0] + (self.next_coord[0] - self.coord[0]) * self.move_progress,
-            self.coord[1] + (self.next_coord[1] - self.coord[1]) * self.move_progress,
+            (self.coord[0] + (self.next_coord[0] -
+                              self.coord[0]) * self.move_progress),
+            (self.coord[1] + (self.next_coord[1] - self.coord[1])
+             * self.move_progress),
         )
 
     def respawn(self):
@@ -328,12 +330,18 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
         else:
             if player.direction == "UP" and player.y - 2 >= 0:
                 self.target = (player.x, player.y - 2)
-            elif player.direction == "DOWN" and player.y + 2 <= maze._height - 1:
+
+            elif (player.direction == "DOWN" and
+                  player.y + 2 <= maze._height - 1):
                 self.target = (player.x, player.y + 2)
-            elif player.direction == "RIGHT" and player.x + 2 <= maze._width - 1:
+
+            elif (player.direction == "RIGHT" and
+                  player.x + 2 <= maze._width - 1):
                 self.target = (player.x + 2, player.y)
+
             elif player.direction == "LEFT" and player.x - 2 >= 0:
                 self.target = (player.x - 2, player.y)
+
             else:
                 self.target = (player.x, player.y)
 
@@ -541,15 +549,3 @@ class Clyde(Ghost):  # weird
                     queue.append((new_x, new_y, move_name, first_step))
 
         return self.coord
-
-
-# PlayerTest = Player(3, 10, 10)
-# BlinkyTest = Blinky("red", 0, 0)
-# maze = MazeGenerator()
-# print(BlinkyTest.next_move(PlayerTest, maze))
-# PinkyTest = Pinky("pink", 14, 14)
-# print(PinkyTest.next_move(PlayerTest, maze))
-# InkyTest = Inky("blue", 5, 5)
-# print(InkyTest.next_move(PlayerTest, maze, BlinkyTest, PinkyTest))
-# ClydeTest = Clyde("green", 0, 0)
-# print(ClydeTest.next_move(PlayerTest, maze))

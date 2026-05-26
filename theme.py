@@ -23,7 +23,8 @@ class Theme:
         text_size: int = 28,
     ) -> None:
         self.background_color: tuple[int, int, int] = background_color
-        self.game_background_color: tuple[int, int, int] = game_background_color
+        self.game_background_color: tuple[int, int, int] = (
+            game_background_color)
         self.title_color: tuple[int, int, int] = title_color
         self.text_color: tuple[int, int, int] = text_color
         self.wall_color: tuple[int, int, int] = wall_color
@@ -150,7 +151,8 @@ class Button(Text, Clickable):
             self.surface.blit(self.displayed_text, (self.x, self.y))
 
     def draw(self, screen) -> None:
-        color = self.on_mouse_over_bg_color if self.hovered else self.background_color
+        color = (self.on_mouse_over_bg_color if self.hovered
+                 else self.background_color)
         pygame.draw.rect(screen, color, self.rect)
         text_surf = self.font.render(self.text, True, self.font_color)
         text_rect = text_surf.get_rect(center=self.rect.center)
@@ -166,8 +168,9 @@ class Button(Text, Clickable):
 class TextInput:
     """Rect de couleur
     si l'utilisateur passe ca souris dessus et click, la couleur change.
-    si il tape des lettres, elles apparaissent a l'ecran et sont dans une variable.
-    lorsque le user click sur ENTER, on sauvegarde la valeur grave a une methode."""
+    si il tape des lettres, elles apparaissent a l'ecran et sont dans
+    une variable. lorsque le user click sur ENTER, on
+    sauvegarde la valeur grave a une methode."""
 
     def __init__(
         self,
@@ -187,7 +190,8 @@ class TextInput:
         self.highscore: HighScore = highscore
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.text: str = ""
-        self.font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf", 28)
+        self.font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf",
+                                     28)
         self.is_valid_name: bool = True
 
     def draw(self) -> None:
@@ -199,7 +203,8 @@ class TextInput:
         displayed_text = self.font.render(self.text, False, (0, 0, 0))
         self.screen.blit(displayed_text, (self.x, self.y + 10))
         if not self.is_valid_name:
-            font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf", 22)
+            font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf",
+                                    22)
             displayed_error = font.render(
                 "Please enter a valid name (<10 char alpha and space only)",
                 False,

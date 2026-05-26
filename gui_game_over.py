@@ -23,9 +23,10 @@ class GameOverScene(Scene):
         self.highscore: HighScore = highscore
         self.PADDING = 80
         self.current_scene = "game_over"
-        self.game_over_text = pygame.font.Font(self.theme.font_path, 56).render(
-            "Game Over ... looser !!!!!", True, (255, 0, 100)
-        )
+        self.game_over_text = (
+            pygame.font.Font(self.theme.font_path, 56).render(
+             "Game Over ... looser !!!!!", True, (255, 0, 100)
+            ))
         self.btn_back_to_menu = Button(
             self.screen,
             self.theme.text_size,
@@ -40,7 +41,8 @@ class GameOverScene(Scene):
             self.theme.btn_on_mouse_over_text_color,
         )
         self.text_input_name = TextInput(
-            self.screen, (350, self.WIDTH // 2), 250, 60, self.player, self.highscore
+            self.screen, (350, self.WIDTH // 2), 250, 60,
+            self.player, self.highscore
         )
 
     def _back_to_menu_callback(self) -> None:
