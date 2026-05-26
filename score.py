@@ -1,12 +1,6 @@
 import json
 import os
 
-# [
-#    ["name", 13000]
-#    ["cle", 5000]
-#   ["name",3000]
-# ]
-
 
 class HighScore:
     def __init__(self) -> None:

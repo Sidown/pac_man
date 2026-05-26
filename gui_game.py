@@ -1,14 +1,16 @@
+import sys
+
 import pygame
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Surface
 
+from checkbox import Checkbox
 from game import Game
 from parser import Config
 from player import Player
 from scene import Scene
 from score import HighScore
-from theme import Theme, Button
-from checkbox import Checkbox
+from theme import Button, Theme
 
 
 class GameScene(Scene):
@@ -20,7 +22,7 @@ class GameScene(Scene):
         config: Config,
         player: Player,
         highscore: HighScore,
-        cheat
+        cheat,
     ) -> None:
         self.current_scene = "game"
         self.screen: Surface = screen
@@ -31,7 +33,6 @@ class GameScene(Scene):
         self.paused = False
         self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING, config, self.player)
         self.current_level = 0
-        # self.load_level(self.current_level)
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
@@ -41,18 +42,27 @@ class GameScene(Scene):
         self.highscore.load_high_score()
         self.cheat = cheat
 
-        self.invincibility_checkbox = Checkbox(self.screen, self.WIDTH // 2.5,
-                                               self.HEIGHT / 3.5, 1,
-                                               caption="Invincibility")
-        self.freeze_checkbox = Checkbox(self.screen, self.WIDTH // 2.5,
-                                               self.HEIGHT / 2.6, 2,
-                                               caption="Freeze Ghosts")
-        self.pacgum_checkbox = Checkbox(self.screen, self.WIDTH // 2.5,
-                                               self.HEIGHT / 2.1, 3,
-                                               caption="Skip Levels")
+        self.invincibility_checkbox = Checkbox(
+            self.screen,
+            self.WIDTH // 2.5,
+            self.HEIGHT / 3.5,
+            1,
+            caption="Invincibility",
+        )
+        self.freeze_checkbox = Checkbox(
+            self.screen,
+            self.WIDTH // 2.5,
+            self.HEIGHT / 2.6,
+            2,
+            caption="Freeze Ghosts",
+        )
+        self.pacgum_checkbox = Checkbox(
+            self.screen, self.WIDTH // 2.5, self.HEIGHT / 2.1, 3, caption="Skip Levels"
+        )
 
     def _cheat_callback(self) -> None:
         self.current_scene = "cheat"
+        self.load_level()
 
     def load_level(self) -> None:
         level = self.game.get_level(self.current_level_index)
@@ -63,7 +73,6 @@ class GameScene(Scene):
         self.cell_height = level.cell_height
         self.pacgums = level.pacgums
         self.super_pacgums = level.super_pacgums
-        # self.player = level.player
         self.blinky = level.ghosts["blinky"]
         self.pinky = level.ghosts["pinky"]
         self.inky = level.ghosts["inky"]
@@ -75,6 +84,10 @@ class GameScene(Scene):
         self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
         self.player._set_pacgum_pos(self.pacgums, self.super_pacgums)
         self.player._set_skins(self.cell_width, self.cell_height)
+        self.player.spawn = self._check_spawn_is_valid(
+            (self.player.spawn[0], self.player.spawn[1])
+        )
+        self.player.reset_param()
 
     def _print_life(self) -> None:
         nb_life = self.player.lives
@@ -264,7 +277,6 @@ class GameScene(Scene):
                 elif not ghost.died and not self.cheat.invincible:
                     self.player.lives -= 1
                     if self.player.lives <= 0:
-                        # sauvegarder le score. le joueur a perdu
                         self._game_over()
                         return
                     pygame.time.wait(1000)
@@ -292,9 +304,10 @@ class GameScene(Scene):
         old_score = self.player.score
         old_lives = self.player.lives
         self.load_level()
-        # remettre le player a son spawn
-        # TODO: CHECK LE SPAWN HORS 42.
-        self.player.spawn = (self.maze_width // 2, self.maze_height // 2)
+        spawn_x, spawn_y = self._check_spawn_is_valid(
+            ((self.maze_width // 2), (self.maze_height // 2))
+        )
+        self.player.spawn = (spawn_x, spawn_y)
         self.player.reset_param()
         self.player.score = old_score
         self.player.lives = old_lives
@@ -322,6 +335,15 @@ class GameScene(Scene):
         else:
             cheat.skip = False
             print(f"skip unchecked, value: {cheat.skip}")
+
+    def _check_spawn_is_valid(self, coordinate: tuple[int, int]) -> tuple[int, int]:
+        spawn_x, spawn_y = coordinate
+        while self.maze.maze[spawn_y][spawn_x] == 15:
+            spawn_y = spawn_y - 1
+            spawn_x = spawn_x - 1
+            if spawn_x < 0 or spawn_y < 0:
+                sys.exit()
+        return (spawn_x, spawn_y)
 
     def draw(self):
         self.screen.fill(self.theme.game_background_color)
