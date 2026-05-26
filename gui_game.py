@@ -1,4 +1,5 @@
 import sys
+from typing import cast
 
 import pygame
 from pygame import Surface
@@ -8,6 +9,7 @@ from checkbox import Checkbox
 from game import Game
 from parser import Config
 from player import Player
+from ghost import Blinky, Clyde, Inky, Pinky
 from scene import Scene
 from score import HighScore
 from theme import Theme
@@ -90,10 +92,10 @@ class GameScene(Scene):
         self.cell_height = level.cell_height
         self.pacgums = level.pacgums
         self.super_pacgums = level.super_pacgums
-        self.blinky = level.ghosts["blinky"]
-        self.pinky = level.ghosts["pinky"]
-        self.inky = level.ghosts["inky"]
-        self.clyde = level.ghosts["clyde"]
+        self.blinky: Blinky = cast(Blinky, level.ghosts["blinky"])
+        self.pinky: Pinky = cast(Pinky, level.ghosts["pinky"])
+        self.inky: Inky = cast(Inky, level.ghosts["inky"])
+        self.clyde: Clyde = cast(Clyde, level.ghosts["clyde"])
         self.life_skin = pygame.transform.scale(
             pygame.image.load("assets/skin/pacman.png"),
             (self.cell_width, self.cell_height),
@@ -261,7 +263,7 @@ class GameScene(Scene):
                 ),
             )
 
-    def _print_skin(self, skin: Surface, x_cell: int, y_cell: int) -> None:
+    def _print_skin(self, skin: Surface, x_cell: float, y_cell: float) -> None:
         """
         A function that print a Skin on the maze.
         arguments:
@@ -364,7 +366,7 @@ class GameScene(Scene):
         if len(self.highscore.scores) == 0:
             highest_score = 0
         else:
-            highest_score = self.highscore.scores[0][1]
+            highest_score = int(self.highscore.scores[0][1])
         highscore_text = self.score_font.render(
             f"HighScore: {highest_score}", True, self.theme.text_color
         )
@@ -485,6 +487,7 @@ class GameScene(Scene):
 
         else:
             self._print_maze()
+            assert self.player.skin is not None, "Player skin not loaded"
             self._print_skin(self.player.skin, self.player.pixel_x,
                              self.player.pixel_y)
             self._print_skin(

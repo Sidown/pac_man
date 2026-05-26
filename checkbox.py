@@ -10,7 +10,7 @@ class Checkbox:
     """
     def __init__(self,
                  surface: Surface,
-                 x: int, y: int, idnum: int,
+                 x: float, y: float, idnum: int,
                  color: tuple[int, int, int] = (230, 230, 230),
                  caption: str = "",
                  outline_color: tuple[int, int, int] = (0, 0, 0),
@@ -34,7 +34,7 @@ class Checkbox:
         font_size: font size used for the text
         font_color -> color of the text
         text_offset -> x, y pixel offset of the text from the box
-        font -> path to the font file used for the text 
+        font -> path to the font file used for the text
         """
         self.surface = surface
         self.x = x

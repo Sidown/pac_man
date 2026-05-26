@@ -3,7 +3,9 @@ from theme import Theme
 
 
 def main() -> None:
-
+    """
+    Build the theme and launch the game
+    """
     theme = Theme(
         background_color=(25, 25, 166),
         game_background_color=(0, 0, 0),

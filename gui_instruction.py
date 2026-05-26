@@ -7,9 +7,19 @@ from theme import Button, Theme
 
 
 class InstructionScene(Scene):
+    """
+    Scene to show the game rules and keyboard controls
+    """
     def __init__(
         self, screen: Surface, theme: Theme, width_height: tuple[int, int]
     ) -> None:
+        """
+        initialise the instruction scene
+        arguments:
+        screen -> pygame surface
+        theme -> the visual theme
+        width_height -> width and height of the window in pixels
+        """
         self.current_scene = "instruction"
         self.screen: Surface = screen
         self.theme: Theme = theme
@@ -30,18 +40,34 @@ class InstructionScene(Scene):
         )
 
     def _back_to_menu_callback(self) -> None:
+        """
+        Return to the main menu
+        """
         self.current_scene = "main_menu"
 
     def handle_events(self, events: list[Event]) -> str:
+        """
+        Process the envents list and return the next scene to display
+        arguments:
+        events -> list of events to process
+        return value:
+        the next scene to display
+        """
         self.current_scene = "instruction"
         for event in events:
             self.btn_back_to_menu.handle_event(event)
         return self.current_scene
 
     def update(self) -> None:
+        """
+        frame per frame logic, not needed in this scene
+        """
         pass
 
     def _print_rules(self) -> None:
+        """
+        Render the game rules
+        """
         line_height = 0
         instruction = []
         instruction.append(
@@ -108,6 +134,9 @@ class InstructionScene(Scene):
             line_height += 38
 
     def _print_cmd(self) -> None:
+        """
+        Draw the keyboard control
+        """
         # UP
         pygame.draw.rect(
             self.screen,
@@ -172,6 +201,9 @@ class InstructionScene(Scene):
         self.screen.blit(space_text, (35, 520))
 
     def draw(self) -> None:
+        """
+        Render the instruction screen
+        """
         self.screen.fill(self.theme.background_color)
         self.btn_back_to_menu.draw(self.screen)
         self._print_rules()

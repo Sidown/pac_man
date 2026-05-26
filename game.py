@@ -63,7 +63,7 @@ class Level:
             (len(self.maze.maze[0]) - 1, 0),
             (len(self.maze.maze[0]) - 1, len(self.maze.maze) - 1),
         ]
-        self.super_pacgums: dict[tuple[int], SuperPacgum] = {}
+        self.super_pacgums: dict[tuple[int, int], SuperPacgum] = {}
         for coord in super_pacgums_coord:
             self.super_pacgums.update(
                 {

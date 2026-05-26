@@ -180,7 +180,7 @@ class Ghost(ABC):
         self.speed = 0.2
         self.is_vulnerable = False
 
-    def get_moves_possible(self, maze: MazeGenerator, coord: tuple[int]
+    def get_moves_possible(self, maze: MazeGenerator, coord: tuple[int, int]
                            ) -> list[str]:
         """
         Return the list of valid moves directeions from coord
@@ -274,16 +274,6 @@ class Ghost(ABC):
         else:
             self.is_vulnerable = False
 
-    @abstractmethod
-    def set_parameters(self, *args: object, **kwarks: object) -> None:
-        """
-        Initialise ghost specific parameters like spawn position,
-        target, ...
-        This function is called by each subclass to bind the ghost to
-        the player and the maze
-        """
-        pass
-
 
 class Blinky(Ghost):  # chases, dest player pos
     """
@@ -305,7 +295,7 @@ class Blinky(Ghost):  # chases, dest player pos
         cell_height -> height of the maze cell in pixel
         """
         super().__init__(skin, cell_width, cell_height)
-        self.angry_skin = transform.scale(
+        self.angry_skin: Surface = transform.scale(
             image.load("assets/skin/ghosts/angry_blinky.png"),
             (cell_width, cell_height),
         )
@@ -353,7 +343,7 @@ class Blinky(Ghost):  # chases, dest player pos
 
         if self.coord == self.target:
             return self.coord
-        queue = deque()
+        queue: deque[tuple[int, int, str, tuple[int, int]]] = deque()
         visited = {self.coord}
 
         moves = self.get_moves_possible(maze, self.coord)
@@ -404,7 +394,8 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
     to the left of Pac-Man. During Scatter mode,
     she heads towards the upper-left corner."""
 
-    def __init__(self, skin: str, cell_width: int, cell_height: int) -> None:
+    def __init__(self, skin: str, cell_width: float,
+                 cell_height: float) -> None:
         """
         Initialise Pinky.
 
@@ -466,7 +457,7 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
 
         if self.coord == self.target:
             return self.coord
-        queue = deque()
+        queue: deque[tuple[int, int, str, tuple[int, int]]] = deque()
         visited = {self.coord}
 
         moves = self.get_moves_possible(maze, self.coord)
@@ -515,11 +506,11 @@ class Inky(Ghost):
     His target is relative to both Blinky and Pac-Man, where the distance
     Blinky is from Pinky's target is doubled to get Inky's target.
     He heads to the lower-right corner during Scatter mode."""
-
-    def __init__(self, skin: str, cell_width: int, cell_height: int) -> None:
+    def __init__(self, skin: str, cell_width: float,
+                 cell_height: float) -> None:
         """
         Initialise Inky.
- 
+
         Arguments:
         skin -> Path to the skin file
         cell_width -> Width of the maze cell in pixels
@@ -533,7 +524,7 @@ class Inky(Ghost):
              ) -> None:
         """
         Override play to update internal blinky/pinky references.
- 
+
         Arguments:
             maze -> The current maze
             player -> The player
@@ -592,7 +583,7 @@ class Inky(Ghost):
 
         if self.coord == self.target:
             return self.coord
-        queue = deque()
+        queue: deque[tuple[int, int, str, tuple[int, int]]] = deque()
         visited = {self.coord}
 
         moves = self.get_moves_possible(maze, self.coord)
@@ -642,7 +633,8 @@ class Clyde(Ghost):  # weird
     an 8-Dot radius of Pac-Man.
     His Scatter Mode corner is the lower-left."""
 
-    def __init__(self, skin: str, cell_width: int, cell_height: int) -> None:
+    def __init__(self, skin: str, cell_width: float,
+                 cell_height: float) -> None:
         """
         Initialise Clyde.
         Arguments:
@@ -691,7 +683,7 @@ class Clyde(Ghost):  # weird
 
         if self.coord == self.target:
             return self.coord
-        queue = deque()
+        queue: deque[tuple[int, int, str, tuple[int, int]]] = deque()
         visited = {self.coord}
 
         moves = self.get_moves_possible(maze, self.coord)

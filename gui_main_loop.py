@@ -3,6 +3,7 @@ import sys
 import pygame
 from pygame import Surface, time
 
+# from typing import cast
 from cheat import Cheat
 from gui_game import GameScene
 from gui_game_over import GameOverScene
@@ -14,15 +15,22 @@ from parser import Config, parser
 from player import Player
 from score import HighScore
 from theme import Theme
+from scene import Scene
 
 
 class Visualizer:
-    """"""
-
+    """
+    Main game loop that own all the scenes and drives the pygame event cycle
+    """
     def __init__(
         self,
         theme: Theme,
     ) -> None:
+        """
+        initialise the visualiser
+        arguments:
+        theme -> the theme applied to all the scenes
+        """
         self.WIDTH = 960
         self.HEIGHT = 720
         self.theme: Theme = theme
@@ -32,7 +40,9 @@ class Visualizer:
         pygame.init()
 
     def run(self) -> None:
-        """The full game visualisation"""
+        """
+        Run the full game visualisation until window close
+        """
         pygame.display.set_caption("Pac-Man")
         running = True
 
@@ -47,7 +57,7 @@ class Visualizer:
         # creer le player
         player: Player = Player(nb_lives, spawn_x, spawn_y)
         cheat: Cheat = Cheat()
-        scenes = {
+        scenes: dict[str, Scene] = {
             "main_menu": MainMenuScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
             ),
@@ -86,7 +96,7 @@ class Visualizer:
 
             next_scene = scenes[current_scene].handle_events(events)
             if current_scene != "game" and next_scene == "game":
-                scenes["game"] = GameScene(
+                game_scene = GameScene(
                     self.screen,
                     self.theme,
                     (self.WIDTH, self.HEIGHT),
@@ -95,7 +105,8 @@ class Visualizer:
                     highscore,
                     cheat,
                 )
-                scenes["game"].load_level()
+                game_scene.load_level()
+                scenes["game"] = game_scene
             current_scene = next_scene
 
             scenes[current_scene].update()

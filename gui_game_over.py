@@ -9,6 +9,9 @@ from theme import Button, TextInput, Theme
 
 
 class GameOverScene(Scene):
+    """
+    Scene displayed when the player loose.
+    """
     def __init__(
         self,
         screen: Surface,
@@ -17,6 +20,15 @@ class GameOverScene(Scene):
         player: Player,
         highscore: HighScore,
     ) -> None:
+        """
+        Initialise the game over scene
+        arguments:
+        screen -> the pygame surface
+        theme -> the visual theme
+        width_height -> width and height of the window in pixels
+        player -> the player
+        highscore -> the highscore manager
+        """
         self.screen: Surface = screen
         self.theme: Theme = theme
         self.WIDTH, self.HEIGHT = width_height
@@ -47,10 +59,20 @@ class GameOverScene(Scene):
         )
 
     def _back_to_menu_callback(self) -> None:
+        """
+        reset the player and return to the main menu
+        """
         self.player.new_game()
         self.current_scene = "main_menu"
 
-    def handle_events(self, events: Event) -> str:
+    def handle_events(self, events: list[Event]) -> str:
+        """
+        Process a list of events and return the name of the next scene
+        arguments:
+        events -> list of events to process
+        return value:
+        the next scene to display
+        """
         self.current_scene = "game_over"
         is_completed_name = False
         for event in events:
@@ -62,9 +84,15 @@ class GameOverScene(Scene):
         return self.current_scene
 
     def update(self) -> None:
+        """
+        Update frame by frame, not needed in this scene
+        """
         pass
 
     def draw(self) -> None:
+        """
+        Render the game over screen
+        """
         self.screen.fill(self.theme.background_color)
         self.btn_back_to_menu.draw(self.screen)
         self.text_input_name.draw()

@@ -57,8 +57,10 @@ def load_config(path: str) -> dict[str, str | int]:
 
             if not config:
                 raise ValueError("Config file empty")
-            return json.loads(config,
-                              object_pairs_hook=dict_raise_on_duplicate)
+            result: dict[str, str | int] = (
+                json.loads(config, object_pairs_hook=dict_raise_on_duplicate)
+                )
+            return result
 
     except json.JSONDecodeError:
         print("Error: JSON not valid")

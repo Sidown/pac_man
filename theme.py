@@ -204,8 +204,8 @@ class Button(Text, Clickable):
         y2 = self.displayed_text.get_height()
 
         if self.center_x:
-            center_x = x1 - (self.displayed_text.get_width() / 2)
-            self.rect = pygame.Rect(center_x, y1, x2, y2)
+            center_x_pos = x1 - (self.displayed_text.get_width() / 2)
+            self.rect = pygame.Rect(center_x_pos, y1, x2, y2)
         else:
             self.rect = pygame.Rect(x1, y1, x2, y2)
 

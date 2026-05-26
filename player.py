@@ -5,7 +5,7 @@ from pacgum import Pacgum, SuperPacgum
 
 
 class Player:
-    """Player class"""
+    """Player class representing pacman"""
 
     def __init__(
         self,
@@ -13,6 +13,13 @@ class Player:
         spawn_x: int,
         spawn_y: int,
     ) -> None:
+        """
+        Initialise the player
+        arguments:
+        lives -> number of lives at the start of the game
+        spawn_x -> x spawn cell
+        spawn_y -> y spawn cell
+        """
         self.default_lives: int = lives
         self.lives: int = self.default_lives
         self.x: int = spawn_x
@@ -34,6 +41,12 @@ class Player:
         self.animation_speed = 0.3
 
     def _set_skins(self, cell_width: float, cell_height: float) -> None:
+        """
+        Load and scale the skins
+        arguments:
+        cell_width -> width of a maze cell in pixels
+        cell_height -> height of a maze cell in pixels
+        """
         self.skin: Surface | None = transform.scale(
             image.load("assets/skin/pacman.png"),
             (cell_width, cell_height),
@@ -74,11 +87,17 @@ class Player:
         pacgums: dict[tuple[int, int], Pacgum],
         super_pacgums: dict[tuple[int, int], SuperPacgum],
     ) -> None:
+        """
+        Set the pacgums and super pacgums dicts for this level
+        arguments:
+        pacgums -> dict of coord as key and pacgum as value
+        super_pacgums -> dict of coord as key and super pacgum as value
+        """
         self.pacgums: dict[tuple[int, int], Pacgum] = pacgums
         self.super_pacgums: dict[tuple[int, int], SuperPacgum] = super_pacgums
 
     def reset_param(self) -> None:
-        """Reset the player parameters for a new game."""
+        """Reset the player parameters for a new life."""
         self.x, self.y = (
             self.next_x,
             self.next_y,
@@ -88,6 +107,9 @@ class Player:
         self.pacgum_effect = False
 
     def new_game(self) -> None:
+        """
+        reset player parameters for a new game
+        """
         self.reset_param()
         self.score = 0
         self.lives = self.default_lives
@@ -96,7 +118,16 @@ class Player:
         self, current_cell: tuple[int, int], next_cell: tuple[int, int],
         opp_code: int
     ) -> bool:
-        """A function to know if the movement to the next cell is possible."""
+        """
+        A function to know if the movement to the next cell is possible.
+        arguments:
+        current_cell -> x,y coord of the actual cell
+        next_cell-> x,y coor of the next cell
+        opp_code -> bitmask of the current cell
+        return value:
+        true if the move if valid
+        false otherwise
+        """
         curr_x, curr_y = current_cell
         next_x, next_y = next_cell
         if curr_y > next_y:
@@ -116,8 +147,12 @@ class Player:
         return False
 
     def update_player(self, maze: MazeGenerator) -> None:
-        """update the player position, player movement pixel by
-        pixel and player skin"""
+        """
+        update the player position, player movement pixel by
+        pixel and player skin
+        arguments:
+        maze -> the current maze
+        """
         if self.timer_effect > 0:
             self.timer_effect -= 1
         if self.timer_effect == 0 and self.pacgum_effect:
@@ -185,6 +220,10 @@ class Player:
         self._update_skin()
 
     def _update_skin(self) -> None:
+        """
+        change the skin of the player to correspond to the direction
+        and the frame
+        """
         if self.direction:
             self.skin_timer += self.animation_speed
             if self.skin_timer >= 1:

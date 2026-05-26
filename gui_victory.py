@@ -9,6 +9,9 @@ from theme import Button, TextInput, Theme
 
 
 class VictoryScene(Scene):
+    """
+    scene displayed when the player win the game
+    """
     def __init__(
         self,
         screen: Surface,
@@ -17,6 +20,15 @@ class VictoryScene(Scene):
         player: Player,
         highscore: HighScore,
     ) -> None:
+        """
+        initialise the victory scene
+        arguments:
+        screen -> the pygame surface
+        theme -> the visual theme
+        width_height -> width and height of the window in pixels
+        player -> the player
+        highscore -> the highscore manager
+        """
         self.screen: Surface = screen
         self.theme: Theme = theme
         self.WIDTH, self.HEIGHT = width_height
@@ -48,19 +60,33 @@ class VictoryScene(Scene):
         )
 
     def _back_to_menu_callback(self) -> None:
+        """
+        reset the player and returns to the main menu
+        """
         self.player.new_game()
         self.current_scene = "main_menu"
 
     def handle_events(self, events: list[Event]) -> str:
+        """
+        process a list of events and return the next scene to display
+        arguments:
+        events -> the list of events to process
+        """
         self.current_scene = "victory"
         for event in events:
             self.btn_back_to_menu.handle_event(event)
         return self.current_scene
 
     def update(self) -> None:
+        """
+        frame per frame logic, not needed for this scene
+        """
         pass
 
     def draw(self) -> None:
+        """
+        Render the victory scene
+        """
         self.screen.fill(self.theme.background_color)
         self.btn_back_to_menu.draw(self.screen)
         self.screen.blit(

@@ -9,6 +9,9 @@ from theme import Button, Theme
 
 
 class HighScoreScene(Scene):
+    """
+    Scene that display the top 10 high scores
+    """
     def __init__(
         self,
         screen: Surface,
@@ -17,6 +20,15 @@ class HighScoreScene(Scene):
         config: Config,
         highscore: HighScore,
     ) -> None:
+        """
+        Initialise the highscore scene
+        arguments:
+        screen -> the pygame surface
+        theme -> the visual theme
+        width_height -> width and height of the window in pixels
+        config -> game configuration
+        highscore -> the highscore manager
+        """
         self.current_scene = "high_score"
         self.screen: Surface = screen
         self.theme: Theme = theme
@@ -39,18 +51,32 @@ class HighScoreScene(Scene):
         )
 
     def _back_to_menu_callback(self) -> None:
+        """
+        return to the main menu
+        """
         self.current_scene = "main_menu"
 
     def handle_events(self, events: list[Event]) -> str:
+        """
+        process a list of events and return the next scene to display
+        arguments:
+        events -> the list of events to process
+        """
         self.current_scene = "high_score"
         for event in events:
             self.btn_back_to_menu.handle_event(event)
         return self.current_scene
 
     def update(self) -> None:
+        """
+        frame per frame logic, not needed in this scene
+        """
         pass
 
     def _display_title(self) -> None:
+        """
+        Render the title of the screen
+        """
         font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 42)
         displayed_title = font.render(
             "PacMac Highscore",
@@ -63,6 +89,9 @@ class HighScoreScene(Scene):
         )
 
     def _display_score(self) -> None:
+        """
+        Display the scores
+        """
         font = font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 24)
         index = 1
         gap = 45
@@ -82,6 +111,9 @@ class HighScoreScene(Scene):
             index += 1
 
     def draw(self) -> None:
+        """
+        Render the highscore scene
+        """
         self.screen.fill(self.theme.background_color)
         self.btn_back_to_menu.draw(self.screen)
         self._display_title()
