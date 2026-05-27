@@ -1,6 +1,6 @@
 import sys
-from typing import cast
 import time
+from typing import cast
 
 import pygame
 from pygame import Surface
@@ -15,6 +15,7 @@ from parser import Config
 from .checkbox import Checkbox
 from .scene import Scene
 from .score import HighScore
+from .ui_elements.button import Button
 from .ui_elements.theme import Theme
 
 
@@ -68,23 +69,37 @@ class GameScene(Scene):
         self.invincibility_checkbox = Checkbox(
             self.screen,
             self.WIDTH // 2.5,
-            self.HEIGHT / 3.5,
+            self.HEIGHT / 2.4,
             1,
             caption="Invincibility",
         )
         self.freeze_checkbox = Checkbox(
             self.screen,
             self.WIDTH // 2.5,
-            self.HEIGHT / 2.6,
+            self.HEIGHT / 2,
             2,
             caption="Freeze Ghosts",
         )
         self.pacgum_checkbox = Checkbox(
             self.screen,
             self.WIDTH // 2.5,
-            self.HEIGHT / 2.1,
+            self.HEIGHT / 1.7,
             3,
             caption="Skip Levels (press Return)",
+        )
+
+        self.btn_back_to_menu = Button(
+            self.screen,
+            self.theme.text_size,
+            self.theme.font_path,
+            self.theme.text_color,
+            (0, 0, 0),
+            "Back to Main Menu",
+            self._back_to_menu_callback,
+            (50, 50),
+            False,
+            (100, 100, 100),
+            self.theme.btn_on_mouse_over_text_color,
         )
 
     def load_level(self) -> None:
@@ -133,8 +148,7 @@ class GameScene(Scene):
         display the current level number
         """
         level_text = self.score_font.render(
-            f"level: {self.current_level_index + 1}",
-            True, self.theme.text_color
+            f"level: {self.current_level_index + 1}", True, self.theme.text_color
         )
         self.screen.blit(
             level_text,
@@ -149,8 +163,7 @@ class GameScene(Scene):
         display the current player score
         """
         score_text = self.score_font.render(
-            f"Score: {self.highscore.current_score}",
-            True, self.theme.text_color
+            f"Score: {self.highscore.current_score}", True, self.theme.text_color
         )
         self.screen.blit(score_text, (self.PADDING, 15))
 
@@ -160,9 +173,15 @@ class GameScene(Scene):
         """
         current_time = time.time()
         timer_text = self.score_font.render(
-            f"Timer: {int(
-                self.game.get_level(self.current_level_index).max_time - current_time + self.total_paused_time)}",
-            True, self.theme.text_color
+            f"Timer: {
+                int(
+                    self.game.get_level(self.current_level_index).max_time
+                    - current_time
+                    + self.total_paused_time
+                )
+            }",
+            True,
+            self.theme.text_color,
         )
         self.screen.blit(timer_text, (self.PADDING * 5, 15))
 
@@ -326,6 +345,7 @@ class GameScene(Scene):
         the scene to display next
         """
         for event in events:
+            self.btn_back_to_menu.handle_event(event)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     self.player.queud_direction = "N"
@@ -384,10 +404,14 @@ class GameScene(Scene):
                         return
                     pygame.time.wait(200)
                     self._reset_all_param()
-        if all(not pacgum.visible for pacgum in self.pacgums.values()): 
+        if all(not pacgum.visible for pacgum in self.pacgums.values()):
             self._next_level()
         current_time = time.time()
-        if current_time >= self.game.get_level(self.current_level_index).max_time + self.total_paused_time:
+        if (
+            current_time
+            >= self.game.get_level(self.current_level_index).max_time
+            + self.total_paused_time
+        ):
             self._game_over()
             return
 
@@ -474,12 +498,21 @@ class GameScene(Scene):
                 sys.exit()
         return (spawn_x, spawn_y)
 
+    def _back_to_menu_callback(self) -> None:
+        """
+        reset the player and return to the main menu
+        """
+        self.player.new_game()
+        self.highscore.current_score = 0
+        self.current_scene = "main_menu"
+
     def draw(self) -> None:
         """
         draw the game scene or the pause
         """
         self.screen.fill(self.theme.game_background_color)
         if self.paused:
+            self.btn_back_to_menu.draw(self.screen)
             self.paused_time = time.time() - self.time_when_paused
             pause_text = pygame.font.Font(self.theme.font_path, 56).render(
                 "PAUSED", True, (255, 0, 100)
@@ -489,7 +522,7 @@ class GameScene(Scene):
                 pause_text.get_rect(
                     center=(
                         (self.WIDTH // 2),
-                        (self.PADDING),
+                        (self.PADDING * 2),
                     )
                 ),
             )
@@ -501,7 +534,7 @@ class GameScene(Scene):
                 cheat_text.get_rect(
                     center=(
                         (self.WIDTH // 2),
-                        (self.PADDING * 2),
+                        (self.PADDING * 3),
                     )
                 ),
             )
