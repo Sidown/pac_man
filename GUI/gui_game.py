@@ -405,10 +405,8 @@ class GameScene(Scene):
         """
         if self.invincibility_checkbox.checked:
             cheat.invincible = True
-            print(f"invincibility checked, value: {cheat.invincible}")
         else:
             cheat.invincible = False
-            print(f"invincibility unchecked, value: {cheat.invincible}")
 
     def _freeze_ghost(self, cheat: Cheat) -> None:
         """
@@ -419,10 +417,8 @@ class GameScene(Scene):
         """
         if self.freeze_checkbox.checked:
             cheat.freeze = True
-            print(f"freeze checked, value: {cheat.freeze}")
         else:
             cheat.freeze = False
-            print(f"freeze unchecked, value: {cheat.freeze}")
 
     def _skip_level(self, cheat: Cheat) -> None:
         """
@@ -433,10 +429,8 @@ class GameScene(Scene):
         """
         if self.pacgum_checkbox.checked:
             cheat.skip = True
-            print(f"skip checked, value: {cheat.skip}")
         else:
             cheat.skip = False
-            print(f"skip unchecked, value: {cheat.skip}")
 
     def _check_spawn_is_valid(self, coordinate: tuple[int, int]) -> tuple[int, int]:
         """
