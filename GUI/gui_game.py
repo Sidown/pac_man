@@ -6,14 +6,14 @@ from pygame import Surface
 from pygame.event import Event
 
 from checkbox import Checkbox
-from game import Game
+from ..game_class.game import Game
 from parser import Config
-from player import Player
-from ghost import Blinky, Clyde, Inky, Pinky
+from ..game_class.player import Player
+from ..game_class.ghost import Blinky, Clyde, Inky, Pinky
 from scene import Scene
 from score import HighScore
 from theme import Theme
-from cheat import Cheat
+from ..game_class.cheat import Cheat
 
 
 class GameScene(Scene):

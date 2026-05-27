@@ -3,7 +3,7 @@ import random
 from mazegenerator.mazegenerator import MazeGenerator
 
 from ghost import Blinky, Clyde, Ghost, Inky, Pinky
-from not_corner import not_corner
+from utils.not_corner import not_corner
 from pacgum import Pacgum, SuperPacgum
 from parser import Config
 from player import Player

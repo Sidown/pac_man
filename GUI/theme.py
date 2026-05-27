@@ -3,7 +3,7 @@ import pygame
 from pygame import Surface
 from pygame.event import Event
 
-from player import Player
+from ..game_class.player import Player
 from score import HighScore
 
 

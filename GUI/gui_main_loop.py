@@ -4,7 +4,7 @@ import pygame
 from pygame import Surface, time
 
 # from typing import cast
-from cheat import Cheat
+from ..game_class.cheat import Cheat
 from gui_game import GameScene
 from gui_game_over import GameOverScene
 from gui_highscore import HighScoreScene
@@ -12,7 +12,7 @@ from gui_instruction import InstructionScene
 from gui_main_menu import MainMenuScene
 from gui_victory import VictoryScene
 from parser import Config, parser
-from player import Player
+from ..game_class.player import Player
 from score import HighScore
 from theme import Theme
 from scene import Scene
