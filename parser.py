@@ -10,7 +10,6 @@ class Config(BaseModel):
     """
     highscore_filename: str
     lives: int
-    level_max_time: int
     seed: int
     points_per_pacgum: int
     points_per_super_pacgum: int
@@ -93,11 +92,8 @@ def config_check(config: Config) -> bool:
         errors.append(f"File not found at {config.highscore_filename}")
     if config.lives <= 0:
         errors.append(f"Lives must be potive int (currently {config.lives})")
-    if config.level_max_time <= 0:
-        errors.append(
-            "Level max time must be positive int (currently"
-            f"{config.level_max_time})"
-        )
+    if config.lives >10:
+        errors.append(f"No more than 10 lives !")
     if config.points_per_pacgum <= 0:
         errors.append(
             "Points per pacgum must be positive int (currently "
