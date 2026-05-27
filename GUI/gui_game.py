@@ -45,6 +45,7 @@ class GameScene(Scene):
         cheat -> the cheat class
         """
         self.paused_time = 0
+        self.total_paused_time = 0
         self.time_when_paused = 0
         self.current_scene = "game"
         self.screen: Surface = screen
@@ -160,7 +161,7 @@ class GameScene(Scene):
         current_time = time.time()
         timer_text = self.score_font.render(
             f"Timer: {int(
-                self.game.get_level(self.current_level_index).max_time - current_time + self.paused_time)}",
+                self.game.get_level(self.current_level_index).max_time - current_time + self.total_paused_time)}",
             True, self.theme.text_color
         )
         self.screen.blit(timer_text, (self.PADDING * 5, 15))
@@ -338,6 +339,8 @@ class GameScene(Scene):
                     self.paused = not self.paused
                     if self.paused is True:
                         self.time_when_paused = time.time()
+                    else:
+                        self.total_paused_time += self.paused_time
                 if event.key == pygame.K_RETURN and self.cheat.skip:
                     self._next_level()
             if self.invincibility_checkbox.update_checkbox(event):
@@ -381,10 +384,11 @@ class GameScene(Scene):
                         return
                     pygame.time.wait(1000)
                     self._reset_all_param()
-        if all(not pacgum.visible for pacgum in self.pacgums.values()):
+        if all(not pacgum.visible for pacgum in self.pacgums.values()): 
             self._next_level()
         current_time = time.time()
-        if current_time + self.paused_time >= self.game.get_level(self.current_level_index).max_time:
+        print(f"current time: {current_time}\nmax time: {self.game.get_level(self.current_level_index).max_time}\nTotal paused time: {self.total_paused_time}")
+        if current_time >= self.game.get_level(self.current_level_index).max_time + self.total_paused_time:
             self._game_over()
             return
 
