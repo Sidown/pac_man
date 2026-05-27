@@ -3,13 +3,15 @@ from pygame import Surface
 from pygame.event import Event
 
 from .scene import Scene
-from .theme import Button, Theme
+from .ui_elements.button import Button
+from .ui_elements.theme import Theme
 
 
 class InstructionScene(Scene):
     """
     Scene to show the game rules and keyboard controls
     """
+
     def __init__(
         self, screen: Surface, theme: Theme, width_height: tuple[int, int]
     ) -> None:

@@ -5,13 +5,16 @@ from pygame import Surface
 from pygame.event import Event
 
 from .scene import Scene
-from .theme import Button, Text, Theme
+from .ui_elements.button import Button
+from .ui_elements.text import Text
+from .ui_elements.theme import Theme
 
 
 class MainMenuScene(Scene):
     """
     The main menu scene
     """
+
     def __init__(
         self, screen: Surface, theme: Theme, width_height: tuple[int, int]
     ) -> None:

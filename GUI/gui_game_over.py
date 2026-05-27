@@ -6,7 +6,9 @@ from game_class.player import Player
 
 from .scene import Scene
 from .score import HighScore
-from .theme import Button, TextInput, Theme
+from .ui_elements.button import Button
+from .ui_elements.highscore_input import HighScoreInput
+from .ui_elements.theme import Theme
 
 
 class GameOverScene(Scene):
@@ -54,7 +56,7 @@ class GameOverScene(Scene):
             self.theme.btn_on_mouse_over_background_color,
             self.theme.btn_on_mouse_over_text_color,
         )
-        self.text_input_name = TextInput(
+        self.text_input_name = HighScoreInput(
             self.screen, (350, self.WIDTH // 2), 250, 60, self.player, self.highscore
         )
 

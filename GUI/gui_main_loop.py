@@ -4,6 +4,7 @@ import pygame
 from pygame import Surface, time
 
 from game_class.cheat import Cheat
+from game_class.player import Player
 from GUI.gui_game import GameScene
 from GUI.gui_game_over import GameOverScene
 from GUI.gui_highscore import HighScoreScene
@@ -11,16 +12,17 @@ from GUI.gui_instruction import InstructionScene
 from GUI.gui_main_menu import MainMenuScene
 from GUI.gui_victory import VictoryScene
 from parser import Config, parser
-from game_class.player import Player
-from .score import HighScore
-from .theme import Theme
+
 from .scene import Scene
+from .score import HighScore
+from .ui_elements.theme import Theme
 
 
 class Visualizer:
     """
     Main game loop that own all the scenes and drives the pygame event cycle
     """
+
     def __init__(
         self,
         theme: Theme,
@@ -33,8 +35,7 @@ class Visualizer:
         self.WIDTH = 960
         self.HEIGHT = 720
         self.theme: Theme = theme
-        self.screen: Surface = pygame.display.set_mode((self.WIDTH,
-                                                        self.HEIGHT))
+        self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
 
         pygame.init()
 
@@ -70,19 +71,16 @@ class Visualizer:
                 cheat,
             ),
             "game_over": GameOverScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT),
-                player, highscore
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT), player, highscore
             ),
             "instruction": InstructionScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
             ),
             "high_score": HighScoreScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT),
-                config, highscore
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT), config, highscore
             ),
             "victory": VictoryScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT),
-                player, highscore
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT), player, highscore
             ),
         }
         current_scene = "main_menu"

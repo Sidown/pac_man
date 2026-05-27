@@ -3,15 +3,18 @@ from pygame import Surface
 from pygame.event import Event
 
 from parser import Config
+
 from .scene import Scene
 from .score import HighScore
-from .theme import Button, Theme
+from .ui_elements.button import Button
+from .ui_elements.theme import Theme
 
 
 class HighScoreScene(Scene):
     """
     Scene that display the top 10 high scores
     """
+
     def __init__(
         self,
         screen: Surface,

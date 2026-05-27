@@ -14,7 +14,7 @@ from parser import Config
 from .checkbox import Checkbox
 from .scene import Scene
 from .score import HighScore
-from .theme import Theme
+from .ui_elements.theme import Theme
 
 
 class GameScene(Scene):
@@ -76,7 +76,11 @@ class GameScene(Scene):
             caption="Freeze Ghosts",
         )
         self.pacgum_checkbox = Checkbox(
-            self.screen, self.WIDTH // 2.5, self.HEIGHT / 2.1, 3, caption="Skip Levels (press Return)"
+            self.screen,
+            self.WIDTH // 2.5,
+            self.HEIGHT / 2.1,
+            3,
+            caption="Skip Levels (press Return)",
         )
 
     def load_level(self) -> None:
@@ -336,7 +340,10 @@ class GameScene(Scene):
         for key in self.pacgums.keys():
             if self.pacgums[key].visible:
                 remaining_pacgums += 1
-        if remaining_pacgums <= len(self.pacgums) // 5 and not self.blinky.is_vulnerable:
+        if (
+            remaining_pacgums <= len(self.pacgums) // 5
+            and not self.blinky.is_vulnerable
+        ):
             self.blinky.angry_mod
         self.blinky.play(self.maze, self.player, self.cheat)
         self.inky.play(self.maze, self.player, self.cheat, self.blinky, self.pinky)
