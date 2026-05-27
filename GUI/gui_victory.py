@@ -70,13 +70,21 @@ class VictoryScene(Scene):
 
     def handle_events(self, events: list[Event]) -> str:
         """
-        process a list of events and return the next scene to display
+        Process a list of events and return the name of the next scene
         arguments:
-        events -> the list of events to process
+        events -> list of events to process
+        return value:
+        the next scene to display
         """
         self.current_scene = "victory"
+        is_completed_name = False
         for event in events:
             self.btn_back_to_menu.handle_event(event)
+            is_completed_name = self.text_input_name.handle_event(event)
+        if is_completed_name:
+            self.player.new_game()
+            self.highscore.current_score = 0
+            return "main_menu"
         return self.current_scene
 
     def update(self) -> None:
@@ -91,6 +99,7 @@ class VictoryScene(Scene):
         """
         self.screen.fill(self.theme.background_color)
         self.btn_back_to_menu.draw(self.screen)
+        self.text_input_name.draw()
         self.screen.blit(
             self.victory_text,
             self.victory_text.get_rect(
