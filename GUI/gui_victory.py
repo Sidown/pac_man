@@ -60,7 +60,7 @@ class VictoryScene(Scene):
         )
         self.text_input_name = HighScoreInput(
             self.screen,
-            (self.WIDTH // 2, self.HEIGHT // 2 + 100),
+            (self.WIDTH // 2, self.HEIGHT // 2 + 150),
             250,
             60,
             self.player,
@@ -114,5 +114,17 @@ class VictoryScene(Scene):
                     (self.WIDTH // 2),
                     (self.HEIGHT // 2),
                 )
+            ),
+        )
+        player_score_text = pygame.font.Font(self.theme.font_path, 28).render(
+            f"your score: {self.highscore.current_score}pts",
+            False,
+            self.theme.text_color,
+        )
+        self.screen.blit(
+            player_score_text,
+            (
+                (self.WIDTH // 2) - (player_score_text.get_width() // 2),
+                self.HEIGHT // 2 + 70,
             ),
         )
