@@ -1,5 +1,4 @@
 import random
-import time
 from mazegenerator.mazegenerator import MazeGenerator
 
 from .ghost import Blinky, Clyde, Ghost, Inky, Pinky
@@ -35,8 +34,8 @@ class Level:
         seed -> random seed used to generate the maze
         player -> the player
         """
-        self.time_started = time.time()
-        self.max_time = self.time_started  + max_time
+        self.time_started = max_time * 1000
+        self.max_time = self.time_started + max_time
         self.maze: MazeGenerator = MazeGenerator(size, seed=seed)
         self.pacgums: dict[tuple[int, int], Pacgum] = {}
         self.player = player

@@ -45,9 +45,8 @@ class GameScene(Scene):
         highscore -> the highscore manager
         cheat -> the cheat class
         """
-        self.paused_time = 0
-        self.total_paused_time = 0
-        self.time_when_paused = 0
+        self.time_elapsed = 0
+        self.time_last_frame = 0
         self.current_scene = "game"
         self.screen: Surface = screen
         self.theme: Theme = theme
@@ -56,12 +55,14 @@ class GameScene(Scene):
         self.HEIGHT: int = width_height[1]
         self.PADDING = 80
         self.paused = False
-        self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING, config, self.player)
+        self.game = Game((self.WIDTH, self.HEIGHT), self.PADDING, config,
+                         self.player)
         self.skin_index = 0
         self.skin_timer = 0
         self.animation_speed = 0.3
         self.current_level_index = 0
-        self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
+        self.score_font = pygame.font.Font(self.theme.font_path,
+                                           self.theme.text_size)
         self.highscore: HighScore = highscore
         self.highscore.load_high_score()
         self.cheat = cheat
@@ -80,7 +81,7 @@ class GameScene(Scene):
             2,
             caption="Freeze Ghosts",
         )
-        self.pacgum_checkbox = Checkbox(
+        self.skip_checkbox = Checkbox(
             self.screen,
             self.WIDTH // 2.5,
             self.HEIGHT / 1.7,
@@ -100,6 +101,14 @@ class GameScene(Scene):
             False,
             (100, 100, 100),
             self.theme.btn_on_mouse_over_text_color,
+        )
+
+        self.timeless_checkbox = Checkbox(
+            self.screen,
+            self.WIDTH // 2.5,
+            self.HEIGHT / 1.8,
+            3,
+            caption="No Timer",
         )
 
     def load_level(self) -> None:
@@ -122,14 +131,16 @@ class GameScene(Scene):
             pygame.image.load("assets/skin/pacman.png"),
             (self.cell_width, self.cell_height),
         )
-        self.score_font = pygame.font.Font(self.theme.font_path, self.theme.text_size)
+        self.score_font = pygame.font.Font(self.theme.font_path,
+                                           self.theme.text_size)
         self.player._set_pacgum_pos(self.pacgums, self.super_pacgums)
         self.player._set_skins(self.cell_width, self.cell_height)
         self.player.spawn = self._check_spawn_is_valid(
             (self.player.spawn[0], self.player.spawn[1])
         )
         self.player.respawn()
-
+        self.time_elapsed = 0
+        self.time_last_frame = 0
     def _print_life(self) -> None:
         """
         Draw player life
@@ -171,17 +182,10 @@ class GameScene(Scene):
         """
         Display the current level timer
         """
-        current_time = time.time()
+        level = self.game.get_level(self.current_level_index)
+        time_remaining = max(0, (level.max_time - self.time_elapsed) // 1000)
         timer_text = self.score_font.render(
-            f"Timer: {
-                int(
-                    self.game.get_level(self.current_level_index).max_time
-                    - current_time
-                    + self.total_paused_time
-                )
-            }",
-            True,
-            self.theme.text_color,
+            f"Timer: {time_remaining}", True, self.theme.text_color
         )
         self.screen.blit(timer_text, (self.PADDING * 5, 15))
 
@@ -357,18 +361,16 @@ class GameScene(Scene):
                     self.player.queud_direction = "W"
                 if event.key == pygame.K_SPACE:
                     self.paused = not self.paused
-                    if self.paused is True:
-                        self.time_when_paused = time.time()
-                    else:
-                        self.total_paused_time += self.paused_time
                 if event.key == pygame.K_RETURN and self.cheat.skip:
                     self._next_level()
             if self.invincibility_checkbox.update_checkbox(event):
                 self._invincibility(self.cheat)
             if self.freeze_checkbox.update_checkbox(event):
                 self._freeze_ghost(self.cheat)
-            if self.pacgum_checkbox.update_checkbox(event):
+            if self.skip_checkbox.update_checkbox(event):
                 self._skip_level(self.cheat)
+            if self.timeless_checkbox.update_checkbox(event):
+                self._timeless(self.cheat)
 
         return self.current_scene
 
@@ -388,7 +390,8 @@ class GameScene(Scene):
         ):
             self.blinky.angry_mod
         self.blinky.play(self.maze, self.player, self.cheat)
-        self.inky.play(self.maze, self.player, self.cheat, self.blinky, self.pinky)
+        self.inky.play(self.maze, self.player, self.cheat,
+                       self.blinky, self.pinky)
         self.pinky.play(self.maze, self.player, self.cheat)
         self.clyde.play(self.maze, self.player, self.cheat)
         self.player.update_player(self.maze, self.highscore)
@@ -404,16 +407,19 @@ class GameScene(Scene):
                         return
                     pygame.time.wait(200)
                     self._reset_all_param()
+                    break
         if all(not pacgum.visible for pacgum in self.pacgums.values()):
             self._next_level()
-        current_time = time.time()
-        if (
-            current_time
-            >= self.game.get_level(self.current_level_index).max_time
-            + self.total_paused_time
-        ):
-            self._game_over()
-            return
+        if not self.paused and not self.cheat.timeless:
+            now = pygame.time.get_ticks()
+            if self.time_last_frame > 0:
+                self.time_elapsed += now - self.time_last_frame
+            self.time_last_frame = now
+            level = self.game.get_level(self.current_level_index)
+            time_ramaining = level.max_time - self.time_elapsed
+            if time_ramaining <= 0:
+                self._game_over()
+                return
 
     def _print_highscore(self) -> None:
         """Print the Highscore."""
@@ -477,12 +483,25 @@ class GameScene(Scene):
         arguments:
         cheat -> the cheat class
         """
-        if self.pacgum_checkbox.checked:
+        if self.skip_checkbox.checked:
             cheat.skip = True
         else:
             cheat.skip = False
+        
+    def _timeless(self, cheat: Cheat) -> None:
+        """
+        Deactivate timer when checked
+        arguments:
+        cheat -> the cheat class
+        """
+        if self.timeless_checkbox.checked:
+            cheat.timeless = True
+            self.time_last_frame = 0
+        else:
+            cheat.timeless = False
 
-    def _check_spawn_is_valid(self, coordinate: tuple[int, int]) -> tuple[int, int]:
+    def _check_spawn_is_valid(self, coordinate: tuple[int, int]
+                              ) -> tuple[int, int]:
         """
         Find the nearest non closed cell starting from coordinate
         arguments:
@@ -513,7 +532,6 @@ class GameScene(Scene):
         self.screen.fill(self.theme.game_background_color)
         if self.paused:
             self.btn_back_to_menu.draw(self.screen)
-            self.paused_time = time.time() - self.time_when_paused
             pause_text = pygame.font.Font(self.theme.font_path, 56).render(
                 "PAUSED", True, (255, 0, 100)
             )
@@ -540,12 +558,14 @@ class GameScene(Scene):
             )
             self.invincibility_checkbox.draw()
             self.freeze_checkbox.draw()
-            self.pacgum_checkbox.draw()
+            self.skip_checkbox.draw()
+            self.timeless_checkbox.draw()
 
         else:
             self._print_maze()
             assert self.player.skin is not None, "Player skin not loaded"
-            self._print_skin(self.player.skin, self.player.pixel_x, self.player.pixel_y)
+            self._print_skin(self.player.skin, self.player.pixel_x,
+                             self.player.pixel_y)
             self._print_skin(
                 self.blinky.current_skin,
                 self.blinky.pixel_coord[0],
