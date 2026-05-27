@@ -76,7 +76,7 @@ class GameScene(Scene):
             caption="Freeze Ghosts",
         )
         self.pacgum_checkbox = Checkbox(
-            self.screen, self.WIDTH // 2.5, self.HEIGHT / 2.1, 3, caption="Skip Levels"
+            self.screen, self.WIDTH // 2.5, self.HEIGHT / 2.1, 3, caption="Skip Levels (press Return)"
         )
 
     def load_level(self) -> None:
