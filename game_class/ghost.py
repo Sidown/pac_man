@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from collections import deque
 from math import dist
 from typing import Optional
-from player import Player
-from cheat import Cheat
+from .player import Player
+from .cheat import Cheat
 
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import image, transform, Surface

@@ -4,8 +4,8 @@ import pygame
 from pygame import Surface
 from pygame.event import Event
 
-from scene import Scene
-from theme import Button, Text, Theme
+from .scene import Scene
+from .theme import Button, Text, Theme
 
 
 class MainMenuScene(Scene):

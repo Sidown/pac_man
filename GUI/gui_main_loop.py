@@ -3,19 +3,18 @@ import sys
 import pygame
 from pygame import Surface, time
 
-# from typing import cast
-from ..game_class.cheat import Cheat
-from gui_game import GameScene
-from gui_game_over import GameOverScene
-from gui_highscore import HighScoreScene
-from gui_instruction import InstructionScene
-from gui_main_menu import MainMenuScene
-from gui_victory import VictoryScene
+from game_class.cheat import Cheat
+from GUI.gui_game import GameScene
+from GUI.gui_game_over import GameOverScene
+from GUI.gui_highscore import HighScoreScene
+from GUI.gui_instruction import InstructionScene
+from GUI.gui_main_menu import MainMenuScene
+from GUI.gui_victory import VictoryScene
 from parser import Config, parser
-from ..game_class.player import Player
-from score import HighScore
-from theme import Theme
-from scene import Scene
+from game_class.player import Player
+from .score import HighScore
+from .theme import Theme
+from .scene import Scene
 
 
 class Visualizer:

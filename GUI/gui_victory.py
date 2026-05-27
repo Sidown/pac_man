@@ -2,10 +2,10 @@ import pygame
 from pygame import Surface
 from pygame.event import Event
 
-from ..game_class.player import Player
-from scene import Scene
-from score import HighScore
-from theme import Button, TextInput, Theme
+from game_class.player import Player
+from .scene import Scene
+from .score import HighScore
+from .theme import Button, TextInput, Theme
 
 
 class VictoryScene(Scene):

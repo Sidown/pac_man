@@ -1,7 +1,7 @@
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Surface, image, transform
 
-from pacgum import Pacgum, SuperPacgum
+from .pacgum import Pacgum, SuperPacgum
 
 
 class Player:

@@ -1,5 +1,5 @@
-from gui_main_loop import Visualizer
-from theme import Theme
+from GUI.gui_main_loop import Visualizer
+from GUI.theme import Theme
 
 
 def main() -> None:

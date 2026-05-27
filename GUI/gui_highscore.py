@@ -3,9 +3,9 @@ from pygame import Surface
 from pygame.event import Event
 
 from parser import Config
-from scene import Scene
-from score import HighScore
-from theme import Button, Theme
+from .scene import Scene
+from .score import HighScore
+from .theme import Button, Theme
 
 
 class HighScoreScene(Scene):
