@@ -140,6 +140,7 @@ class GameScene(Scene):
         self.player.respawn()
         self.time_elapsed = 0
         self.time_last_frame = 0
+
     def _print_life(self) -> None:
         """
         Draw player life
@@ -158,7 +159,8 @@ class GameScene(Scene):
         display the current level number
         """
         level_text = self.score_font.render(
-            f"level: {self.current_level_index + 1}", True, self.theme.text_color
+            f"level: {self.current_level_index + 1}",
+            True, self.theme.text_color
         )
         self.screen.blit(
             level_text,
@@ -173,7 +175,8 @@ class GameScene(Scene):
         display the current player score
         """
         score_text = self.score_font.render(
-            f"Score: {self.highscore.current_score}", True, self.theme.text_color
+            f"Score: {self.highscore.current_score}",
+            True, self.theme.text_color
         )
         self.screen.blit(score_text, (self.PADDING, 15))
 
@@ -486,7 +489,7 @@ class GameScene(Scene):
             cheat.skip = True
         else:
             cheat.skip = False
-        
+
     def _timeless(self, cheat: Cheat) -> None:
         """
         Deactivate timer when checked
