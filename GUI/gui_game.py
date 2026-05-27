@@ -1,5 +1,6 @@
 import sys
 from typing import cast
+import time
 
 import pygame
 from pygame import Surface
@@ -43,6 +44,7 @@ class GameScene(Scene):
         highscore -> the highscore manager
         cheat -> the cheat class
         """
+        self.paused_time = 0
         self.current_scene = "game"
         self.screen: Surface = screen
         self.theme: Theme = theme
@@ -147,6 +149,17 @@ class GameScene(Scene):
             f"Score: {self.highscore.current_score}", True, self.theme.text_color
         )
         self.screen.blit(score_text, (self.PADDING, 15))
+
+    def _print_timer(self) -> None:
+        """
+        Display the current level timer
+        """
+        current_time = time.time()
+        timer_text = self.score_font.render(
+            f"Timer: {int(self.game.get_level(self.current_level_index).max_time - current_time)}",
+            True, self.theme.text_color
+        )
+        self.screen.blit(timer_text, (self.PADDING * 5, 15))
 
     def _show_maze(self, curr_x: float, curr_y: float) -> None:
         """
@@ -364,6 +377,10 @@ class GameScene(Scene):
                     self._reset_all_param()
         if all(not pacgum.visible for pacgum in self.pacgums.values()):
             self._next_level()
+        current_time = time.time()
+        if current_time >= self.game.get_level(self.current_level_index).max_time:
+            self._game_over()
+            return
 
     def _print_highscore(self) -> None:
         """Print the Highscore."""
@@ -374,7 +391,7 @@ class GameScene(Scene):
         highscore_text = self.score_font.render(
             f"HighScore: {highest_score}", True, self.theme.text_color
         )
-        self.screen.blit(highscore_text, (self.WIDTH // 2, 15))
+        self.screen.blit(highscore_text, (self.WIDTH // 2 + 120, 15))
 
     def _next_level(self) -> None:
         """
@@ -518,5 +535,6 @@ class GameScene(Scene):
                     )
             self._print_life()
             self._print_score()
+            self._print_timer()
             self._print_highscore()
             self._print_level()
