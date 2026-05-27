@@ -10,7 +10,7 @@ run: install
 	uv run main.py
 
 debug:
-	uv run python -m pdb -m main.py
+	uv run python -m pdb -m main
 
 lint: install
 	flake8 --extend-exclude .venv
@@ -19,5 +19,4 @@ lint: install
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type d -name .mypy_cache -exec rm -rf {} +
-	rm -rf data/output
 	rm -rf .venv
