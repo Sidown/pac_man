@@ -6,10 +6,12 @@ class HighScore:
     """
     Manage the highscore leaderboard stored in a json file
     """
+
     def __init__(self) -> None:
         """
         Initialise with an empty score list
         """
+        self.current_score: int = 0
         self.scores: list[list[str | int]] = []
 
     def load_high_score(self) -> None:
@@ -36,7 +38,6 @@ class HighScore:
     def save_high_score(
         self,
         name: str,
-        score: int,
     ) -> None:
         """
         Append a new entry and keep the top 10 scores
@@ -45,8 +46,8 @@ class HighScore:
         name -> player name
         score -> player score
         """
-        if [name, score] not in self.scores:
-            self.scores.append([name, score])
+        if [name, self.current_score] not in self.scores:
+            self.scores.append([name, self.current_score])
         self._sort_score()
         nb_score = len(self.scores)
         if nb_score > 10:

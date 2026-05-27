@@ -3,6 +3,7 @@ from pygame import Surface
 from pygame.event import Event
 
 from game_class.player import Player
+
 from .scene import Scene
 from .score import HighScore
 from .theme import Button, TextInput, Theme
@@ -12,6 +13,7 @@ class GameOverScene(Scene):
     """
     Scene displayed when the player loose.
     """
+
     def __init__(
         self,
         screen: Surface,
@@ -36,10 +38,9 @@ class GameOverScene(Scene):
         self.highscore: HighScore = highscore
         self.PADDING = 80
         self.current_scene = "game_over"
-        self.game_over_text = (
-            pygame.font.Font(self.theme.font_path, 56).render(
-             "Game Over ... looser !!!!!", True, (255, 0, 100)
-            ))
+        self.game_over_text = pygame.font.Font(self.theme.font_path, 56).render(
+            "Game Over ... looser !!!!!", True, (255, 0, 100)
+        )
         self.btn_back_to_menu = Button(
             self.screen,
             self.theme.text_size,
@@ -54,8 +55,7 @@ class GameOverScene(Scene):
             self.theme.btn_on_mouse_over_text_color,
         )
         self.text_input_name = TextInput(
-            self.screen, (350, self.WIDTH // 2), 250, 60,
-            self.player, self.highscore
+            self.screen, (350, self.WIDTH // 2), 250, 60, self.player, self.highscore
         )
 
     def _back_to_menu_callback(self) -> None:
@@ -63,6 +63,7 @@ class GameOverScene(Scene):
         reset the player and return to the main menu
         """
         self.player.new_game()
+        self.highscore.current_score = 0
         self.current_scene = "main_menu"
 
     def handle_events(self, events: list[Event]) -> str:
@@ -80,6 +81,7 @@ class GameOverScene(Scene):
             is_completed_name = self.text_input_name.handle_event(event)
         if is_completed_name:
             self.player.new_game()
+            self.highscore.current_score = 0
             return "main_menu"
         return self.current_scene
 

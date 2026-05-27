@@ -2,11 +2,12 @@ from abc import ABC, abstractmethod
 from collections import deque
 from math import dist
 from typing import Optional
-from .player import Player
-from .cheat import Cheat
 
 from mazegenerator.mazegenerator import MazeGenerator
-from pygame import image, transform, Surface
+from pygame import Surface, image, transform
+
+from .cheat import Cheat
+from .player import Player
 
 
 class Ghost(ABC):
@@ -58,8 +59,9 @@ class Ghost(ABC):
         self.just_respawned: bool = False
 
     @abstractmethod
-    def next_move(self, maze: MazeGenerator, player: Player,
-                  cheat: Cheat) -> tuple[int, int]:
+    def next_move(
+        self, maze: MazeGenerator, player: Player, cheat: Cheat
+    ) -> tuple[int, int]:
         """
         Return the next cell the ghost should move to.
         Arguments:
@@ -72,8 +74,7 @@ class Ghost(ABC):
         """
         pass
 
-    def play(self, maze: MazeGenerator, player: Player, cheat: Cheat
-             ) -> None:
+    def play(self, maze: MazeGenerator, player: Player, cheat: Cheat) -> None:
         """
         Move the ghost pixel by pixel.
         arguments:
@@ -117,8 +118,7 @@ class Ghost(ABC):
                     ):
                         moves = self.get_moves_possible(maze, self.coord)
                         forward = [
-                            m for m in moves
-                            if m != opposite.get(self.direction)
+                            m for m in moves if m != opposite.get(self.direction)
                         ]
                         if forward:
                             move_chosen = forward[0]
@@ -132,8 +132,7 @@ class Ghost(ABC):
                 # force un mouvement si pas de deplacement
                 if move == self.coord:
                     moves = self.get_moves_possible(maze, self.coord)
-                    forward = [m for m in moves
-                               if m != opposite.get(self.direction)]
+                    forward = [m for m in moves if m != opposite.get(self.direction)]
                     # check si mouvement autre que demi tour possible
                     if forward:
                         move_chosen = forward[0]
@@ -158,10 +157,8 @@ class Ghost(ABC):
 
         self.move_progress = min(1.0, self.move_progress + self.speed)
         self.pixel_coord = (
-            (self.coord[0] + (self.next_coord[0] -
-                              self.coord[0]) * self.move_progress),
-            (self.coord[1] + (self.next_coord[1] - self.coord[1])
-             * self.move_progress),
+            (self.coord[0] + (self.next_coord[0] - self.coord[0]) * self.move_progress),
+            (self.coord[1] + (self.next_coord[1] - self.coord[1]) * self.move_progress),
         )
 
     def respawn(self) -> None:
@@ -180,8 +177,9 @@ class Ghost(ABC):
         self.speed = 0.2
         self.is_vulnerable = False
 
-    def get_moves_possible(self, maze: MazeGenerator, coord: tuple[int, int]
-                           ) -> list[str]:
+    def get_moves_possible(
+        self, maze: MazeGenerator, coord: tuple[int, int]
+    ) -> list[str]:
         """
         Return the list of valid moves directeions from coord
         arguments:
@@ -285,8 +283,7 @@ class Blinky(Ghost):  # chases, dest player pos
     speed and change his skin.
     """
 
-    def __init__(self, skin: str, cell_width: float, cell_height: float
-                 ) -> None:
+    def __init__(self, skin: str, cell_width: float, cell_height: float) -> None:
         """
         Initialise Blinky and load his angry skin.
         Arguments:
@@ -321,8 +318,9 @@ class Blinky(Ghost):  # chases, dest player pos
         self.speed = 0.08
         self.default_skin = self.angry_skin
 
-    def next_move(self, maze: MazeGenerator, player: Player,
-                  cheat: Cheat) -> tuple[int, int]:
+    def next_move(
+        self, maze: MazeGenerator, player: Player, cheat: Cheat
+    ) -> tuple[int, int]:
         """
         Return the next cell using BFS with player as the target
         or the spawn if vulnerable.
@@ -394,8 +392,7 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
     to the left of Pac-Man. During Scatter mode,
     she heads towards the upper-left corner."""
 
-    def __init__(self, skin: str, cell_width: float,
-                 cell_height: float) -> None:
+    def __init__(self, skin: str, cell_width: float, cell_height: float) -> None:
         """
         Initialise Pinky.
 
@@ -419,8 +416,9 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
         self.target = (player.x, player.y)
         self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
 
-    def next_move(self, maze: MazeGenerator, player: Player,
-                  cheat: Cheat) -> tuple[int, int]:
+    def next_move(
+        self, maze: MazeGenerator, player: Player, cheat: Cheat
+    ) -> tuple[int, int]:
         """
         Return the next cell using BFS with a point
         ahead of the player as the target
@@ -441,12 +439,10 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
             if player.direction == "UP" and player.y - 2 >= 0:
                 self.target = (player.x, player.y - 2)
 
-            elif (player.direction == "DOWN" and
-                  player.y + 2 <= maze._height - 1):
+            elif player.direction == "DOWN" and player.y + 2 <= maze._height - 1:
                 self.target = (player.x, player.y + 2)
 
-            elif (player.direction == "RIGHT" and
-                  player.x + 2 <= maze._width - 1):
+            elif player.direction == "RIGHT" and player.x + 2 <= maze._width - 1:
                 self.target = (player.x + 2, player.y)
 
             elif player.direction == "LEFT" and player.x - 2 >= 0:
@@ -506,8 +502,8 @@ class Inky(Ghost):
     His target is relative to both Blinky and Pac-Man, where the distance
     Blinky is from Pinky's target is doubled to get Inky's target.
     He heads to the lower-right corner during Scatter mode."""
-    def __init__(self, skin: str, cell_width: float,
-                 cell_height: float) -> None:
+
+    def __init__(self, skin: str, cell_width: float, cell_height: float) -> None:
         """
         Initialise Inky.
 
@@ -518,10 +514,14 @@ class Inky(Ghost):
         """
         super().__init__(skin, cell_width, cell_height)
 
-    def play(self, maze: MazeGenerator, player: Player,
-             cheat: Cheat, blinky: Optional[Blinky] = None,
-             pinky: Optional[Pinky] = None
-             ) -> None:
+    def play(
+        self,
+        maze: MazeGenerator,
+        player: Player,
+        cheat: Cheat,
+        blinky: Optional[Blinky] = None,
+        pinky: Optional[Pinky] = None,
+    ) -> None:
         """
         Override play to update internal blinky/pinky references.
 
@@ -538,8 +538,9 @@ class Inky(Ghost):
             self._pinky = pinky
         super().play(maze, player, cheat)
 
-    def set_parameters(self, maze: MazeGenerator, player: Player,
-                       blinky: Blinky, pinky: Pinky) -> None:
+    def set_parameters(
+        self, maze: MazeGenerator, player: Player, blinky: Blinky, pinky: Pinky
+    ) -> None:
         """
         Set Inky spawn.
         Arguments:
@@ -556,8 +557,9 @@ class Inky(Ghost):
         self._blinky = blinky
         self._pinky = pinky
 
-    def next_move(self, maze: MazeGenerator, player: Player,
-                  cheat: Cheat) -> tuple[int, int]:
+    def next_move(
+        self, maze: MazeGenerator, player: Player, cheat: Cheat
+    ) -> tuple[int, int]:
         """
         Return the next cell using BFS toward Inky target.
 
@@ -633,8 +635,7 @@ class Clyde(Ghost):  # weird
     an 8-Dot radius of Pac-Man.
     His Scatter Mode corner is the lower-left."""
 
-    def __init__(self, skin: str, cell_width: float,
-                 cell_height: float) -> None:
+    def __init__(self, skin: str, cell_width: float, cell_height: float) -> None:
         """
         Initialise Clyde.
         Arguments:
@@ -657,8 +658,9 @@ class Clyde(Ghost):  # weird
         self.target = (player.x, player.y)
         self.pixel_coord = (float(self.spawn[0]), float(self.spawn[1]))
 
-    def next_move(self, maze: MazeGenerator, player: Player,
-                  cheat: Cheat) -> tuple[int, int]:
+    def next_move(
+        self, maze: MazeGenerator, player: Player, cheat: Cheat
+    ) -> tuple[int, int]:
         """
         Return the next cell, chase the player unless within 3 cells or
         vulnerable.
