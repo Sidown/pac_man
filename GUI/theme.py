@@ -1,9 +1,11 @@
 from typing import Callable
+
 import pygame
 from pygame import Surface
 from pygame.event import Event
 
 from game_class.player import Player
+
 from .score import HighScore
 
 
@@ -11,6 +13,7 @@ class Theme:
     """
     Class for all the visual styling parameters used for the scenes.
     """
+
     def __init__(
         self,
         background_color: tuple[int, int, int] = (25, 25, 166),
@@ -46,8 +49,7 @@ class Theme:
         text_size -> font size for text
         """
         self.background_color: tuple[int, int, int] = background_color
-        self.game_background_color: tuple[int, int, int] = (
-            game_background_color)
+        self.game_background_color: tuple[int, int, int] = game_background_color
         self.title_color: tuple[int, int, int] = title_color
         self.text_color: tuple[int, int, int] = text_color
         self.wall_color: tuple[int, int, int] = wall_color
@@ -69,6 +71,7 @@ class Text:
     """
     A text label rendered with pygame
     """
+
     def __init__(
         self,
         surface: Surface,
@@ -121,6 +124,7 @@ class Clickable:
     """
     Class for clickable
     """
+
     def __init__(
         self,
         on_mouse_over_background_color: tuple[int, int, int],
@@ -146,6 +150,7 @@ class Button(Text, Clickable):
     """
     A button combining text and click handling
     """
+
     def __init__(
         self,
         surface: Surface,
@@ -227,8 +232,7 @@ class Button(Text, Clickable):
         Arguments:
         screen -> the surface to render the button on
         """
-        color = (self.on_mouse_over_bg_color if self.hovered
-                 else self.background_color)
+        color = self.on_mouse_over_bg_color if self.hovered else self.background_color
         pygame.draw.rect(screen, color, self.rect)
         text_surf = self.font.render(self.text, True, self.font_color)
         text_rect = text_surf.get_rect(center=self.rect.center)
@@ -282,8 +286,7 @@ class TextInput:
         self.highscore: HighScore = highscore
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.text: str = ""
-        self.font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf",
-                                     28)
+        self.font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf", 28)
         self.is_valid_name: bool = True
 
     def draw(self) -> None:
@@ -298,8 +301,7 @@ class TextInput:
         displayed_text = self.font.render(self.text, False, (0, 0, 0))
         self.screen.blit(displayed_text, (self.x, self.y + 10))
         if not self.is_valid_name:
-            font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf",
-                                    22)
+            font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf", 22)
             displayed_error = font.render(
                 "Please enter a valid name (<10 char alpha and space only)",
                 False,
@@ -318,7 +320,7 @@ class TextInput:
         """
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
-                self.highscore.save_high_score(self.text, self.player.score)
+                self.highscore.save_high_score(self.text)
                 self.text = ""
                 return True
             if event.key == pygame.K_BACKSPACE:

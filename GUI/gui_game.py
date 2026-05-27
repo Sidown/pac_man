@@ -105,7 +105,7 @@ class GameScene(Scene):
         self.player.spawn = self._check_spawn_is_valid(
             (self.player.spawn[0], self.player.spawn[1])
         )
-        self.player.reset_param()
+        self.player.respawn()
 
     def _print_life(self) -> None:
         """
@@ -140,7 +140,7 @@ class GameScene(Scene):
         display the current player score
         """
         score_text = self.score_font.render(
-            f"Score: {self.player.score}", True, self.theme.text_color
+            f"Score: {self.highscore.current_score}", True, self.theme.text_color
         )
         self.screen.blit(score_text, (self.PADDING, 15))
 
@@ -283,7 +283,7 @@ class GameScene(Scene):
 
     def _reset_all_param(self) -> None:
         """Reset param for all ghosts and the player"""
-        self.player.reset_param()
+        self.player.respawn()
         self.blinky.reset_param()
         self.inky.reset_param()
         self.pinky.reset_param()
@@ -342,12 +342,12 @@ class GameScene(Scene):
         self.inky.play(self.maze, self.player, self.cheat, self.blinky, self.pinky)
         self.pinky.play(self.maze, self.player, self.cheat)
         self.clyde.play(self.maze, self.player, self.cheat)
-        self.player.update_player(self.maze)
+        self.player.update_player(self.maze, self.highscore)
         for ghost in [self.blinky, self.pinky, self.inky, self.clyde]:
             if ghost.collide_with_player(self.player):
                 if ghost.is_vulnerable:
                     ghost.die()
-                    self.player.score += 200
+                    self.highscore.current_score += 200
                 elif not ghost.died and not self.cheat.invincible:
                     self.player.lives -= 1
                     if self.player.lives <= 0:
@@ -378,15 +378,15 @@ class GameScene(Scene):
         if self.current_level_index >= len(self.game.level_configs):
             self.current_scene = "victory"
             return
-        old_score = self.player.score
+        # old_score = self.highscore.current_score
         old_lives = self.player.lives
         self.load_level()
         spawn_x, spawn_y = self._check_spawn_is_valid(
             ((self.maze_width // 2), (self.maze_height // 2))
         )
         self.player.spawn = (spawn_x, spawn_y)
-        self.player.reset_param()
-        self.player.score = old_score
+        self.player.respawn()
+        # self.player.score = old_score
         self.player.lives = old_lives
 
     def _invincibility(self, cheat: Cheat) -> None:

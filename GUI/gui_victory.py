@@ -3,6 +3,7 @@ from pygame import Surface
 from pygame.event import Event
 
 from game_class.player import Player
+
 from .scene import Scene
 from .score import HighScore
 from .theme import Button, TextInput, Theme
@@ -12,6 +13,7 @@ class VictoryScene(Scene):
     """
     scene displayed when the player win the game
     """
+
     def __init__(
         self,
         screen: Surface,
@@ -55,8 +57,7 @@ class VictoryScene(Scene):
             self.theme.btn_on_mouse_over_text_color,
         )
         self.text_input_name = TextInput(
-            self.screen, (350, self.WIDTH // 2), 250, 60, self.player,
-            self.highscore
+            self.screen, (350, self.WIDTH // 2), 250, 60, self.player, self.highscore
         )
 
     def _back_to_menu_callback(self) -> None:
@@ -64,6 +65,7 @@ class VictoryScene(Scene):
         reset the player and returns to the main menu
         """
         self.player.new_game()
+        self.highscore.current_score = 0
         self.current_scene = "main_menu"
 
     def handle_events(self, events: list[Event]) -> str:

@@ -1,6 +1,8 @@
 from mazegenerator.mazegenerator import MazeGenerator
 from pygame import Surface, image, transform
 
+from GUI.score import HighScore
+
 from .pacgum import Pacgum, SuperPacgum
 
 
@@ -32,7 +34,6 @@ class Player:
         self.move_progress: float = 1.0
         self.direction: str = ""
         self.queud_direction: str = ""
-        self.score: int = 0
         self.speed: float = 0.10
         self.pacgum_effect: bool = False
         self.timer_effect = 0
@@ -96,7 +97,7 @@ class Player:
         self.pacgums: dict[tuple[int, int], Pacgum] = pacgums
         self.super_pacgums: dict[tuple[int, int], SuperPacgum] = super_pacgums
 
-    def reset_param(self) -> None:
+    def respawn(self) -> None:
         """Reset the player parameters for a new life."""
         self.x, self.y = (
             self.next_x,
@@ -110,13 +111,11 @@ class Player:
         """
         reset player parameters for a new game
         """
-        self.reset_param()
-        self.score = 0
+        self.respawn()
         self.lives = self.default_lives
 
     def _is_neighbor(
-        self, current_cell: tuple[int, int], next_cell: tuple[int, int],
-        opp_code: int
+        self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int
     ) -> bool:
         """
         A function to know if the movement to the next cell is possible.
@@ -146,7 +145,7 @@ class Player:
             return False
         return False
 
-    def update_player(self, maze: MazeGenerator) -> None:
+    def update_player(self, maze: MazeGenerator, highscore: HighScore) -> None:
         """
         update the player position, player movement pixel by
         pixel and player skin
@@ -208,12 +207,12 @@ class Player:
         if (self.x, self.y) in self.pacgums:
             if self.pacgums[(self.x, self.y)].visible:
                 self.pacgums[(self.x, self.y)].visible = False
-                self.score += self.pacgums[(self.x, self.y)].points
+                highscore.current_score += self.pacgums[(self.x, self.y)].points
 
         if (self.x, self.y) in self.super_pacgums:
             if self.super_pacgums[(self.x, self.y)].visible:
                 self.super_pacgums[(self.x, self.y)].visible = False
-                self.score += self.super_pacgums[(self.x, self.y)].points
+                highscore.current_score += self.super_pacgums[(self.x, self.y)].points
                 self.pacgum_effect = True
                 self.timer_effect = 360
 
