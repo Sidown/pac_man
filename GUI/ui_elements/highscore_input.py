@@ -42,7 +42,7 @@ class HighScoreInput:
         self.highscore: HighScore = highscore
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.text: str = ""
-        self.font = pygame.font.Font("assets/fonts/pressstart2p-regular.ttf", 28)
+        self.font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 28)
         self.is_valid_name: bool = True
 
     def draw(self) -> None:
