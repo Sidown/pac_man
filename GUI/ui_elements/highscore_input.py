@@ -44,6 +44,8 @@ class HighScoreInput:
         self.text: str = ""
         self.font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 28)
         self.is_valid_name: bool = True
+        self.is_clicked: bool = False
+        self.hovered: bool = False
 
     def draw(self) -> None:
         """
@@ -53,11 +55,8 @@ class HighScoreInput:
         self.screen.blit(
             displayed_text, (self.x - displayed_text.get_width() - 10, self.y + 10)
         )
-        pygame.draw.rect(self.screen, (255, 255, 255), self.rect)
-        if self.text == "":
-            return
-        displayed_text = self.font.render(self.text, False, (0, 0, 0))
-        self.screen.blit(displayed_text, (self.x, self.y + 10))
+        color = (255, 255, 255) if self.is_clicked or self.hovered else (200, 200, 200)
+        pygame.draw.rect(self.screen, color, self.rect)
         if not self.is_valid_name:
             font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 22)
             displayed_error = font.render(
@@ -65,7 +64,20 @@ class HighScoreInput:
                 False,
                 (255, 0, 0),
             )
-            self.screen.blit(displayed_error, (self.x - 250, self.y + 65))
+            self.screen.blit(
+                displayed_error,
+                (self.x - (displayed_error.get_width() // 2), (self.y + 100)),
+            )
+        if self.text == "":
+            return
+        name_text = self.font.render(self.text, False, (0, 0, 0))
+        self.screen.blit(name_text, (self.x, self.y + 10))
+
+    def _reset_text(self) -> None:
+        self.text = ""
+        self.hovered = False
+        self.is_clicked = False
+        self.is_valid_name = True
 
     def handle_event(self, event: Event) -> bool:
         """
@@ -76,10 +88,18 @@ class HighScoreInput:
         true if the player pressed enter and the name was saved
         false otherwise
         """
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.MOUSEMOTION:
+            self.hovered = self.rect.collidepoint(event.pos)
+        elif event.type == pygame.MOUSEBUTTONDOWN and self.hovered:
+            # si l'utilisateur a clique sur la zone de texte.
+            self.is_clicked = True
+        elif event.type == pygame.MOUSEBUTTONDOWN and not self.hovered:
+            # si le user click en dehors de la zone de texte.
+            self.is_clicked = False
+        if self.is_clicked and event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 self.highscore.save_high_score(self.text)
-                self.text = ""
+                self._reset_text()
                 return True
             if event.key == pygame.K_BACKSPACE:
                 self.text = self.text[:-1]
