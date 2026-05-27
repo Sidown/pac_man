@@ -105,7 +105,7 @@ class GameScene(Scene):
         self.timeless_checkbox = Checkbox(
             self.screen,
             self.WIDTH // 2.5,
-            self.HEIGHT / 1.8,
+            self.HEIGHT / 1.5,
             3,
             caption="No Timer",
         )
@@ -587,7 +587,8 @@ class GameScene(Scene):
             )
             for pacgum in self.pacgums.values():
                 if pacgum.visible:
-                    self._print_skin(pacgum.skin, pacgum.pixel_x, pacgum.pixel_y)
+                    self._print_skin(pacgum.skin, pacgum.pixel_x,
+                                     pacgum.pixel_y)
             for super_pacgum in self.super_pacgums.values():
                 if super_pacgum.visible:
                     self._print_skin(
