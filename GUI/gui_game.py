@@ -382,12 +382,11 @@ class GameScene(Scene):
                     if self.player.lives <= 0:
                         self._game_over()
                         return
-                    pygame.time.wait(1000)
+                    pygame.time.wait(200)
                     self._reset_all_param()
         if all(not pacgum.visible for pacgum in self.pacgums.values()): 
             self._next_level()
         current_time = time.time()
-        print(f"current time: {current_time}\nmax time: {self.game.get_level(self.current_level_index).max_time}\nTotal paused time: {self.total_paused_time}")
         if current_time >= self.game.get_level(self.current_level_index).max_time + self.total_paused_time:
             self._game_over()
             return
