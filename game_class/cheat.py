@@ -9,3 +9,4 @@ class Cheat:
         self.freeze = False
         self.skip = False
         self.invincible = False
+        self.timeless = False

@@ -47,6 +47,7 @@ class GameScene(Scene):
         self.paused_time = 0
         self.total_paused_time = 0
         self.time_when_paused = 0
+        self.time_when_timeless = 0
         self.current_scene = "game"
         self.screen: Surface = screen
         self.theme: Theme = theme
@@ -79,12 +80,20 @@ class GameScene(Scene):
             2,
             caption="Freeze Ghosts",
         )
-        self.pacgum_checkbox = Checkbox(
+        self.skip_checkbox = Checkbox(
             self.screen,
             self.WIDTH // 2.5,
             self.HEIGHT / 2.1,
             3,
             caption="Skip Levels (press Return)",
+        )
+
+        self.timeless_checkbox = Checkbox(
+            self.screen,
+            self.WIDTH // 2.5,
+            self.HEIGHT / 1.8,
+            3,
+            caption="No Timer",
         )
 
     def load_level(self) -> None:
@@ -347,8 +356,10 @@ class GameScene(Scene):
                 self._invincibility(self.cheat)
             if self.freeze_checkbox.update_checkbox(event):
                 self._freeze_ghost(self.cheat)
-            if self.pacgum_checkbox.update_checkbox(event):
+            if self.skip_checkbox.update_checkbox(event):
                 self._skip_level(self.cheat)
+            if self.timeless_checkbox.update_checkbox(event):
+                self._timeless(self.cheat)
 
         return self.current_scene
 
@@ -453,10 +464,24 @@ class GameScene(Scene):
         arguments:
         cheat -> the cheat class
         """
-        if self.pacgum_checkbox.checked:
+        if self.skip_checkbox.checked:
             cheat.skip = True
         else:
             cheat.skip = False
+        
+    def _timeless(self, cheat: Cheat) -> None:
+        """
+        Deactivate timer when checked
+        arguments:
+        cheat -> the cheat class
+        """
+        if self.timeless_checkbox.checked:
+            cheat.timeless = True
+            self.time_when_timeless = time.time()
+        else:
+            cheat.timeless = False
+            t = time.time() - self.time_when_timeless
+            self.total_paused_time += t
 
     def _check_spawn_is_valid(self, coordinate: tuple[int, int]) -> tuple[int, int]:
         """
@@ -507,7 +532,9 @@ class GameScene(Scene):
             )
             self.invincibility_checkbox.draw()
             self.freeze_checkbox.draw()
-            self.pacgum_checkbox.draw()
+            self.skip_checkbox.draw()
+            self.timeless_checkbox.draw()
+
 
         else:
             self._print_maze()
@@ -545,6 +572,7 @@ class GameScene(Scene):
                     )
             self._print_life()
             self._print_score()
-            self._print_timer()
+            if not self.cheat.timeless:
+                self._print_timer()
             self._print_highscore()
             self._print_level()
