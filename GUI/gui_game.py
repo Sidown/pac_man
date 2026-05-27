@@ -336,7 +336,7 @@ class GameScene(Scene):
         for key in self.pacgums.keys():
             if self.pacgums[key].visible:
                 remaining_pacgums += 1
-        if remaining_pacgums <= len(self.pacgums) // 5:
+        if remaining_pacgums <= len(self.pacgums) // 5 and not self.blinky.is_vulnerable:
             self.blinky.angry_mod
         self.blinky.play(self.maze, self.player, self.cheat)
         self.inky.play(self.maze, self.player, self.cheat, self.blinky, self.pinky)
