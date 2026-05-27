@@ -145,12 +145,12 @@ class InstructionScene(Scene):
             self.theme.game_background_color,
             (self.WIDTH // 2, 600 - 86, 80, 80),
         )
-        up_text = pygame.font.Font(self.theme.font_path, 18).render(
-            "Upper arrow to go up",
+        up_text = pygame.font.SysFont("Arial", 42).render(
+            "↑",
             False,
             self.theme.text_color,
         )
-        self.screen.blit(up_text, (self.WIDTH // 2, 600 - 86 + 40))
+        self.screen.blit(up_text, (self.WIDTH // 2 + 30, 600 - 70))
 
         # LEFT
         pygame.draw.rect(
@@ -158,36 +158,36 @@ class InstructionScene(Scene):
             self.theme.game_background_color,
             (self.WIDTH // 2 - 86, 600, 80, 80),
         )
-        left_text = pygame.font.Font(self.theme.font_path, 18).render(
-            "Left arrow to go left",
+        left_text = pygame.font.SysFont("Arial", 42).render(
+            "←",
             False,
             self.theme.text_color,
         )
-        self.screen.blit(left_text, (self.WIDTH // 2 - 86 - 170, 600 + 40))
+        self.screen.blit(left_text, (self.WIDTH // 2 - 65, 600 + 15))
         # DOWN
         pygame.draw.rect(
             self.screen,
             self.theme.game_background_color,
             (self.WIDTH // 2, 600, 80, 80),
         )
-        down_text = pygame.font.Font(self.theme.font_path, 18).render(
-            "Down arrow to go down",
+        down_text = pygame.font.SysFont("Arial", 42).render(
+            "↓",
             False,
             self.theme.text_color,
         )
-        self.screen.blit(down_text, (self.WIDTH // 2, 600 + 80))
+        self.screen.blit(down_text, (self.WIDTH // 2 + 30, 600 + 15))
         # RIGHT
         pygame.draw.rect(
             self.screen,
             self.theme.game_background_color,
             (self.WIDTH // 2 + 86, 600, 80, 80),
         )
-        right_text = pygame.font.Font(self.theme.font_path, 18).render(
-            "Right arrow to go right",
+        right_text = pygame.font.SysFont("Arial", 42).render(
+            "→",
             False,
             self.theme.text_color,
         )
-        self.screen.blit(right_text, (self.WIDTH // 2 + 86, 600 + 40))
+        self.screen.blit(right_text, (self.WIDTH // 2 + 100, 600 + 15))
 
         # SPACE
         pygame.draw.rect(
