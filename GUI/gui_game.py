@@ -45,6 +45,7 @@ class GameScene(Scene):
         cheat -> the cheat class
         """
         self.paused_time = 0
+        self.time_when_paused = 0
         self.current_scene = "game"
         self.screen: Surface = screen
         self.theme: Theme = theme
@@ -131,7 +132,8 @@ class GameScene(Scene):
         display the current level number
         """
         level_text = self.score_font.render(
-            f"level: {self.current_level_index + 1}", True, self.theme.text_color
+            f"level: {self.current_level_index + 1}",
+            True, self.theme.text_color
         )
         self.screen.blit(
             level_text,
@@ -146,7 +148,8 @@ class GameScene(Scene):
         display the current player score
         """
         score_text = self.score_font.render(
-            f"Score: {self.highscore.current_score}", True, self.theme.text_color
+            f"Score: {self.highscore.current_score}",
+            True, self.theme.text_color
         )
         self.screen.blit(score_text, (self.PADDING, 15))
 
@@ -156,7 +159,8 @@ class GameScene(Scene):
         """
         current_time = time.time()
         timer_text = self.score_font.render(
-            f"Timer: {int(self.game.get_level(self.current_level_index).max_time - current_time)}",
+            f"Timer: {int(
+                self.game.get_level(self.current_level_index).max_time - current_time + self.paused_time)}",
             True, self.theme.text_color
         )
         self.screen.blit(timer_text, (self.PADDING * 5, 15))
@@ -332,6 +336,8 @@ class GameScene(Scene):
                     self.player.queud_direction = "W"
                 if event.key == pygame.K_SPACE:
                     self.paused = not self.paused
+                    if self.paused is True:
+                        self.time_when_paused = time.time()
                 if event.key == pygame.K_RETURN and self.cheat.skip:
                     self._next_level()
             if self.invincibility_checkbox.update_checkbox(event):
@@ -378,7 +384,7 @@ class GameScene(Scene):
         if all(not pacgum.visible for pacgum in self.pacgums.values()):
             self._next_level()
         current_time = time.time()
-        if current_time >= self.game.get_level(self.current_level_index).max_time:
+        if current_time + self.paused_time >= self.game.get_level(self.current_level_index).max_time:
             self._game_over()
             return
 
@@ -471,6 +477,7 @@ class GameScene(Scene):
         """
         self.screen.fill(self.theme.game_background_color)
         if self.paused:
+            self.paused_time = time.time() - self.time_when_paused
             pause_text = pygame.font.Font(self.theme.font_path, 56).render(
                 "PAUSED", True, (255, 0, 100)
             )
