@@ -119,7 +119,8 @@ class Button(Text, Clickable):
         Arguments:
         screen -> the surface to render the button on
         """
-        color = self.on_mouse_over_bg_color if self.hovered else self.background_color
+        color = (self.on_mouse_over_bg_color if self.hovered
+                 else self.background_color)
         pygame.draw.rect(screen, color, self.rect)
         text_surf = self.font.render(self.text, True, self.font_color)
         text_rect = text_surf.get_rect(center=self.rect.center)

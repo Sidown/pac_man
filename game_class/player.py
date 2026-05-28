@@ -115,7 +115,8 @@ class Player:
         self.lives = self.default_lives
 
     def _is_neighbor(
-        self, current_cell: tuple[int, int], next_cell: tuple[int, int], opp_code: int
+        self, current_cell: tuple[int, int],
+        next_cell: tuple[int, int], opp_code: int
     ) -> bool:
         """
         A function to know if the movement to the next cell is possible.
@@ -207,12 +208,14 @@ class Player:
         if (self.x, self.y) in self.pacgums:
             if self.pacgums[(self.x, self.y)].visible:
                 self.pacgums[(self.x, self.y)].visible = False
-                highscore.current_score += self.pacgums[(self.x, self.y)].points
+                highscore.current_score += (
+                    self.pacgums[(self.x, self.y)].points)
 
         if (self.x, self.y) in self.super_pacgums:
             if self.super_pacgums[(self.x, self.y)].visible:
                 self.super_pacgums[(self.x, self.y)].visible = False
-                highscore.current_score += self.super_pacgums[(self.x, self.y)].points
+                highscore.current_score += (
+                    self.super_pacgums[(self.x, self.y)].points)
                 self.pacgum_effect = True
                 self.timer_effect = 360
 

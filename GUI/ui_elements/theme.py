@@ -38,7 +38,8 @@ class Theme:
         text_size -> font size for text
         """
         self.background_color: tuple[int, int, int] = background_color
-        self.game_background_color: tuple[int, int, int] = game_background_color
+        self.game_background_color: tuple[int, int, int] = (
+            game_background_color)
         self.title_color: tuple[int, int, int] = title_color
         self.text_color: tuple[int, int, int] = text_color
         self.wall_color: tuple[int, int, int] = wall_color

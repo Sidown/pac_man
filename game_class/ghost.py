@@ -118,7 +118,8 @@ class Ghost(ABC):
                     ):
                         moves = self.get_moves_possible(maze, self.coord)
                         forward = [
-                            m for m in moves if m != opposite.get(self.direction)
+                            m for m in moves
+                            if m != opposite.get(self.direction)
                         ]
                         if forward:
                             move_chosen = forward[0]
@@ -132,7 +133,8 @@ class Ghost(ABC):
                 # force un mouvement si pas de deplacement
                 if move == self.coord:
                     moves = self.get_moves_possible(maze, self.coord)
-                    forward = [m for m in moves if m != opposite.get(self.direction)]
+                    forward = [m for m in moves
+                               if m != opposite.get(self.direction)]
                     # check si mouvement autre que demi tour possible
                     if forward:
                         move_chosen = forward[0]
@@ -157,8 +159,14 @@ class Ghost(ABC):
 
         self.move_progress = min(1.0, self.move_progress + self.speed)
         self.pixel_coord = (
-            (self.coord[0] + (self.next_coord[0] - self.coord[0]) * self.move_progress),
-            (self.coord[1] + (self.next_coord[1] - self.coord[1]) * self.move_progress),
+            (self.coord[0] + (
+                self.next_coord[0]
+                - self.coord[0])
+                * self.move_progress),
+            (self.coord[1] + (
+                self.next_coord[1]
+                - self.coord[1])
+                * self.move_progress),
         )
 
     def respawn(self) -> None:
@@ -283,7 +291,8 @@ class Blinky(Ghost):  # chases, dest player pos
     speed and change his skin.
     """
 
-    def __init__(self, skin: str, cell_width: float, cell_height: float) -> None:
+    def __init__(self, skin: str, cell_width: float,
+                 cell_height: float) -> None:
         """
         Initialise Blinky and load his angry skin.
         Arguments:
@@ -392,7 +401,8 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
     to the left of Pac-Man. During Scatter mode,
     she heads towards the upper-left corner."""
 
-    def __init__(self, skin: str, cell_width: float, cell_height: float) -> None:
+    def __init__(self, skin: str, cell_width: float,
+                 cell_height: float) -> None:
         """
         Initialise Pinky.
 
@@ -439,10 +449,12 @@ class Pinky(Ghost):  # ambushes, dest 2 case devant le player
             if player.direction == "UP" and player.y - 2 >= 0:
                 self.target = (player.x, player.y - 2)
 
-            elif player.direction == "DOWN" and player.y + 2 <= maze._height - 1:
+            elif (player.direction == "DOWN"
+                  and player.y + 2 <= maze._height - 1):
                 self.target = (player.x, player.y + 2)
 
-            elif player.direction == "RIGHT" and player.x + 2 <= maze._width - 1:
+            elif (player.direction == "RIGHT"
+                  and player.x + 2 <= maze._width - 1):
                 self.target = (player.x + 2, player.y)
 
             elif player.direction == "LEFT" and player.x - 2 >= 0:
@@ -503,7 +515,8 @@ class Inky(Ghost):
     Blinky is from Pinky's target is doubled to get Inky's target.
     He heads to the lower-right corner during Scatter mode."""
 
-    def __init__(self, skin: str, cell_width: float, cell_height: float) -> None:
+    def __init__(self, skin: str, cell_width: float,
+                 cell_height: float) -> None:
         """
         Initialise Inky.
 
@@ -635,7 +648,8 @@ class Clyde(Ghost):  # weird
     an 8-Dot radius of Pac-Man.
     His Scatter Mode corner is the lower-left."""
 
-    def __init__(self, skin: str, cell_width: float, cell_height: float) -> None:
+    def __init__(self, skin: str, cell_width: float,
+                 cell_height: float) -> None:
         """
         Initialise Clyde.
         Arguments:

@@ -51,11 +51,14 @@ class HighScoreInput:
         """
         Draw the input label, box, text and error message
         """
-        displayed_text = self.font.render("Enter your Name:", False, (255, 255, 255))
+        displayed_text = self.font.render("Enter your Name:",
+                                          False, (255, 255, 255))
         self.screen.blit(
-            displayed_text, (self.x - displayed_text.get_width() - 10, self.y + 10)
+            displayed_text,
+            (self.x - displayed_text.get_width() - 10, self.y + 10)
         )
-        color = (255, 255, 255) if self.is_clicked or self.hovered else (200, 200, 200)
+        color = ((255, 255, 255) if self.is_clicked or self.hovered
+                 else (200, 200, 200))
         pygame.draw.rect(self.screen, color, self.rect)
         if not self.is_valid_name:
             font = pygame.font.Font("assets/fonts/Retro Gaming.ttf", 22)

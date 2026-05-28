@@ -35,7 +35,8 @@ class Visualizer:
         self.WIDTH = 960
         self.HEIGHT = 720
         self.theme: Theme = theme
-        self.screen: Surface = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.screen: Surface = pygame.display.set_mode((self.WIDTH,
+                                                        self.HEIGHT))
 
         pygame.init()
 
@@ -71,16 +72,19 @@ class Visualizer:
                 cheat,
             ),
             "game_over": GameOverScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT), player, highscore
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT),
+                player, highscore
             ),
             "instruction": InstructionScene(
                 self.screen, self.theme, (self.WIDTH, self.HEIGHT)
             ),
             "high_score": HighScoreScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT), config, highscore
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT),
+                config, highscore
             ),
             "victory": VictoryScene(
-                self.screen, self.theme, (self.WIDTH, self.HEIGHT), player, highscore
+                self.screen, self.theme, (self.WIDTH, self.HEIGHT),
+                player, highscore
             ),
         }
         current_scene = "main_menu"

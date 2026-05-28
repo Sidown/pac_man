@@ -40,7 +40,8 @@ class GameOverScene(Scene):
         self.highscore: HighScore = highscore
         self.PADDING = 80
         self.current_scene = "game_over"
-        self.game_over_text = pygame.font.Font(self.theme.font_path, 56).render(
+        self.game_over_text = pygame.font.Font(self.theme.font_path,
+                                               56).render(
             "Game Over ... looser !!!!!", True, (255, 0, 100)
         )
         self.btn_back_to_menu = Button(
