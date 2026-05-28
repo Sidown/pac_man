@@ -1,16 +1,17 @@
 .PHONY: install run debug lint clean
 
 MAZE_GENERATOR=mazegenerator-00001-py3-none-any.whl
+ARGS=json_file/config.json
 
 install:
 	uv sync
 	UV_SKIP_WHEEL_FILENAME_CHECK=1 uv pip install $(MAZE_GENERATOR)
 
 run: install
-	uv run main.py
+	uv run pac-man.py $(ARGS)
 
 debug:
-	uv run python -m pdb -m main
+	uv run python -m pdb -m pac-man $(ARGS)
 
 lint: install
 	flake8 --extend-exclude .venv

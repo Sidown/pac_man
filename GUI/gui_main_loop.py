@@ -26,6 +26,7 @@ class Visualizer:
     def __init__(
         self,
         theme: Theme,
+        config_path: str
     ) -> None:
         """
         initialise the visualiser
@@ -37,6 +38,7 @@ class Visualizer:
         self.theme: Theme = theme
         self.screen: Surface = pygame.display.set_mode((self.WIDTH,
                                                         self.HEIGHT))
+        self.config_path = config_path
 
         pygame.init()
 
@@ -50,7 +52,7 @@ class Visualizer:
         highscore: HighScore = HighScore()
 
         # charge la config
-        config: Config = parser("json_file/config.json")
+        config: Config = parser(self.config_path)
         nb_lives = config.lives
         spawn_x = config.levels[0]["width"] // 2
         spawn_y = config.levels[0]["height"] // 2
