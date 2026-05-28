@@ -90,56 +90,84 @@ def config_check(config: Config) -> bool:
     try:
         open(f"{config.highscore_filename}", "r")
     except FileNotFoundError:
-        errors.append(f"File not found at {config.highscore_filename}")
+        print(f"File not found at {config.highscore_filename}")
+        return False
     if config.lives <= 0:
         errors.append(f"Lives must be potive int (currently {config.lives})")
+        config.lives = 3
     if config.lives > 10:
+        config.lives = 3
         errors.append("No more than 10 lives !")
     if config.level_max_time <= 0:
         errors.append(
             "Level max time must be positive int (currently"
-            f"{config.level_max_time})"
+            f" {config.level_max_time})"
         )
+        config.level_max_time = 90
     if config.points_per_pacgum <= 0:
         errors.append(
             "Points per pacgum must be positive int (currently "
             f"{config.points_per_pacgum})"
         )
+        config.points_per_pacgum = 10
     if config.points_per_super_pacgum <= 0:
         errors.append(
             "Point per super pacgum must be positive int"
             f"(currently {config.points_per_super_pacgum})"
         )
+        config.points_per_super_pacgum = 50
     if config.points_per_ghost <= 0:
         errors.append(
             "Points per ghost must be postivie int"
             f"(currently {config.points_per_ghost})"
         )
+        config.points_per_ghost = 200
     if len(config.levels) < 10:
         errors.append(
             "The game must have at least 10 levels"
             f"(currently {len(config.levels)})"
         )
+        config.levels = [
+            {"width": 15, "height": 15},
+            {"width": 15, "height": 15},
+            {"width": 15, "height": 15},
+            {"width": 15, "height": 15},
+            {"width": 15, "height": 15},
+            {"width": 15, "height": 15},
+            {"width": 15, "height": 15},
+            {"width": 15, "height": 15},
+            {"width": 15, "height": 15},
+            {"width": 15, "height": 15},
+            ]
+    i = 0
     for level in config.levels:
         if len(level) > 2:
+            level = {"width": 15, "height": 15}
             errors.append("A level must only contain a width and height")
         if len(level) < 2:
+            level = {"width": 15, "height": 15}
             errors.append("A level must have a width and a height key")
         try:
             if level["width"] <= 2:
+                level["width"] = 15
                 errors.append("The width of a level must be at least 3")
             if level["width"] > 20:
-                errors.append("The width of a level should not be >20")
+                level["width"] = 15
+                errors.append("The width of a level should not be > 20")
             if level["height"] <= 2:
+                level["height"] = 15
                 errors.append("The height of a level must be at least 3")
             if level["height"] > 20:
-                errors.append("The height of a level should not be >20")
+                level["height"] = 15
+                errors.append("The height of a level should not be > 20")
         except KeyError:
+            config.levels[i] = {"width": 15, "height": 15}
             errors.append("Level must have a width an height key")
+        i += 1
     if errors:
         for error in errors:
             print(f"Error: {error}")
-        return False
+        print("Errors found, used default values to continue the program.")
     return True
 
 
