@@ -335,8 +335,8 @@ Parser (parser.py)
 
 - [Pac-Man Wikipedia](https://en.wikipedia.org/wiki/Pac-Man): Comprehensive history and mechanics
 - [Ghost AI Behavior Documentation](https://pacman.fandom.com/wiki/Ghosts): Fan documentation of ghost behaviors
-- Pygame Official Documentation: https://www.pygame.org/docs/
-- pygame tuto: https://medium.com/@fulton_shaun/main-menus-to-cutscenes-building-game-screens-with-pygame-7415065c9fb9
+- [Pygame Official Documentation](https://www.pygame.org/docs/)
+- [Pygame tuto](https://medium.com/@fulton_shaun/main-menus-to-cutscenes-building-game-screens-with-pygame-7415065c9fb9)
 
 ### AI Usage in This Project
 
