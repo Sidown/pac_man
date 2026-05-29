@@ -588,13 +588,17 @@ class Inky(Ghost):
 
         if self.is_vulnerable or self.died:
             self.target = self.spawn
-        elif dist(self.coord, (player.x, player.y)) <= 3:
-            self.target = (player.x, player.y)
         else:
-            self.target = (
-                self._blinky.target[0] - self._pinky.target[0],
-                self._blinky.target[1] - self._pinky.target[1],
-            )
+            directions = {"N": (0, -1), "S": (0, 1),
+                          "E": (1, 0), "W": (-1, 0)}
+            dx, dy = directions.get(player.direction, (0, 0))
+            dest_x = player.x + dx * 2
+            dest_y = player.y + dy * 2
+            target_x = dest_x + (dest_x - self._blinky.coord[0])
+            target_y = dest_y + (dest_y - self._blinky.coord[1])
+            target_x = max(0, min(len(maze.maze[0]) - 1, target_x))
+            target_y = max(0, min(len(maze.maze) - 1, target_y))
+            self.target = (target_x, target_y)
 
         if self.coord == self.target:
             return self.coord
