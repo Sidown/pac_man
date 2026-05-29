@@ -345,3 +345,18 @@ Parser (parser.py)
 
 
 ## Project Management
+
+We began by breaking the project down into major functional categories:
+- The visual layer
+- Ghost artifical intelligence
+- Player management
+
+Each category was then subdivided into distinct steps and features to form the basis of our planned Gantt Chart.
+
+Roles were distributed to minimize dependencies between our respective developments: 
+
+Clefrere focused on the game logic (ghosts, pacgums, level, timer) while cjeanin handled the graphical interface (visualizer, menus, HUD), allowing us to work in parallel and maintain a steady pace of progress throughout the projet.
+
+- Our project [planification](./project_management/Gantt%20Chart.pdf)
+- Our actual [schedule](./project_management/actual%20project%20tracking.pdf)
+
