@@ -101,7 +101,7 @@ def config_check(config: Config) -> bool:
         open(f"{config.highscore_filename}", "r")
     except FileNotFoundError:
         print(f"File not found at {config.highscore_filename}")
-        return False
+
     if config.lives <= 0:
         errors.append(f"Lives must be potive int (currently {config.lives})")
         config.lives = 3
