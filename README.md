@@ -363,12 +363,13 @@ Clefrere focused on the game logic (ghosts, pacgums, level, timer) while cjeanin
 Risk analysis:
 No major risk was found during the establishment of the project.
 At every development step, we test every feature, both the newly added features and the previous ones to check that we did not break our project.
+
 The main bugs found/fixed were:
 
 The player could lose 2 lives if 2 ghosts touched him at the same time.
 The player could spawn in the 42 pattern if the coordinates were invalid.
 Angry ghosts could go back to their spawn quickly even if they were in vulnerable mode.
-The player could not start a new game after losing a previous one; when clicking the "New Game" button, they were taken back to their previous game.
+The player could not start a new game after losing a previous one, when clicking the "New Game" button, they were taken back to their previous game.
 
 The main blocking points and conflicts during the project:
 
