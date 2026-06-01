@@ -41,6 +41,9 @@ Or directly with Python:
 uv run pac-man.py
 ```
 
+On itch.io:
+- [pac-man](https://clefrere.itch.io/42-pac-man)
+
 ### Game Controls
 
 - **Arrow Keys**: Move Pac-Man
