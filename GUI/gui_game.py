@@ -228,7 +228,7 @@ class GameScene(Scene):
         curr_x = self.PADDING
         curr_y = self.PADDING
 
-        # afficher le maze
+        # show the maze
         self._show_maze(curr_x, curr_y)
 
     def _print_cell(
@@ -294,8 +294,8 @@ class GameScene(Scene):
                 (x, y + cell_height + self.theme.wall_size),
                 self.theme.wall_size,
             )
-        # si tout les murs sont ferme, c'est le 42 pattern,
-        # le mettre en couleur
+        # if all walls closed -> 42 pattern
+        # show it in colot
         if opp_code == 15:
             pygame.draw.rect(
                 self.screen,
@@ -443,7 +443,7 @@ class GameScene(Scene):
         if self.current_level_index >= len(self.game.level_configs):
             self.current_scene = "victory"
             return
-        # old_score = self.highscore.current_score
+
         old_lives = self.player.lives
         self.load_level()
         spawn_x, spawn_y = self._check_spawn_is_valid(
@@ -451,7 +451,6 @@ class GameScene(Scene):
         )
         self.player.spawn = (spawn_x, spawn_y)
         self.player.respawn()
-        # self.player.score = old_score
         self.player.lives = old_lives
 
     def _invincibility(self, cheat: Cheat) -> None:

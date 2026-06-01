@@ -51,13 +51,13 @@ class Visualizer:
 
         highscore: HighScore = HighScore()
 
-        # charge la config
+        # load config
         config: Config = parser(self.config_path)
         nb_lives = config.lives
         spawn_x = config.levels[0]["width"] // 2
         spawn_y = config.levels[0]["height"] // 2
 
-        # creer le player
+        # create player
         player: Player = Player(nb_lives, spawn_x, spawn_y)
         cheat: Cheat = Cheat()
         scenes: dict[str, Scene] = {

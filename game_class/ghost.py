@@ -101,7 +101,7 @@ class Ghost(ABC):
                     "RIGHT": (1, 0),
                 }
 
-                # check si next move est un demi tour
+                # check if next movement is going backward
                 if move != self.coord:
                     direction_x = move[0] - self.coord[0]
                     direction_y = move[1] - self.coord[1]
@@ -130,12 +130,12 @@ class Ghost(ABC):
                             )
                             self.direction = move_chosen
 
-                # force un mouvement si pas de deplacement
+                # forcing movement if no deplacement
                 if move == self.coord:
                     moves = self.get_moves_possible(maze, self.coord)
                     forward = [m for m in moves
                                if m != opposite.get(self.direction)]
-                    # check si mouvement autre que demi tour possible
+                    # check if no other movement than backward
                     if forward:
                         move_chosen = forward[0]
                         direction_x, direction_y = directions[move_chosen]
@@ -144,7 +144,7 @@ class Ghost(ABC):
                             self.coord[1] + direction_y,
                         )
                         self.direction = move_chosen
-                    # si pas de mouvement autre que demi tour : demi tour
+                    # if only backward movement available -> go backward
                     elif moves:
                         move_chosen = moves[0]
                         direction_x, direction_y = directions[move_chosen]
@@ -281,7 +281,7 @@ class Ghost(ABC):
             self.is_vulnerable = False
 
 
-class Blinky(Ghost):  # chases, dest player pos
+class Blinky(Ghost):
     """
     Follows Pac-Man directly during Chase mode,
     and heads to the upper-right corner
@@ -394,7 +394,7 @@ class Blinky(Ghost):  # chases, dest player pos
         return self.coord
 
 
-class Pinky(Ghost):  # ambushes, dest 2 case devant le player
+class Pinky(Ghost):
     """Chases towards the spot 2 Pac-Dots in front of Pac-Man.
     Due to a bug in the original game's coding, if Pac-Man faces upwards,
     Pinky's target will be 2 Pac-Dots in front of and 2
@@ -646,7 +646,7 @@ class Inky(Ghost):
         return self.coord
 
 
-class Clyde(Ghost):  # weird
+class Clyde(Ghost):
     """Chases directly after Pac-Man, but tries to
     head to his Scatter corner when within
     an 8-Dot radius of Pac-Man.

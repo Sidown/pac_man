@@ -94,10 +94,10 @@ class HighScoreInput:
         if event.type == pygame.MOUSEMOTION:
             self.hovered = self.rect.collidepoint(event.pos)
         elif event.type == pygame.MOUSEBUTTONDOWN and self.hovered:
-            # si l'utilisateur a clique sur la zone de texte.
+            # if user click on the text input
             self.is_clicked = True
         elif event.type == pygame.MOUSEBUTTONDOWN and not self.hovered:
-            # si le user click en dehors de la zone de texte.
+            # if user click outside of the text input
             self.is_clicked = False
         if self.is_clicked and event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
