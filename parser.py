@@ -5,17 +5,27 @@ from pydantic import BaseModel, ValidationError
 
 
 class Config(BaseModel):
-    """
-    Pydantic model for the game configuration loaded from the json file.
-    """
-    highscore_filename: str
-    lives: int
-    level_max_time: int
-    seed: int
-    points_per_pacgum: int
-    points_per_super_pacgum: int
-    points_per_ghost: int
-    levels: list[dict[str, int]]
+    """ Pydantic model for the game configuration
+    loaded from the json file. """
+    highscore_filename: str = './json_file/highscore.json'
+    lives: int = 3
+    level_max_time: int = 90
+    seed: int = 42
+    points_per_pacgum: int = 10
+    points_per_super_pacgum: int = 50
+    points_per_ghost: int = 200
+    levels: list[dict[str, int]] = [
+        {"width": 15, "height": 15},
+        {"width": 15, "height": 15},
+        {"width": 15, "height": 15},
+        {"width": 15, "height": 15},
+        {"width": 15, "height": 15},
+        {"width": 15, "height": 15},
+        {"width": 15, "height": 15},
+        {"width": 15, "height": 15},
+        {"width": 15, "height": 15},
+        {"width": 15, "height": 15},
+        ]
 
 
 def dict_raise_on_duplicate(pairs: list[tuple[str, str | int]]
